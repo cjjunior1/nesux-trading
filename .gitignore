@@ -1,0 +1,7 @@
+.env
+.env.local
+.env.production
+*.zip
+*.log
+ql*
+node_modules

@@ -1,0 +1,23 @@
+[0;1;32m●[0m nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (]8;;file://vmi3294524/usr/lib/systemd/system/nginx.service/usr/lib/systemd/system/nginx.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Wed 2026-05-20 14:23:41 CEST; 4h 26min ago
+       Docs: ]8;;man:nginx(8)man:nginx(8)]8;;
+    Process: 258526 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 258531 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 258532 (nginx)
+      Tasks: 7 (limit: 14307)
+     Memory: 5.4M (peak: 6.4M)
+        CPU: 1.028s
+     CGroup: /system.slice/nginx.service
+             ├─[0;38;5;245m258532 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"[0m
+             ├─[0;38;5;245m258533 "nginx: worker process"[0m
+             ├─[0;38;5;245m258534 "nginx: worker process"[0m
+             ├─[0;38;5;245m258536 "nginx: worker process"[0m
+             ├─[0;38;5;245m258537 "nginx: worker process"[0m
+             ├─[0;38;5;245m258538 "nginx: worker process"[0m
+             └─[0;38;5;245m269358 "nginx: worker process"[0m
+
+May 20 14:23:41 vmi3294524 systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+May 20 14:23:41 vmi3294524 nginx[258526]: 2026/05/20 14:23:41 [warn] 258526#258526: conflicting server name "trading.nesuxglobalbusinessrd.com" on 0.0.0.0:80, ignored
+May 20 14:23:41 vmi3294524 nginx[258531]: 2026/05/20 14:23:41 [warn] 258531#258531: conflicting server name "trading.nesuxglobalbusinessrd.com" on 0.0.0.0:80, ignored
+May 20 14:23:41 vmi3294524 systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.

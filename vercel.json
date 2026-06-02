@@ -1,0 +1,18 @@
+{
+  "build": {
+    "env": {
+      "NEXT_PRIVATE_STANDALONE": "true"
+    }
+  },
+  "headers": [
+    {
+      "source": "/dashboard/:path*",
+      "headers": [
+        {
+          "key": "x-dynamic-route",
+          "value": "true"
+        }
+      ]
+    }
+  ]
+}

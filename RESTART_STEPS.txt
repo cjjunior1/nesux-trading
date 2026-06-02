@@ -1,0 +1,50 @@
+Pasos para reiniciar Trading Academy (Windows - PowerShell)
+
+1) Abrir PowerShell.
+
+2) Si usaste Docker para Postgres, arranca el contenedor:
+   docker start ta-postgres
+   docker ps
+
+   Si NO usaste Docker, asegúrate que PostgreSQL esté en ejecución (el nombre del servicio puede variar):
+   Get-Service -Name postgresql*    # revisar estado
+   # Para iniciar el servicio (ejemplo):
+   net start postgresql-x64-15
+
+3) Entrar al directorio del proyecto:
+   cd "c:/Users/Usuario/Documents/Base de datos Academy/trading_academy CJ/trading_academy/nextjs_space"
+
+4) Verificar variables de entorno (opcional pero recomendable):
+   Get-Content .env
+   # Confirma que DATABASE_URL y NEXTAUTH_SECRET son correctos
+
+5) Regenerar Prisma Client (recomendado):
+   npx.cmd prisma generate
+
+6) Sincronizar esquema si es necesario (opcional):
+   npx.cmd prisma db push
+   # o para migraciones: npx.cmd prisma migrate deploy
+
+7) Iniciar la app en modo desarrollo:
+   npm run dev
+   # Observa la salida: Next.js arrancará en http://localhost:3000 (o en otro puerto si 3000 está ocupado)
+
+8) Abrir la app en el navegador:
+   http://localhost:3000
+   # o http://localhost:3001 si Next.js informó que 3000 estaba en uso
+
+Comandos útiles adicionales:
+- Ver usuarios en la BD:
+  node scripts/checkUsers.js
+
+- Actualizar rol de un usuario a admin:
+  node scripts/setRole.js cjindustrialrd@hotmail.com admin
+
+- Parar el servidor de desarrollo: en la terminal con `npm run dev` presiona Ctrl+C
+
+Notas y recomendaciones:
+- Si PowerShell bloquea la ejecución de `npx`, usa `npx.cmd` o abre Git Bash.
+- Evita pasar contraseñas en texto plano en la línea de comandos si puedes.
+- Para producción, usa `npm run build` y `npm start` en lugar de `npm run dev`.
+
+Fin.

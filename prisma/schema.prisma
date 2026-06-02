@@ -1,0 +1,159 @@
+	generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  firstName         String
+  lastName          String
+  whatsappNumber    String
+  role              String    @default("user")
+  emailVerified     DateTime?
+  verificationToken String?   @unique
+  tokenExpiry       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  chatSessions      ChatSession[]
+  courseAccess      UserCourseAccess[]
+  progress          UserProgress[]
+}
+
+model Lead {
+  id             String   @id @default(cuid())
+  email          String
+  firstName      String?
+  lastName       String?
+  whatsappNumber String?
+  source         String?  @default("website")
+  status         String   @default("new")
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
+
+model ChatSession {
+  id                 String        @id
+  userId             String?
+  user               User?         @relation(fields: [userId], references: [id])
+  startedAt          DateTime      @default(now())
+  lastActiveAt       DateTime      @default(now())
+  totalInteractionMs Int           @default(0)
+  attendanceDate     DateTime      @default(now())
+  userAgent          String?
+  messages           ChatMessage[]
+  topics             ChatTopic[]
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String  @db.Text
+  createdAt DateTime    @default(now())
+}
+
+model ChatTopic {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  topic     String
+  source    String      @default("keyword")
+  createdAt DateTime    @default(now())
+}
+
+model Course {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  title       String
+  description String
+  imageUrl    String?
+  price       Float              @default(0)
+  isPublished Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  modules     CourseModule[]
+  userAccess  UserCourseAccess[]
+}
+
+model CourseModule {
+  id          String          @id @default(cuid())
+  courseId    String
+  course      Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  lessons     CourseLesson[]
+}
+
+model CourseLesson {
+  id          String            @id @default(cuid())
+  moduleId    String
+  module      CourseModule      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  content     String?
+  order       Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  resources   CourseResource[]
+  progress    UserProgress[]
+}
+
+model CourseResource {
+  id         String       @id @default(cuid())
+  lessonId   String
+  lesson     CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  type       String       // "image", "video", "pdf", "link"
+  title      String
+  url        String
+  order      Int
+  createdAt  DateTime     @default(now())
+}
+
+model UserCourseAccess {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  grantedAt   DateTime @default(now())
+  expiresAt   DateTime?
+  paymentInfo String?
+  
+  @@unique([userId, courseId])
+}
+
+model UserProgress {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed   Boolean      @default(false)
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@unique([userId, lessonId])
+}
