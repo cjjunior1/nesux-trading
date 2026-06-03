@@ -1,10 +1,10 @@
-	generator client {
+generator client {
     provider = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
-    provider = "mysql"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
@@ -67,7 +67,7 @@ model ChatMessage {
   sessionId String
   session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   role      String
-  content   String  @db.Text
+  content   String
   createdAt DateTime    @default(now())
 }
 
@@ -124,7 +124,7 @@ model CourseResource {
   id         String       @id @default(cuid())
   lessonId   String
   lesson     CourseLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  type       String       // "image", "video", "pdf", "link"
+  type       String
   title      String
   url        String
   order      Int
