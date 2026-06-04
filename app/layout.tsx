@@ -2,15 +2,17 @@ import { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import LayoutShell from '@/components/layout-shell';
+import Script from 'next/script';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Trading Academy',
+  title: 'Nesux Trading Academy',
   description: 'Plataforma profesional de trading',
+  metadataBase: new URL('https://trading.nesuxglobalbusinessrd.com'),
   openGraph: {
-    title: 'Trading Academy',
+    title: 'Nesux Trading Academy',
     description: 'Aprende a operar en los mercados financieros',
     type: 'website',
     images: [
@@ -22,9 +24,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <head>
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js" />
-      </head>
       <body className={inter.className}>
         <Providers>
           <LayoutShell>{children}</LayoutShell>
