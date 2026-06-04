@@ -141,8 +141,9 @@ export default function TestimoniosPage() {
                       src={testimonial.image}
                       alt={testimonial.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover"
-                    / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    />
                   </div>
                   <div>
                     <h3 className="font-bold text-white">{testimonial.name}</h3>
@@ -214,5 +215,3 @@ export default function TestimoniosPage() {
     </div>
   );
 }
-
-
