@@ -28,11 +28,13 @@ async function extractTextFromFile(filePath: string, fileType: string) {
 
     if (fileType.includes('pdf')) {
       const pdfModule = await import('pdf-parse');
-      const data = await pdfModule.default(buffer);
+      const pdfParse = (pdfModule as any).default || pdfModule;
+      const data = await pdfParse(buffer);
       return data.text || '';
     } else if (fileType.includes('word') || fileType.includes('document')) {
       const mammothModule = await import('mammoth');
-      const result = await mammothModule.default.extractRawText({ buffer });
+      const mammoth = (mammothModule as any).default || mammothModule;
+      const result = await mammoth.extractRawText({ buffer: buffer as any });
       return result.value || '';
     } else if (fileType.includes('sheet') || fileType.includes('excel')) {
       const XLSX = await import('xlsx');
