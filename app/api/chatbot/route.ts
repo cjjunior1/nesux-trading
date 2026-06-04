@@ -12,22 +12,14 @@ const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión
    - "¡Hey! ¿Listo para operar con conocimiento?"
    - "¡Qué tal! ¿En qué tema de trading te puedo orientar?"
    - "¡Hola trader! ¿Qué duda tienes hoy?"
-   - "¡Bienvenido de vuelta! ¿Qué quieres explorar hoy?"
    Varía tus saludos para que no sean repetitivos.
 
-3. PROHIBIDO HABLAR DE MOVIMIENTOS DE ACTIVOS: NUNCA menciones:
-   - Precios actuales de activos
-   - "El EUR/USD está subiendo/bajando"
-   - "Bitcoin está en X precio"
-   - Datos de mercado en tiempo real
-   Solo explicas conceptos educativos, NO das información de mercado actual.
+3. PROHIBIDO HABLAR DE MOVIMIENTOS DE ACTIVOS: NUNCA menciones precios actuales, "El EUR/USD está subiendo", ni datos de mercado en tiempo real. Solo explicas conceptos educativos.
 
 4. PEDIR ACLARACIÓN INTELIGENTE: Si el usuario escribe mensajes ambiguos o cortos sin contexto, pide aclaración de forma natural:
    - Si escribe "sí" sin contexto → "¿Sí a qué? ¿Podrías darme más detalles sobre lo que necesitas?"
    - Si escribe "ya dime" → "Claro, pero necesito saber qué tema te interesa para ayudarte mejor"
    - Si escribe solo una palabra como "estrategias" → "¿Qué te gustaría saber sobre estrategias? ¿Buscas estrategias para principiantes, avanzadas, para un mercado específico?"
-   - Si escribe "hola" o "buenas" → Saluda de vuelta y pregunta en qué puedes ayudar
-   - Si escribe algo que no entiendes → "No estoy seguro de entender. ¿Podrías explicarme mejor qué necesitas?"
    Sé conversacional y no asumas cosas.
 
 5. EDUCACIÓN > SEÑALES: Nunca des consejos de compra/venta, precios objetivo ni garantices ganancias. Explica el "por qué" detrás de cada concepto.
@@ -35,13 +27,11 @@ const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión
 6. GESTIÓN DE RIESGO: Enfatiza stop loss, tamaño de posición, ratio riesgo/beneficio y control emocional. El capital se protege antes de buscar rentabilidad.
 
 7. ESTRUCTURA DE RESPUESTA (FLEXIBLE Y NATURAL):
-   - No uses estructura rígida siempre
-   - Adapta tu respuesta al contexto de la pregunta
-   - Para preguntas simples: respuesta directa + ejemplo breve
-   - Para preguntas complejas: definición + ejemplo + aplicación + error común
-   - Usa texto plano, evita markdown excesivo (###, **, -, etc.)
-   - Usa saltos de línea naturales para separar ideas
-   - Sé conciso, no repitas información
+   - No uses estructura rígida siempre. Adapta tu respuesta al contexto.
+   - Para preguntas simples: respuesta directa + ejemplo breve.
+   - Para preguntas complejas: definición + ejemplo + aplicación + error común.
+   - Usa texto plano, evita markdown excesivo (###, **, -, etc.). Usa saltos de línea naturales.
+   - Sé conciso, no repitas información.
 
 8. ADAPTACIÓN: Si el usuario es principiante, usa analogías simples. Si es avanzado, profundiza en mecánica, matemáticas o psicología.
 
@@ -53,7 +43,7 @@ const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión
 
 12. CONTEXTO DE MERCADO: Menciona sesiones, volatilidad, noticias o liquidez solo si es relevante para la pregunta. No inventes datos en tiempo real.
 
-13. CIERRE EDUCATIVO: Termina invitando a practicar, revisar un gráfico o profundizar en un concepto específico. No seas repetitivo con los cierres.
+13. CIERRE EDUCATIVO: Termina invitando a practicar, revisar un gráfico o profundizar en un concepto específico. No seas repetitivo.
 
 SI NO SABES ALGO: Dilo con honestidad. Sugiere dónde aprenderlo o cómo verificarlo. Nunca inventes.`;
 
@@ -73,10 +63,11 @@ async function extractTextFromFile(filePath: string, fileType: string) {
       return result.value || '';
     } else if (fileType.includes('sheet') || fileType.includes('excel')) {
       const XLSX = await import('xlsx');
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const workbook = XLSX.read(buffer as any, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      return XLSX.utils.sheetToCsv(sheet) || '';
+      // CORREGIDO: sheet_to_csv en lugar de sheetToCsv
+      return XLSX.utils.sheet_to_csv(sheet) || ''; 
     }
     return buffer.toString('utf-8');
   } catch (error) {
@@ -150,7 +141,7 @@ export async function POST(request: Request) {
 - Patrones técnicos (triángulos, hombro-cabeza-hombro, canales, etc.)
 - Indicadores visibles (SMA, EMA, RSI, MACD) y su interpretación
 - Posibles sesgos de mercado y riesgos
-Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles (links a artículos o herramientas) al final.`;
+Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles al final.`;
 
         userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: imagen\nOCR extraído:\n${ocrText}\n\n${analysisPrompt}\nPregunta del usuario: ${message}` }];
       } else if (buffer && ['pdf', 'doc', 'docx', 'txt'].includes(fileType)) {
@@ -158,9 +149,9 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
         try {
           await mkdir(path.dirname(tmpPath), { recursive: true });
         } catch (e) {}
-        await writeFile(tmpPath, buffer);
+        await writeFile(tmpPath, buffer as any);
         const text = await extractTextFromFile(tmpPath, fileType || 'pdf');
-        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: ${fileType}\nContenido extraído:\n${text}\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar (artículos, herramientas, tutoriales). Pregunta del usuario: ${message}` }];
+        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: ${fileType}\nContenido extraído:\n${text}\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar. Pregunta del usuario: ${message}` }];
       } else {
         userContent = [{ type: 'text', text: `He subido un archivo llamado ${fileName}, pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ${message}` }];
       }

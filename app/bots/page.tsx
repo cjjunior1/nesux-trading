@@ -279,5 +279,47 @@ export default function BotsPage() {
           <div className="space-y-8">
             {[
               { step: "1", title: "Elige tu plan", desc: "Selecciona el bot que mejor se adapte a tus necesidades y nivel de experiencia." },
-              { step: "2", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura.Tus fondos siempre están en tu broker." },
-              { step: "3
+              { step: "2", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura. Tus fondos siempre están en tu broker." },
+              { step: "3", title: "Configura el bot", desc: "Personaliza los parámetros según tu tolerancia al riesgo y objetivos financieros." },
+              { step: "4", title: "Opera automáticamente", desc: "El bot ejecuta operaciones 24/7 mientras tú te enfocas en otras actividades." },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.15 }}
+                className="flex gap-6 items-start"
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">{item.step}</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-slate-400">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 bg-gradient-to-b from-slate-950 to-slate-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            ¿Listo para automatizar tu <span className="gradient-text">trading</span>?
+          </h2>
+          <p className="text-lg text-slate-400 mb-8">
+            Comienza hoy y deja que la tecnología trabaje por ti.
+          </p>
+          <Link
+            href="/registro"
+            className="btn-primary inline-flex items-center gap-2 text-lg"
+          >
+            Comenzar Ahora <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
