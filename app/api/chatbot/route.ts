@@ -56,7 +56,7 @@ async function performOCR(buffer: Buffer) {
     form.append('apikey', apiKey as string);
     form.append('language', 'spa');
     form.append('isOverlayRequired', 'false');
-    form.append('base64Image', `data:image/png;base64,`);
+    form.append('base64Image', `data:image/png;base64,${buffer.toString('base64')}`);
 
     const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: form as any });
     const json = await res.json();
@@ -115,17 +115,17 @@ export async function POST(request: Request) {
 - Posibles sesgos de mercado y riesgos
 Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles (links a artículos o herramientas) al final.`;
 
-        userContent = [{ type: 'text', text: `Archivo: \nTipo: imagen\nOCR extraído:\n\n\n\nPregunta del usuario: ` }];
+        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: imagen\nOCR extraído:\n${ocrText}\n\n${analysisPrompt}\nPregunta del usuario: ${message}` }];
       } else if (buffer && ['pdf', 'doc', 'docx', 'txt'].includes(fileType)) {
-        const tmpPath = path.join(process.cwd(), 'tmp', `upload--`);
+        const tmpPath = path.join(process.cwd(), 'tmp', `upload-${Date.now()}-${fileName}`);
         try {
           await mkdir(path.dirname(tmpPath), { recursive: true });
         } catch (e) {}
         await writeFile(tmpPath, buffer);
         const text = await extractTextFromFile(tmpPath, fileType || 'pdf');
-        userContent = [{ type: 'text', text: `Archivo: \nTipo: \nContenido extraído:\n\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar (artículos, herramientas, tutoriales). Pregunta del usuario: ` }];
+        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: ${fileType}\nContenido extraído:\n${text}\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar (artículos, herramientas, tutoriales). Pregunta del usuario: ${message}` }];
       } else {
-        userContent = [{ type: 'text', text: `He subido un archivo llamado , pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ` }];
+        userContent = [{ type: 'text', text: `He subido un archivo llamado ${fileName}, pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ${message}` }];
       }
     }
 
@@ -141,7 +141,7 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer `,
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: model,
@@ -156,7 +156,7 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
       console.error("=== OPENAI ERROR DETALLADO ===");
       console.error("Status HTTP:", response.status);
       console.error("Cuerpo error:", JSON.stringify(errData));
-      throw new Error(OpenAI rechazó la petición: );
+      throw new Error(`OpenAI rechazó la petición: ${response.status}`);
     }
 
     const data = await response.json();
