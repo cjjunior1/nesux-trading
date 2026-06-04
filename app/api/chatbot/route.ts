@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
-const pdf = require('pdf-parse');
-import mammoth from 'mammoth';
-import * as XLSX from 'xlsx';
 
 const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión es educar, no dar señales. Sigue estrictamente estas reglas:
 
@@ -30,12 +27,15 @@ async function extractTextFromFile(filePath: string, fileType: string) {
     const buffer = await readFile(filePath);
 
     if (fileType.includes('pdf')) {
-      const data = await pdf(buffer);
+      const pdf = await import('pdf-parse');
+      const data = await pdf.default(buffer);
       return data.text || '';
     } else if (fileType.includes('word') || fileType.includes('document')) {
-      const result = await mammoth.extractRawText({ buffer });
+      const mammoth = await import('mammoth');
+      const result = await mammoth.default.extractRawText({ buffer });
       return result.value || '';
     } else if (fileType.includes('sheet') || fileType.includes('excel')) {
+      const XLSX = await import('xlsx');
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
@@ -56,7 +56,7 @@ async function performOCR(buffer: Buffer) {
     form.append('apikey', apiKey as string);
     form.append('language', 'spa');
     form.append('isOverlayRequired', 'false');
-    form.append('base64Image', `data:image/png;base64,${buffer.toString('base64')}`);
+    form.append('base64Image', `data:image/png;base64,`);
 
     const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: form as any });
     const json = await res.json();
@@ -86,14 +86,12 @@ export async function POST(request: Request) {
 
       try {
         if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
-          // Descarga remota
           const res = await fetch(fileUrl);
           const arr = await res.arrayBuffer();
           buffer = Buffer.from(arr);
           const urlParts = fileUrl.split('?')[0].split('.');
           fileType = urlParts[urlParts.length - 1].toLowerCase();
         } else {
-          // Normalizar y quitar slashes iniciales para join correcto
           const relative = fileUrl.replace(/^\/+/, '');
           const filePath = path.join(process.cwd(), 'public', relative);
           const arr = await readFile(filePath);
@@ -107,26 +105,27 @@ export async function POST(request: Request) {
       console.log('Procesando archivo:', fileUrl, fileType);
 
       if (buffer && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileType)) {
-        // Primero intentamos OCR para capturar texto en la imagen
         const ocrText = await performOCR(buffer);
+        const analysisPrompt = `Analiza esta imagen como si fueras un experto en trading. Si es un gráfico, describe:
+- Tipo de gráfico (velas, líneas, barras)
+- Tendencia predominante y su fuerza
+- Niveles clave (soporte, resistencia)
+- Patrones técnicos (triángulos, hombro-cabeza-hombro, canales, etc.)
+- Indicadores visibles (SMA, EMA, RSI, MACD) y su interpretación
+- Posibles sesgos de mercado y riesgos
+Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles (links a artículos o herramientas) al final.`;
 
-        // Construir mensaje claro para el modelo
-        const analysisPrompt = `Analiza esta imagen como si fueras un experto en trading. Si es un gráfico, describe:\n- Tipo de gráfico (velas, líneas, barras)\n- Tendencia predominante y su fuerza\n- Niveles clave (soporte, resistencia)\n- Patrones técnicos (triángulos, hombro-cabeza-hombro, canales, etc.)\n- Indicadores visibles (SMA, EMA, RSI, MACD) y su interpretación\n- Posibles sesgos de mercado y riesgos\nSi la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles (links a artículos o herramientas) al final.`;
-
-        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: imagen\nOCR extraído:\n${ocrText}\n\n${analysisPrompt}\nPregunta del usuario: ${message}` }];
+        userContent = [{ type: 'text', text: `Archivo: \nTipo: imagen\nOCR extraído:\n\n\n\nPregunta del usuario: ` }];
       } else if (buffer && ['pdf', 'doc', 'docx', 'txt'].includes(fileType)) {
-        // Guardar temporal para usar las funciones existentes
-        const tmpPath = path.join(process.cwd(), 'tmp', `upload-${Date.now()}-${fileName}`);
+        const tmpPath = path.join(process.cwd(), 'tmp', `upload--`);
         try {
-          // Crear tmp si no existe
           await mkdir(path.dirname(tmpPath), { recursive: true });
         } catch (e) {}
         await writeFile(tmpPath, buffer);
         const text = await extractTextFromFile(tmpPath, fileType || 'pdf');
-        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: ${fileType}\nContenido extraído:\n${text}\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar (artículos, herramientas, tutoriales). Pregunta del usuario: ${message}` }];
+        userContent = [{ type: 'text', text: `Archivo: \nTipo: \nContenido extraído:\n\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar (artículos, herramientas, tutoriales). Pregunta del usuario: ` }];
       } else {
-        // Fallback: enviar nota al modelo
-        userContent = [{ type: 'text', text: `He subido un archivo llamado ${fileName}, pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ${message}` }];
+        userContent = [{ type: 'text', text: `He subido un archivo llamado , pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ` }];
       }
     }
 
@@ -142,7 +141,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Authorization": `Bearer `,
       },
       body: JSON.stringify({
         model: model,
@@ -157,7 +156,7 @@ export async function POST(request: Request) {
       console.error("=== OPENAI ERROR DETALLADO ===");
       console.error("Status HTTP:", response.status);
       console.error("Cuerpo error:", JSON.stringify(errData));
-      throw new Error(`OpenAI rechazó la petición: ${response.status}`);
+      throw new Error(OpenAI rechazó la petición: );
     }
 
     const data = await response.json();
