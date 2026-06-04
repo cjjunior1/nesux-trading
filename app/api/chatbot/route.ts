@@ -27,12 +27,12 @@ async function extractTextFromFile(filePath: string, fileType: string) {
     const buffer = await readFile(filePath);
 
     if (fileType.includes('pdf')) {
-      const pdf = await import('pdf-parse');
-      const data = await pdf.default(buffer);
+      const pdfModule = await import('pdf-parse');
+      const data = await pdfModule.default(buffer);
       return data.text || '';
     } else if (fileType.includes('word') || fileType.includes('document')) {
-      const mammoth = await import('mammoth');
-      const result = await mammoth.default.extractRawText({ buffer });
+      const mammothModule = await import('mammoth');
+      const result = await mammothModule.default.extractRawText({ buffer });
       return result.value || '';
     } else if (fileType.includes('sheet') || fileType.includes('excel')) {
       const XLSX = await import('xlsx');
