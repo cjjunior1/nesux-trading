@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -105,9 +105,10 @@ export default function MetodoPage() {
               className="relative aspect-video rounded-2xl overflow-hidden"
             >
               <Image
-                src="https://cdn.abacus.ai/images/2a4bf941-3927-4c8e-91eb-b6158caac34a.png"
+                src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
                 alt="Método de trading"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
               />
             </motion.div>
@@ -196,9 +197,10 @@ export default function MetodoPage() {
               className="relative aspect-video rounded-2xl overflow-hidden"
             >
               <Image
-                src="https://cdn.abacus.ai/images/693298cd-889f-4ae4-b495-22b42e09844d.png"
+                src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
                 alt="Resultados del método"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
               />
             </motion.div>

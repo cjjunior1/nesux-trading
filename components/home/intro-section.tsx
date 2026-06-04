@@ -1,4 +1,4 @@
-"use client";
+﻿  "use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -20,9 +20,10 @@ export function IntroSection() {
             className="relative aspect-video rounded-2xl overflow-hidden"
           >
             <Image
-              src="https://cdn.abacus.ai/images/10684efa-88d9-4dd7-b020-df00b554f9f1.png"
+              src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
               alt="Libertad financiera con trading"
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
             />
           </motion.div>
@@ -72,7 +73,7 @@ export function IntroSection() {
             {/* Disclaimer */}
             <div className="mt-6 p-4 bg-slate-800/30 border-l-4 border-purple-500 rounded-r-xl">
               <p className="text-xs text-slate-400">
-                <strong className="text-purple-400">Nota:</strong> Con este módulo en nada ofrecemos hacerte un Trader profesional o garantizarle que no hay riesgos de pérdida de su capital, sino de darle las herramientas y el conocimiento básico para que usted se desarrolle y emprenda en camino del conocimiento del MUNDO DEL TRADING. No olvides que la universidad no hace al profesional, solo es una base de introducción al conocimiento.
+                <strong className="text-purple-400">Nota:</strong> Con este módulo en nada ofrecemos hacerte unTrader profesional o garantizarle que no hay riesgos de pérdida de su capital, sino de darle las herramientas yel conocimiento básico para que usted se desarrolle y emprenda en camino del conocimiento del MUNDO DEL TRADING. No olvides que la universidad no hace al profesional, solo es una base de introducción al conocimiento.
               </p>
             </div>
           </motion.div>

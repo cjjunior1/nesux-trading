@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -135,9 +135,10 @@ export default function BotsPage() {
               className="relative aspect-video rounded-2xl overflow-hidden"
             >
               <Image
-                src="https://cdn.abacus.ai/images/8a7395d3-1020-4901-b375-0b03767e9381.png"
+                src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
                 alt="Bot de trading automatizado"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
               />
             </motion.div>
@@ -278,29 +279,5 @@ export default function BotsPage() {
           <div className="space-y-8">
             {[
               { step: "1", title: "Elige tu plan", desc: "Selecciona el bot que mejor se adapte a tus necesidades y nivel de experiencia." },
-              { step: "2", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura. Tus fondos siempre están en tu broker." },
-              { step: "3", title: "Configura parámetros", desc: "Ajusta el riesgo, los pares y las estrategias según tu perfil de inversor." },
-              { step: "4", title: "El bot opera por ti", desc: "Relájate mientras el bot analiza el mercado y ejecuta operaciones 24/7." },
-            ].map((item, idx) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-6"
-              >
-                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {item.step}
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-slate-400">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
+              { step: "2", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura.Tus fondos siempre están en tu broker." },
+              { step: "3

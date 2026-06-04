@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -268,7 +268,13 @@ export default function CursosPage() {
                 )}
 
                 <div className="relative aspect-video rounded-xl overflow-hidden mb-6">
-                  <Image src={course.image} alt={course.title} fill className="object-cover" />
+                  <Image 
+                    src={course.image} 
+                    alt={course.title} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover" 
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 flex items-center gap-2">
                     <div className="bg-emerald-500 p-2 rounded-full">

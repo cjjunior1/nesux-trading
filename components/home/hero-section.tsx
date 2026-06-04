@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -11,9 +11,10 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://cdn.abacus.ai/images/31f74caf-5d2c-4805-be8e-accbeb7f450f.png"
+          src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
           alt="Trading profesional"
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover opacity-30"
           priority
         />
@@ -48,7 +49,7 @@ export function HeroSection() {
 
           <div className="bg-gradient-to-r from-emerald-900/40 to-blue-900/40 border border-emerald-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
             <p className="text-base text-white leading-relaxed mb-3">
-              <strong className="text-emerald-300 text-lg">Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong className="text-yellow-300">mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, clara y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
+              <strong className="text-emerald-300 text-lg">Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong className="text-yellow-300">mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
             </p>
             <p className="text-base text-slate-200 leading-relaxed">
               Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong className="text-emerald-300">No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la libertad financiera.

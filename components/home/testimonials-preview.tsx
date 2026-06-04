@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -10,7 +10,7 @@ const testimonials = [
   {
     name: "Emmanuel Ortega",
     role: "Empresario - México",
-    image: "https://cdn.abacus.ai/images/ebb839ff-92be-4262-abb0-6f84790e20d2.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Después de perder dinero con otras plataformas, Trading Academy A Otro Nivel me enseñó a operar con disciplina. En 6 meses recuperé mi inversión y ahora genero ingresos consistentes.",
     profit: "+$8,500",
     period: "6 meses",
@@ -18,7 +18,7 @@ const testimonials = [
   {
     name: "Janet Sánchez",
     role: "Mercadóloga - República Dominicana",
-    image: "https://cdn.abacus.ai/images/af4bb859-3b2c-4712-8273-b6179878f311.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "El método es increíblemente claro. Nunca pensé que alguien sin experiencia como yo pudiera aprender trading. Ahora tengo una fuente de ingresos adicional.",
     profit: "+$3,200",
     period: "4 meses",
@@ -26,7 +26,7 @@ const testimonials = [
   {
     name: "Andrés Rivera",
     role: "Ingeniero - Perú",
-    image: "https://cdn.abacus.ai/images/fa1703ff-801f-4333-9c24-9c142466ad56.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Lo mejor es la comunidad y el soporte. Siempre hay alguien dispuesto a ayudar. El bot de trading me ahorra horas de análisis cada día.",
     profit: "+$12,800",
     period: "8 meses",
@@ -74,6 +74,7 @@ export function TestimonialsPreview() {
                     src={testimonial.image}
                     alt={testimonial.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"
                   />
                 </div>

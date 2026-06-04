@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -11,7 +11,7 @@ const testimonials = [
     name: "Emmanuel Ortega",
     role: "Empresario",
     country: "México",
-    image: "https://cdn.abacus.ai/images/ebb839ff-92be-4262-abb0-6f84790e20d2.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Después de perder más de $15,000 dólares probando diferentes estrategias por mi cuenta, encontré Trading Academy A Otro Nivel. El método es completamente diferente a todo lo que había visto. En 6 meses no solo recuperé mi inversión, sino que ahora genero un ingreso constante que me permite trabajar menos horas en mi negocio.",
     profit: "+$8,500",
     period: "6 meses",
@@ -21,7 +21,7 @@ const testimonials = [
     name: "Janet Sánchez",
     role: "Mercadóloga",
     country: "República Dominicana",
-    image: "https://cdn.abacus.ai/images/af4bb859-3b2c-4712-8273-b6179878f311.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Como contadora, siempre fui escéptica sobre el trading. Pero el enfoque matemático y lógico del método me convenció. Lo mejor es que no necesité conocimientos previos. Ahora tengo una fuente de ingresos adicional que complementa mi salario y me da tranquilidad financiera.",
     profit: "+$3,200",
     period: "4 meses",
@@ -31,7 +31,7 @@ const testimonials = [
     name: "Mario Guzmán",
     role: "Ingeniero",
     country: "Honduras",
-    image: "https://cdn.abacus.ai/images/fa1703ff-801f-4333-9c24-9c142466ad56.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "El bot de trading fue un cambio total para mí. Como ingeniero, no tenía tiempo para estar frente a las pantallas todo el día. Ahora el bot opera mientras trabajo y duermo. La comunidad es increíble - siempre hay alguien dispuesto a ayudar con cualquier duda.",
     profit: "+$12,800",
     period: "8 meses",
@@ -41,7 +41,7 @@ const testimonials = [
     name: "Robinson Rosario",
     role: "Ingeniero",
     country: "Argentina",
-    image: "https://cdn.abacus.ai/images/7b84ff46-2b35-4b18-afc1-a3eeab693673.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Tenía mucho miedo de entrar al mundo del trading después de escuchar tantas historias negativas. Pero la garantía de 7 días me dio confianza para probar. Fue la mejor decisión. El soporte por WhatsApp es excepcional - responden todas mis dudas en minutos.",
     profit: "+$4,100",
     period: "5 meses",
@@ -51,7 +51,7 @@ const testimonials = [
     name: "Joel Paredes",
     role: "Médico",
     country: "Chile",
-    image: "https://cdn.abacus.ai/images/7b84ff46-2b35-4b18-afc1-a3eeab693673.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Con mi horario de hospital, necesitaba algo que no requiriera estar pegado a la pantalla. El método me enseñó a identificar oportunidades en timeframes altos y el bot hace el resto. Es ingreso pasivo real mientras salvo vidas.",
     profit: "+$6,700",
     period: "7 meses",
@@ -61,7 +61,7 @@ const testimonials = [
     name: "Ana Martínez",
     role: "Ama de Casa",
     country: "Ecuador",
-    image: "https://cdn.abacus.ai/images/62a1c1c2-2e18-49b7-9f2d-b7044fa75e82.png",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
     content: "Nunca pensé que alguien como yo, sin estudios en finanzas, pudiera aprender trading. El curso básico explica todo de manera tan simple que cualquiera puede entenderlo. Ahora contribuyo a los gastos del hogar y me siento realizada.",
     profit: "+$1,800",
     period: "3 meses",
@@ -142,7 +142,7 @@ export default function TestimoniosPage() {
                       alt={testimonial.name}
                       fill
                       className="object-cover"
-                    />
+                    / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                   </div>
                   <div>
                     <h3 className="font-bold text-white">{testimonial.name}</h3>
@@ -214,3 +214,5 @@ export default function TestimoniosPage() {
     </div>
   );
 }
+
+
