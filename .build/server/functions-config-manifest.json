@@ -1,1 +1,0 @@
-{"version":1,"functions":{"/api/auth/[...nextauth]":{},"/api/courses/progress":{},"/api/courses":{},"/api/courses/[courseId]/access":{},"/api/lead":{},"/api/tutor/track":{},"/api/chatbot":{},"/api/auth/login":{},"/api/signup":{},"/api/verify-email":{},"/api/profile":{}}}

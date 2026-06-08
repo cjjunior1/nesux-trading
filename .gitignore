@@ -5,3 +5,13 @@
 *.log
 ql*
 node_modules
+
+# Next.js / build
+.next
+.build
+out
+next-env.d.ts
+
+# Sistema
+.DS_Store
+Thumbs.db
