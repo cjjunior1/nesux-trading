@@ -78,6 +78,13 @@ export function Chatbot() {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const dragControls = useDragControls();
 
+  // Modo conversación continuo por voz (manos libres)
+  const conversationModeRef = useRef(false);   // true mientras la conversación por voz esté activa
+  const isSpeakingRef = useRef(false);          // true mientras el bot está hablando (TTS)
+  const processingRef = useRef(false);          // true mientras se procesa una respuesta
+  const sendMessageRef = useRef<(text?: string) => void>(() => {});
+  const wakeLockRef = useRef<any>(null);        // evita que la pantalla se apague durante la conversación
+
   // Inicializar micrófono
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -86,25 +93,49 @@ export function Chatbot() {
       const recognition = new SpeechRecognition();
       recognition.lang = "es-ES";
       recognition.interimResults = true;
-      
+      recognition.continuous = true; // conversación fluida: no se corta tras la primera frase
+
       recognition.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0].transcript)
-          .join("");
-        setInput(transcript);
-        
-        if (event.results[event.results.length - 1].isFinal) {
-          setIsRecording(false);
-          sendMessage(transcript);
+        // Solo procesamos los resultados nuevos (desde resultIndex)
+        let interim = "";
+        let finalText = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const r = event.results[i];
+          if (r.isFinal) finalText += r[0].transcript;
+          else interim += r[0].transcript;
+        }
+
+        // Mostrar lo que se va dictando en tiempo real
+        if (interim) setInput(interim);
+
+        // Cuando el usuario termina una frase, la enviamos y seguimos escuchando
+        if (finalText.trim()) {
+          processingRef.current = true; // pausa el auto-reinicio mientras respondemos
+          try { recognition.stop(); } catch {}
+          setInput("");
+          sendMessageRef.current(finalText.trim());
         }
       };
-      
+
       recognition.onerror = (e: any) => {
+        // "no-speech"/"aborted" son normales: dejamos que onend reanude la escucha
+        if (e.error === "no-speech" || e.error === "aborted") return;
         setMicError(e.error === "not-allowed" ? "Permisos denegados" : "Error de audio");
-        setIsRecording(false);
+        if (e.error === "not-allowed") {
+          conversationModeRef.current = false;
+          setIsRecording(false);
+        }
       };
-      
-      recognition.onend = () => setIsRecording(false);
+
+      recognition.onend = () => {
+        // En modo conversación, si no estamos hablando ni procesando, reanudamos la escucha
+        if (conversationModeRef.current && !isSpeakingRef.current && !processingRef.current) {
+          try { recognition.start(); } catch {}
+        } else if (!conversationModeRef.current) {
+          setIsRecording(false);
+        }
+      };
+
       recognitionRef.current = recognition;
       setMicSupported(true);
     }
@@ -225,6 +256,24 @@ export function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Mantener sendMessage siempre actualizado para usarlo dentro del reconocimiento de voz
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  });
+
+  // Al cerrar el chat, detener la conversación por voz
+  useEffect(() => {
+    if (!isOpen && conversationModeRef.current) {
+      conversationModeRef.current = false;
+      isSpeakingRef.current = false;
+      processingRef.current = false;
+      try { recognitionRef.current?.stop(); } catch {}
+      if (typeof window !== "undefined") window.speechSynthesis.cancel();
+      releaseWakeLock();
+      setIsRecording(false);
+    }
+  }, [isOpen]);
+
   // --- FUNCIONES DE VOZ ---
   const getCombinedText = (msg: Message) => {
     const greeting = (msg.greeting || "").trim();
@@ -315,19 +364,93 @@ export function Chatbot() {
     startReading(msg.id, combined, wordIdx);
   };
 
-  // --- FUNCIONES DE MICRÓFONO ---
+  // --- WAKE LOCK: mantener la pantalla activa durante la conversación ---
+  const requestWakeLock = async () => {
+    try {
+      if (typeof navigator !== "undefined" && "wakeLock" in navigator) {
+        wakeLockRef.current = await (navigator as any).wakeLock.request("screen");
+      }
+    } catch (e) {
+      // Si falla (p. ej. sin permiso o no soportado), la conversación sigue igual
+    }
+  };
+
+  const releaseWakeLock = () => {
+    try {
+      wakeLockRef.current?.release?.();
+    } catch (e) {}
+    wakeLockRef.current = null;
+  };
+
+  // Readquirir el wake lock si el usuario vuelve a la pestaña con la conversación activa
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && conversationModeRef.current && !wakeLockRef.current) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  // --- VOZ DEL BOT (respuesta hablada en modo conversación) ---
+  const speakReply = (text: string) => {
+    if (typeof window === "undefined") return;
+    const clean = (text || "")
+      .replace(EMOJI_RE, "")
+      .replace(/[•▪◦●]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const resumeListening = () => {
+      isSpeakingRef.current = false;
+      if (conversationModeRef.current) {
+        try { recognitionRef.current?.start(); } catch {}
+      }
+    };
+
+    if (!clean) {
+      resumeListening();
+      return;
+    }
+
+    isSpeakingRef.current = true;
+    // Silenciar el micrófono mientras el bot habla (evita que se escuche a sí mismo)
+    try { recognitionRef.current?.stop(); } catch {}
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = "es-ES";
+    utterance.rate = 1;
+    utterance.onend = resumeListening;
+    utterance.onerror = resumeListening;
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // --- FUNCIONES DE MICRÓFONO (conversación continua manos libres) ---
   const toggleMic = () => {
     if (!micSupported) return;
-    if (isRecording) {
-      recognitionRef.current?.stop();
+    if (conversationModeRef.current) {
+      // Desactivar conversación
+      conversationModeRef.current = false;
+      isSpeakingRef.current = false;
+      processingRef.current = false;
+      try { recognitionRef.current?.stop(); } catch {}
+      window.speechSynthesis.cancel();
+      releaseWakeLock();
       setIsRecording(false);
       setMicError(null);
     } else {
+      // Activar conversación
       try {
+        conversationModeRef.current = true;
         recognitionRef.current?.start();
+        requestWakeLock();
         setIsRecording(true);
         setMicError(null);
       } catch (e) {
+        conversationModeRef.current = false;
         setMicError("Inicia con un clic primero");
       }
     }
@@ -335,11 +458,19 @@ export function Chatbot() {
 
   const sendMessage = async (text?: string) => {
     const msg = (text || input).trim();
-    if (!msg || isLoading) return;
+    if (!msg || isLoading) {
+      // Evita quedarse bloqueado si se llamó desde la voz mientras se procesaba
+      processingRef.current = false;
+      if (conversationModeRef.current && !isSpeakingRef.current) {
+        try { recognitionRef.current?.start(); } catch {}
+      }
+      return;
+    }
     setInput("");
     const userMessage: Message = { id: Date.now().toString(), role: "user", content: msg };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    let replyText = "";
     try {
       const response = await fetch("/api/chatbot", {
         method: "POST",
@@ -349,12 +480,19 @@ export function Chatbot() {
       if (!response.ok) throw new Error("Error");
       const data = await response.json();
       if (data.error) throw new Error(data.error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: cleanMarkdown(data.content) }]);
+      replyText = cleanMarkdown(data.content);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: replyText }]);
     } catch (error) {
       console.error("Error:", error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Error al procesar. Intenta de nuevo." }]);
+      replyText = "Lo siento, tuve un problema al procesar. ¿Puedes repetirlo?";
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: replyText }]);
     } finally {
       setIsLoading(false);
+      processingRef.current = false;
+      // En modo conversación, el bot responde con voz y luego vuelve a escuchar
+      if (conversationModeRef.current) {
+        speakReply(replyText);
+      }
     }
   };
 
@@ -494,10 +632,10 @@ export function Chatbot() {
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     isRecording ? "bg-red-500 text-white animate-pulse" : "bg-white/20 text-white hover:bg-white/30"
                   }`}
-                  title={isRecording ? "Detener conversación" : "Hablar"}
+                  title={isRecording ? "Detener conversación por voz" : "Iniciar conversación por voz (manos libres)"}
                 >
                   {isRecording ? <PhoneOff size={14} /> : <Mic size={14} />}
-                  {isRecording ? "Detener" : "Hablar"}
+                  {isRecording ? "Detener" : "Conversar"}
                 </button>
                 
                 {/* Zoom + Maximizar + Cerrar */}
