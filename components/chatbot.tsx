@@ -170,17 +170,18 @@ export function Chatbot() {
 
     const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
+    // Invitaciones EDUCATIVAS (sin inventar datos de mercado en tiempo real).
     const marketContexts = [
-      "El mercado de Forex acaba de abrir con fuerza. El EUR/USD muestra movimientos interesantes. ¿Te gustaría analizar las oportunidades de hoy?",
-      "Hoy hay alta volatilidad en los pares principales. Las noticias económicas están moviendo el mercado. ¿Quieres que revisemos las mejores entradas?",
-      "Los mercados están en pleno movimiento. He detectado varias configuraciones técnicas prometedoras. ¿Por dónde quieres empezar?",
-      "El día está perfecto para operar. Los spreads están bajos y la liquidez es alta. ¿Qué par te gustaría analizar hoy?",
-      "Acabo de detectar movimientos significativos en el GBP/USD y USD/JPY. La volatilidad está en su punto óptimo. ¿Quieres que lo revisemos?",
-      "Hoy es un día excelente para el trading. Los indicadores técnicos están mostrando señales claras. ¿En qué activo quieres enfocarte?",
-      "El mercado asiático cerró con movimientos interesantes y Europa está abriendo con fuerza. ¿Listo para encontrar buenas oportunidades?",
-      "Las sesiones se están solapando y hay mucha liquidez. Perfecto para operar. ¿Qué estrategia quieres aplicar hoy?",
-      "Los niveles de soporte y resistencia están muy definidos hoy. Ideal para entrar con precisión. ¿Quieres que analicemos el gráfico?",
-      "Hoy hay noticias económicas importantes que están moviendo el mercado. Oportunidades claras para quien sepa leerlas. ¿Te ayudo a identificarlas?"
+      "¿Quieres que repasemos cómo leer la estructura de un gráfico paso a paso?",
+      "Podemos trabajar tu gestión de riesgo: stop loss, tamaño de posición y ratio riesgo/beneficio. ¿Te interesa?",
+      "¿Te gustaría aprender a identificar soportes y resistencias con criterio?",
+      "Puedo ayudarte a diferenciar el análisis técnico del fundamental. ¿Por dónde empezamos?",
+      "¿Profundizamos en psicología y control emocional al operar?",
+      "Podemos repasar los patrones de velas y qué significan realmente. ¿Te animas?",
+      "¿Buscas construir un plan de trading sólido desde cero?",
+      "Puedo explicarte cómo funcionan las sesiones del mercado y la liquidez. ¿Lo vemos?",
+      "¿Quieres entender cómo definir tu ratio riesgo/beneficio antes de cada operación?",
+      "Podemos analizar qué errores frenan a la mayoría de traders principiantes. ¿Te interesa?"
     ];
     
     const weekendMessages = [
