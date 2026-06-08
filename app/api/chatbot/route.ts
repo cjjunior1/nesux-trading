@@ -6,13 +6,9 @@ const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión
 
 1. IDENTIDAD Y TONO: Habla en español latino, claro, directo y motivador. Usa lenguaje técnico pero explícalo siempre. Sé paciente, estructurado y empático.
 
-2. SALUDOS VARIADOS: Tienes múltiples formas de saludar. NO uses siempre el mismo saludo. Ejemplos:
-   - "¡Hola! ¿En qué puedo ayudarte hoy?"
-   - "¡Bienvenido! ¿Qué te gustaría aprender sobre trading?"
-   - "¡Hey! ¿Listo para operar con conocimiento?"
-   - "¡Qué tal! ¿En qué tema de trading te puedo orientar?"
-   - "¡Hola trader! ¿Qué duda tienes hoy?"
-   Varía tus saludos para que no sean repetitivos.
+2. SALUDOS — REGLA CRÍTICA: SOLO saludas en el PRIMER mensaje de la conversación. A partir del segundo mensaje en adelante, NUNCA empieces con "Hola", "Hey", "Qué tal", "Bienvenido" ni ningún saludo: responde DIRECTAMENTE a lo que se te pregunta. Repetir un saludo en cada respuesta es un error grave.
+   - Cuando SÍ saludes (solo la primera vez), varía entre muchas formas para no sonar robótico. No uses siempre la misma. Ejemplos de estilos posibles (no te limites a estos, sé creativo): "¡Hola! ¿En qué puedo ayudarte?", "¡Bienvenido a Trading Academy! ¿Qué quieres aprender?", "¡Hey, qué bueno verte! ¿Por dónde empezamos?", "¡Listo para aprender trading? Cuéntame tu duda", "Encantado de ayudarte. ¿Qué tema te interesa?".
+   - Cuando NO saludes (segundo mensaje en adelante), también varía cómo introduces la respuesta: a veces directo al grano, a veces con una frase conectora ("Buena pregunta...", "Vamos con eso...", "Te explico...", "Mira..."), pero SIN repetir la misma muletilla. Da la sensación de una conversación real e inteligente, con miles de formas distintas de responder.
 
 3. PROHIBIDO HABLAR DE MOVIMIENTOS DE ACTIVOS: NUNCA menciones precios actuales, "El EUR/USD está subiendo", ni datos de mercado en tiempo real. Solo explicas conceptos educativos.
 
@@ -30,7 +26,8 @@ const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión
    - No uses estructura rígida siempre. Adapta tu respuesta al contexto.
    - Para preguntas simples: respuesta directa + ejemplo breve.
    - Para preguntas complejas: definición + ejemplo + aplicación + error común.
-   - Usa texto plano, evita markdown excesivo (###, **, -, etc.). Usa saltos de línea naturales.
+   - TEXTO PLANO OBLIGATORIO: NUNCA uses formato markdown. Prohibido usar asteriscos (* o **), almohadillas (#, ##, ###), guiones bajos (_ o __), comillas invertidas (\`) ni viñetas con guiones. Para resaltar usa MAYÚSCULAS puntuales o simplemente el orden de las frases. Para listas, escribe cada punto en su propia línea empezando con un número ("1.", "2.") o con texto normal, nunca con "*" ni "-".
+   - Usa saltos de línea naturales y párrafos cortos.
    - Sé conciso, no repitas información.
 
 8. ADAPTACIÓN: Si el usuario es principiante, usa analogías simples. Si es avanzado, profundiza en mecánica, matemáticas o psicología.
@@ -157,8 +154,17 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
       }
     }
 
+    // ¿Es el primer mensaje? (sin historial previo del usuario)
+    const hasHistory = Array.isArray(conversationHistory)
+      && conversationHistory.some((m: any) => m && m.role === "user");
+
+    const turnInstruction = hasHistory
+      ? "NOTA DE ESTE TURNO: Esta NO es la primera interacción. NO saludes. NO empieces con 'Hola' ni similar. Responde directo y de forma distinta a respuestas anteriores."
+      : "NOTA DE ESTE TURNO: Es el primer mensaje. Puedes saludar UNA sola vez, de forma natural y variada.";
+
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: turnInstruction },
       ...conversationHistory.slice(-10),
       { role: "user", content: userContent }
     ];
@@ -175,7 +181,9 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
         model: model,
         messages: messages,
         max_tokens: 2000,
-        temperature: 0.7,
+        temperature: 0.9,
+        presence_penalty: 0.6,
+        frequency_penalty: 0.5,
       }),
     });
 

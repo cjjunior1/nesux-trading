@@ -133,7 +133,7 @@ export default function CursosPage() {
             </h1>
 
             <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-              Programas estructurados para llevarte de principiante a trader profesional con nuestro método probado.
+              Programas estructurados para llevarte de principiante a un trader RENTABLE con nuestro método probado.
             </p>
 
             <div className="max-w-4xl mx-auto mb-8">
