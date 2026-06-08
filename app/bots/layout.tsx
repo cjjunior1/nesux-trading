@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Bots IA | Nesux Trading Academy',
     description: 'Automatización inteligente',
-    images: [{ url: '/og/bots.jpg', width: 1200, height: 630, alt: 'Bots IA' }],
+    images: [{ url: '/og-images/bots.jpg', width: 1200, height: 630, alt: 'Bots IA' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Bots IA | Nesux Trading Academy',
     description: 'Automatización inteligente',
-    images: ['/og/bots.jpg'],
+    images: ['/og-images/bots.jpg'],
   },
 };
 

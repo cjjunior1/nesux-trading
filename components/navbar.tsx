@@ -83,7 +83,12 @@ function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
             <Bot className="h-5 w-5 flex-shrink-0" />
             <div className="flex flex-col ml-1">
               <span className="font-bold leading-tight">CJ Bot</span>
-              <span className="text-xs text-emerald-300">Automatiza tu trading, resultado real 24/7</span>
+              <span className="block text-xs font-bold text-white mt-2">
+                Automatiza tu trading, resultado real{" "}
+                <span className="text-emerald-400">24</span>
+                <span className="text-white">/</span>
+                <span className="text-purple-400">7</span>
+              </span>
             </div>
           </Link>
         </div>

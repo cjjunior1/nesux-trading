@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Crossover | Nesux Trading Academy',
     description: 'Golden Cross Strategy',
-    images: [{ url: '/og/crossover.jpg', width: 1200, height: 630, alt: 'Crossover' }],
+    images: [{ url: '/og-images/crossover.jpg', width: 1200, height: 630, alt: 'Crossover' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Crossover | Nesux Trading Academy',
     description: 'Golden Cross Strategy',
-    images: ['/og/crossover.jpg'],
+    images: ['/og-images/crossover.jpg'],
   },
 };
 

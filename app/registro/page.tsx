@@ -143,7 +143,7 @@ export default function RegistroPage() {
             animate={{ opacity: 1, x: 0 }}
             className="hidden lg:block"
           >
-            <h1 className="text-4xl font-bold text-white mb-6">
+            <h1 className="title-anim text-4xl font-bold text-white mb-6">
               Comienza tu camino hacia la{" "}
               <span className="gradient-text">libertad financiera</span>
             </h1>

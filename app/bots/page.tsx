@@ -108,7 +108,7 @@ export default function BotsPage() {
                 <span className="text-sm text-purple-400">Trading Automatizado</span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              <h1 className="title-anim text-4xl md:text-5xl font-bold text-white mb-6">
                 Bots de Trading <span className="gradient-text">Inteligentes</span>
               </h1>
 

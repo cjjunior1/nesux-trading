@@ -78,7 +78,7 @@ export default function MetodoPage() {
                 <span className="text-sm text-emerald-400">El Método Trading Academy A Otro Nivel</span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              <h1 className="title-anim text-4xl md:text-5xl font-bold text-white mb-6">
                 Un Sistema <span className="gradient-text">Probado</span> Para Traders Exitosos
               </h1>
 

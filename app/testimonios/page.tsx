@@ -93,7 +93,7 @@ export default function TestimoniosPage() {
               <span className="text-sm text-amber-400">Historias Reales</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="title-anim text-4xl md:text-5xl font-bold text-white mb-6">
               Testimonios de <span className="gradient-text">Éxito</span>
             </h1>
 

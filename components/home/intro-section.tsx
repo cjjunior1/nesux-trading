@@ -20,7 +20,7 @@ export function IntroSection() {
             className="relative aspect-video rounded-2xl overflow-hidden"
           >
             <Image
-              src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
+              src="https://cdn.abacus.ai/images/10684efa-88d9-4dd7-b020-df00b554f9f1.png"
               alt="Libertad financiera con trading"
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

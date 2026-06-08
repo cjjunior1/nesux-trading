@@ -71,6 +71,83 @@ body {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+/* =========================================================
+   ANIMACIÓN DE TÍTULOS EN LAS LANDINGS
+   Ciclo de 11s (infinito):
+     · 0 – 3s   -> color original (reposo)
+     · 3 – 8s   -> degradado multicolor (variación completa, 5s)
+     · 8 – 11s  -> color original (reposo)
+   ( 3/11 = 27.27% ,  8/11 = 72.73% )
+   ========================================================= */
+@keyframes landing-title-sweep {
+  0%, 27.27% {                    /* reposo inicial 3s */
+    background-position: 0% 50%;
+    filter: none;
+  }
+  50% {                           /* pico encendido (mitad de los 5s) */
+    background-position: 50% 50%;
+    filter: saturate(2) brightness(1.45)
+            drop-shadow(0 0 16px rgba(168, 85, 247, 0.5));
+  }
+  72.73%, 100% {                  /* reposo final 3s */
+    background-position: 100% 50%;
+    filter: none;
+  }
+}
+
+/* Título principal (h1) de cada página.
+   REPOSO = BLANCO (color original). La palabra interna con .gradient-text
+   conserva su propio degradado en reposo (tiene su propio recorte de texto).
+   El degradado se divide en 3 tercios (por el background-size: 300%):
+     · Tercio izq. (0–33%)    = blanco      -> visible en reposo inicial (3s)
+     · Tercio centro (33–66%) = multicolor  -> visible en el pico
+     · Tercio der. (66–100%)  = blanco      -> visible en reposo final  (3s)  */
+h1.title-anim {
+  background-image: linear-gradient(
+    90deg,
+    var(--title-rest, #ffffff) 0%, var(--title-rest, #ffffff) 33.33%,   /* reposo (se adapta al tema) */
+    #f472b6 38%, #f59e0b 43%, #facc15 48%, #34d399 52%,
+    #22d3ee 57%, #38bdf8 61%, #6366f1 64.66%,               /* tercio multicolor */
+    var(--title-rest, #ffffff) 66.66%, var(--title-rest, #ffffff) 100%  /* reposo (se adapta al tema) */
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  /* 'linear' = velocidad constante para que el degradado tarde los 5s completos
+     (con ease-in-out aceleraba en el medio y se sentía rápido) */
+  animation: landing-title-sweep 11s linear infinite;
+}
+
+/* La palabra interna (.gradient-text) se anima EN SINCRONÍA con el título para que
+   el degradado cubra TODO el texto, no solo las partes blancas.
+   En reposo conserva su degradado original (esmeralda → púrpura); en el barrido
+   muestra el mismo multicolor que el resto de la frase. */
+h1.title-anim .gradient-text {
+  background-image: linear-gradient(
+    90deg,
+    #34d399 0%, #c084fc 33.33%,                             /* original de la palabra */
+    #f472b6 38%, #f59e0b 43%, #facc15 48%, #34d399 52%,
+    #22d3ee 57%, #38bdf8 61%, #6366f1 64.66%,               /* multicolor (igual que el título) */
+    #34d399 66.66%, #c084fc 100%                            /* original de la palabra */
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: landing-title-sweep 11s linear infinite;
+}
+
+/* Respeta a quienes prefieren menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  h1.title-anim,
+  h1.title-anim .gradient-text {
+    animation: none;
+  }
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -83,6 +160,11 @@ body {
 /* Variable para el texto del chatbot (se adapta al tema) */
 :root { --chat-text: #E2E8F0; }
 html.light { --chat-text: #1e293b; }
+
+/* Color de REPOSO del título animado: blanco en oscuro, gris oscuro en claro.
+   Evita que en modo claro el título blanco quede invisible (parpadeo). */
+:root { --title-rest: #ffffff; }
+html.light { --title-rest: #0f172a; }
 
 /* =========================================================
    MODO CLARO  (se activa con la clase .light en <html>)

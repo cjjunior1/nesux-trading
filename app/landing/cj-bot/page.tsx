@@ -2,11 +2,11 @@
 
 export default function CjBotLanding() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[var(--color-darker)] via-slate-900 to-[var(--color-dark)] text-white flex flex-col items-center">
+    <main className="landing-page min-h-screen bg-gradient-to-br from-[var(--color-darker)] via-slate-900 to-[var(--color-dark)] text-white flex flex-col items-center">
       {/* HERO - SECCIÓN 1 */}
       <section className="max-w-3xl w-full px-4 mx-auto pt-24 pb-10 text-center">
         <div className="inline-block bg-emerald-900/70 text-emerald-200 px-3 py-0.5 rounded-full font-semibold uppercase text-xs tracking-wider mb-3">EXCLUSIVO 2024</div>
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 gradient-text">
+        <h1 className="title-anim text-4xl md:text-5xl font-extrabold mb-4">
           El Trading Automático Acaba de Evolucionar
         </h1>
         <p className="section-subtitle max-w-2xl mx-auto">

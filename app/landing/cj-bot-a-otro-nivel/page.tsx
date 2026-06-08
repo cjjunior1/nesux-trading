@@ -5,7 +5,7 @@
 
 export default function CjBotOtroNivelLanding() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[var(--color-darker)] via-slate-900 to-[var(--color-dark)] text-white flex flex-col items-center">
+    <main className="landing-page min-h-screen bg-gradient-to-br from-[var(--color-darker)] via-slate-900 to-[var(--color-dark)] text-white flex flex-col items-center">
       {/* [1] HERO ORIGINAL */}
       {/* ... contenido clásico de /landing/cj-bot ... */}
       {/* Copiado directamente respetando estructura y estilos */}
@@ -13,7 +13,7 @@ export default function CjBotOtroNivelLanding() {
       {/* [2] SUMATORIA: HEADLINE + SUBHEAD MARKETING */}
       <section className="max-w-3xl w-full px-4 mx-auto pt-24 pb-10 text-center">
         <div className="inline-block bg-emerald-900/70 text-emerald-200 px-3 py-0.5 rounded-full font-semibold uppercase text-xs tracking-wider mb-3">NUEVA VERSIN 2024 | LANZAMIENTO EXCLUSIVO</div>
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-3 gradient-text">
+        <h1 className="title-anim text-4xl md:text-5xl font-extrabold mb-3">
           525 Domina el Trading Algortimeico con CJ Bot v2.30: Tu Ventaja Injusta
         </h1>
         <h2 className="text-xl md:text-2xl font-bold text-emerald-300 mb-5">

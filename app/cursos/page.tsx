@@ -128,7 +128,7 @@ export default function CursosPage() {
               <span className="text-sm text-emerald-400">Educación de Calidad</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="title-anim text-4xl md:text-5xl font-bold text-white mb-6">
               Cursos de <span className="gradient-text">Trading</span>
             </h1>
 

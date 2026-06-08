@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Dashboard | Nesux Trading Academy',
     description: 'Métricas en tiempo real',
-    images: [{ url: '/og/dashboard.jpg', width: 1200, height: 630, alt: 'Dashboard' }],
+    images: [{ url: '/og-images/dashboard.jpg', width: 1200, height: 630, alt: 'Dashboard' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Dashboard | Nesux Trading Academy',
     description: 'Métricas en tiempo real',
-    images: ['/og/dashboard.jpg'],
+    images: ['/og-images/dashboard.jpg'],
   },
 };
 

@@ -84,6 +84,9 @@ export function Chatbot() {
   const processingRef = useRef(false);          // true mientras se procesa una respuesta
   const sendMessageRef = useRef<(text?: string) => void>(() => {});
   const wakeLockRef = useRef<any>(null);        // evita que la pantalla se apague durante la conversación
+  const resumedRef = useRef(false);             // evita reanudar la escucha dos veces por respuesta
+  const speechWatchdogRef = useRef<any>(null);  // vigila que el TTS termine (bug de Chrome con onend)
+  const keepAliveRef = useRef<any>(null);       // AudioContext silencioso para no "congelar" la pestaña
 
   // Inicializar micrófono
   useEffect(() => {
@@ -211,8 +214,10 @@ export function Chatbot() {
       `${timeGreeting}, bienvenido — soy tu asistente personal de Trading Academy para esta ${period}.`,
       `${timeGreeting}! Tu coach de trading está online esta ${period}. ¿Listo para mejorar?`,
       `${timeGreeting}. Soy el asistente de Trading Academy: vamos a aprovechar esta ${period} para aprender.`,
-      `${timeGreeting}! Tu guía de trading te saluda esta ${period}, ¿por dónde empezamos?`,
-      `${timeGreeting}. ¡Hola! Tu tutor de Trading Academy está aquí para ayudarte esta ${period}.`
+      `${timeGreeting}! Tu guía de trading te acompaña esta ${period}, ¿por dónde empezamos?`,
+      `Soy CJ, tu tutor de Trading Academy. Cuéntame qué quieres dominar esta ${period}.`,
+      `Aquí CJ, de Trading Academy. ¿Qué tema de trading exploramos esta ${period}?`,
+      `Listo para ayudarte esta ${period}. Soy CJ, tu mentor de Trading Academy.`
     ];
 
     const greetingLine = pick(greetingTemplates);
@@ -261,18 +266,9 @@ export function Chatbot() {
     sendMessageRef.current = sendMessage;
   });
 
-  // Al cerrar el chat, detener la conversación por voz
-  useEffect(() => {
-    if (!isOpen && conversationModeRef.current) {
-      conversationModeRef.current = false;
-      isSpeakingRef.current = false;
-      processingRef.current = false;
-      try { recognitionRef.current?.stop(); } catch {}
-      if (typeof window !== "undefined") window.speechSynthesis.cancel();
-      releaseWakeLock();
-      setIsRecording(false);
-    }
-  }, [isOpen]);
+  // IMPORTANTE: la conversación por voz NO se detiene al cerrar la ventana del chat.
+  // Sigue activa en segundo plano (manos libres) y solo se detiene cuando el usuario
+  // pulsa "Detener" (toggleMic). Por eso aquí NO cortamos nada al cambiar isOpen.
 
   // --- FUNCIONES DE VOZ ---
   const getCombinedText = (msg: Message) => {
@@ -393,7 +389,42 @@ export function Chatbot() {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
-  // --- VOZ DEL BOT (respuesta hablada en modo conversación) ---
+  // Keep-alive: un AudioContext silencioso reduce que el navegador "congele" la
+  // pestaña al cambiar de app (con la pantalla encendida), ayudando a que la voz siga.
+  const startKeepAlive = () => {
+    try {
+      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!Ctx) return;
+      if (!keepAliveRef.current) keepAliveRef.current = new Ctx();
+      const ctx = keepAliveRef.current;
+      if (ctx.state === "suspended") ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0; // 100% silencioso
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      ctx._osc = osc;
+    } catch {}
+  };
+
+  const stopKeepAlive = () => {
+    try {
+      keepAliveRef.current?._osc?.stop?.();
+      keepAliveRef.current?.close?.();
+    } catch {}
+    keepAliveRef.current = null;
+  };
+
+  // Inicia el reconocimiento de voz de forma segura (ignora "ya iniciado")
+  const safeStartRecognition = () => {
+    if (!conversationModeRef.current) return;
+    try { recognitionRef.current?.start(); } catch (e) { /* ya estaba escuchando */ }
+  };
+
+  // --- VOZ DEL BOT (respuesta hablada en modo conversación CONTINUA) ---
+  // El bot habla la respuesta y, al terminar, REANUDA automáticamente la escucha,
+  // manteniendo una conversación fluida hasta que el usuario pulse "Detener".
   const speakReply = (text: string) => {
     if (typeof window === "undefined") return;
     const clean = (text || "")
@@ -402,11 +433,14 @@ export function Chatbot() {
       .replace(/\s+/g, " ")
       .trim();
 
+    // Reanuda la escucha una sola vez (lo pueden llamar onend Y el watchdog)
     const resumeListening = () => {
+      if (resumedRef.current) return;
+      resumedRef.current = true;
+      if (speechWatchdogRef.current) { clearInterval(speechWatchdogRef.current); speechWatchdogRef.current = null; }
       isSpeakingRef.current = false;
-      if (conversationModeRef.current) {
-        try { recognitionRef.current?.start(); } catch {}
-      }
+      // Pequeña pausa para que el micrófono se libere antes de volver a escuchar
+      setTimeout(safeStartRecognition, 250);
     };
 
     if (!clean) {
@@ -415,6 +449,7 @@ export function Chatbot() {
     }
 
     isSpeakingRef.current = true;
+    resumedRef.current = false;
     // Silenciar el micrófono mientras el bot habla (evita que se escuche a sí mismo)
     try { recognitionRef.current?.stop(); } catch {}
     window.speechSynthesis.cancel();
@@ -425,6 +460,23 @@ export function Chatbot() {
     utterance.onend = resumeListening;
     utterance.onerror = resumeListening;
     utteranceRef.current = utterance;
+
+    // Chrome a veces no dispara onend ni reanuda el habla pasados ~14s: lo reactivamos
+    if (speechWatchdogRef.current) clearInterval(speechWatchdogRef.current);
+    speechWatchdogRef.current = setInterval(() => {
+      if (!conversationModeRef.current) {
+        clearInterval(speechWatchdogRef.current); speechWatchdogRef.current = null; return;
+      }
+      const synth = window.speechSynthesis;
+      // Si terminó de hablar (ni hablando ni en cola), reanudamos la escucha
+      if (!synth.speaking && !synth.pending) {
+        resumeListening();
+      } else if (synth.speaking && !synth.paused) {
+        // Truco anti-corte de Chrome en textos largos
+        try { synth.pause(); synth.resume(); } catch {}
+      }
+    }, 500);
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -432,13 +484,15 @@ export function Chatbot() {
   const toggleMic = () => {
     if (!micSupported) return;
     if (conversationModeRef.current) {
-      // Desactivar conversación
+      // Desactivar conversación (única forma de detenerla)
       conversationModeRef.current = false;
       isSpeakingRef.current = false;
       processingRef.current = false;
+      if (speechWatchdogRef.current) { clearInterval(speechWatchdogRef.current); speechWatchdogRef.current = null; }
       try { recognitionRef.current?.stop(); } catch {}
       window.speechSynthesis.cancel();
       releaseWakeLock();
+      stopKeepAlive();
       setIsRecording(false);
       setMicError(null);
     } else {
@@ -447,6 +501,7 @@ export function Chatbot() {
         conversationModeRef.current = true;
         recognitionRef.current?.start();
         requestWakeLock();
+        startKeepAlive();
         setIsRecording(true);
         setMicError(null);
       } catch (e) {
@@ -584,14 +639,21 @@ export function Chatbot() {
   // --- RENDER ---
   return (
     <>
-      {/* Botón flotante para abrir/cerrar */}
+      {/* Botón flotante para abrir/cerrar.
+          Si la conversación por voz está activa y el chat está cerrado, el botón se
+          pone rojo y pulsa con un icono de micrófono para indicar que sigue escuchando. */}
       <motion.button
-        className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white p-4 rounded-full shadow-lg hover:bg-emerald-700 transition-colors"
+        className={`fixed bottom-6 right-6 z-50 text-white p-4 rounded-full shadow-lg transition-colors ${
+          isRecording && !isOpen
+            ? "bg-red-600 hover:bg-red-700 ring-4 ring-red-400/50 animate-pulse"
+            : "bg-emerald-600 hover:bg-emerald-700"
+        }`}
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
+        title={isRecording && !isOpen ? "Conversación por voz activa — toca para abrir" : (isOpen ? "Cerrar" : "Abrir chat")}
       >
-        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+        {isOpen ? <X size={24} /> : (isRecording ? <Mic size={24} /> : <MessageCircle size={24} />)}
       </motion.button>
 
       <AnimatePresence>
@@ -654,6 +716,14 @@ export function Chatbot() {
                 </div>
               </div>
             </div>
+
+            {/* Aviso: conversación por voz activa */}
+            {isRecording && (
+              <div className="bg-emerald-500/15 text-emerald-200 text-[11px] px-3 py-1.5 text-center border-b border-emerald-500/20 leading-snug">
+                🎙️ Conversación por voz activa. Sigue aunque cierres esta ventana — solo <b>“Detener”</b> la apaga.
+                <span className="block text-emerald-300/70">(Con la pantalla del móvil bloqueada, el navegador la pausa.)</span>
+              </div>
+            )}
 
             {/* Error de Micrófono */}
             {micError && (

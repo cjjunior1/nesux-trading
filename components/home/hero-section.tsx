@@ -11,7 +11,7 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
+          src="https://cdn.abacus.ai/images/31f74caf-5d2c-4805-be8e-accbeb7f450f.png"
           alt="Trading profesional"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -33,14 +33,41 @@ export function HeroSection() {
             <span className="text-sm text-emerald-400">Método Probado para Traders Exitosos</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Transforma tu Vida con el{" "}
             <span className="gradient-text">Trading Inteligente</span>
           </h1>
 
+          {/* Las 3 Verdades del Trading */}
+          <div className="max-w-3xl mx-auto mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-5">
+              Las 3 Verdades del Trading que Debes Saber
+            </h2>
+            <div className="grid gap-4 text-left">
+              <div className="bg-slate-900/50 border border-emerald-500/30 rounded-2xl p-5 flex gap-4 items-start">
+                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-300 font-bold flex items-center justify-center">1</span>
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                  En los mercados financieros, <strong className="text-white">la mayoría pierde</strong>. No es mala suerte — es no tener el método correcto.
+                </p>
+              </div>
+              <div className="bg-slate-900/50 border border-amber-500/30 rounded-2xl p-5 flex gap-4 items-start">
+                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center">2</span>
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                  Hay una verdad incómoda en el trading: <strong className="text-white">los mercados no perdonan la improvisación</strong>. La mayoría paga un precio muy caro por aprenderlo tarde.
+                </p>
+              </div>
+              <div className="bg-slate-900/50 border border-blue-500/30 rounded-2xl p-5 flex gap-4 items-start">
+                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-blue-500/20 text-blue-300 font-bold flex items-center justify-center">3</span>
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                  El dinero que pierde la mayoría de los traders no desaparece — <strong className="text-white">alguien más se lo lleva</strong>. La pregunta es: ¿de qué lado quieres estar?
+                </p>
+              </div>
+            </div>
+          </div>
+
           <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto">
-            Aprende el método que te llevará del 95% que pierde al{" "}
-            <strong className="text-emerald-400">5% que GANA</strong> consistentemente en los mercados financieros.
+            Aprende el método que te llevará del <strong className="text-red-500">95%</strong> que pierde al{" "}
+            <strong className="text-sky-400">5%</strong> <strong className="text-emerald-400">que GANA</strong> consistentemente en los mercados financieros.
           </p>
 
           <p className="text-lg text-slate-200 mb-6 max-w-3xl mx-auto leading-relaxed">

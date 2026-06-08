@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Regístrate | Nesux Trading Academy',
     description: 'Crea tu cuenta hoy',
-    images: [{ url: '/og/registro.jpg', width: 1200, height: 630, alt: 'Regístrate' }],
+    images: [{ url: '/og-images/registro.jpg', width: 1200, height: 630, alt: 'Regístrate' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Regístrate | Nesux Trading Academy',
     description: 'Crea tu cuenta hoy',
-    images: ['/og/registro.jpg'],
+    images: ['/og-images/registro.jpg'],
   },
 };
 
