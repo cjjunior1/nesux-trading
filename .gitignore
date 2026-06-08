@@ -1,6 +1,7 @@
 .env
 .env.local
 .env.production
+*.backup
 *.zip
 *.log
 ql*

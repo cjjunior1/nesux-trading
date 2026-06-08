@@ -79,3 +79,67 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Variable para el texto del chatbot (se adapta al tema) */
+:root { --chat-text: #E2E8F0; }
+html.light { --chat-text: #1e293b; }
+
+/* =========================================================
+   MODO CLARO  (se activa con la clase .light en <html>)
+   El sitio está construido en oscuro; aquí se mapean las
+   clases más usadas a una paleta clara y legible.
+   ========================================================= */
+html.light body {
+  background: linear-gradient(135deg, #c1cad8 0%, #aab5c7 100%);
+  color: #0f172a;
+}
+
+/* Fondos sólidos y translúcidos -> superficies claras (tono suave, no blanco) */
+html.light .bg-slate-950,
+html.light .bg-slate-900,
+html.light .bg-slate-900\/95,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/40,
+html.light .bg-slate-950\/70 { background-color: #d2d9e4 !important; }
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/40,
+html.light .bg-slate-800\/30 { background-color: #c5cedb !important; }
+
+html.light .bg-slate-700,
+html.light .bg-slate-700\/50 { background-color: #b6c0d0 !important; }
+
+/* Degradados de sección */
+html.light .from-slate-950,
+html.light .from-slate-900,
+html.light .from-slate-800 {
+  --tw-gradient-from: #c5cedb var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(197 206 219 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+html.light .via-slate-900,
+html.light .via-slate-800 {
+  --tw-gradient-stops: var(--tw-gradient-from), #bcc6d4 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+html.light .to-slate-950,
+html.light .to-slate-900,
+html.light .to-slate-800 {
+  --tw-gradient-to: #b8c2d1 var(--tw-gradient-to-position) !important;
+}
+
+/* Texto */
+html.light .text-white { color: #0f172a !important; }
+html.light .text-slate-200 { color: #1e293b !important; }
+html.light .text-slate-300 { color: #334155 !important; }
+html.light .text-slate-400 { color: #475569 !important; }
+
+/* Bordes */
+html.light .border-slate-600,
+html.light .border-slate-700,
+html.light .border-slate-700\/50,
+html.light .border-slate-800 { border-color: #a6b1c2 !important; }

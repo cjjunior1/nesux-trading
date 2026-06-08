@@ -19,6 +19,12 @@ export const metadata: Metadata = {
       { url: '/og/trading-academy.jpg', width: 1200, height: 630, alt: 'Trading Academy' },
     ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Nesux Trading Academy',
+    description: 'Aprende a operar en los mercados financieros',
+    images: ['/og/trading-academy.jpg'],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

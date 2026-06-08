@@ -20,6 +20,34 @@ interface Message {
   textColor?: string;
 }
 
+// Rango amplio de emojis/símbolos para que el lector de voz no los pronuncie (evita "sonido raro")
+const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{2122}\u{2139}\u{20E3}]/gu;
+
+// Color uniforme para el cuerpo del mensaje (las letras deben verse iguales; se adapta al tema)
+const BODY_TEXT_COLOR = "var(--chat-text, #E2E8F0)";
+
+// Quita marcas de markdown que el modelo a veces deja (###, **, ***, viñetas, etc.)
+function cleanMarkdown(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(/```[\s\S]*?```/g, (m) => m.replace(/```/g, "").trim()) // bloques de código
+    .replace(/`([^`]+)`/g, "$1")              // código en línea
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")     // imágenes markdown
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")  // enlaces -> solo el texto
+    .replace(/^#{1,6}\s*/gm, "")               // encabezados ###
+    .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")     // ***negrita-cursiva***
+    .replace(/\*\*([^*]+)\*\*/g, "$1")         // **negrita**
+    .replace(/\*([^*]+)\*/g, "$1")             // *cursiva*
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/^\s*>\s?/gm, "")                  // citas >
+    .replace(/^\s*[-*+]\s+/gm, "• ")            // viñetas -> punto
+    .replace(/[*#`~]{1,}/g, "")                 // símbolos sueltos (***), ###, etc.
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -223,7 +251,7 @@ export function Chatbot() {
     window.speechSynthesis.cancel();
     
     const words = content.split(/\s+/);
-    const textToRead = words.slice(fromIndex).join(" ").replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "").trim();
+    const textToRead = words.slice(fromIndex).join(" ").replace(EMOJI_RE, "").replace(/[•▪◦●]/g, " ").replace(/\s+/g, " ").trim();
     
     const utterance = new SpeechSynthesisUtterance(textToRead);
     utterance.lang = "es-ES";
@@ -240,7 +268,7 @@ export function Chatbot() {
         let wordCount = 0;
         let currentChar = 0;
         for (let i = 0; i < words.length; i++) {
-          const word = words[i].replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "");
+          const word = words[i].replace(EMOJI_RE, "");
           if (word.length > 0) {
             if (currentChar >= event.charIndex) {
               wordCount = i;
@@ -321,7 +349,7 @@ export function Chatbot() {
       if (!response.ok) throw new Error("Error");
       const data = await response.json();
       if (data.error) throw new Error(data.error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: data.content }]);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: cleanMarkdown(data.content) }]);
     } catch (error) {
       console.error("Error:", error);
       setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Error al procesar. Intenta de nuevo." }]);
@@ -395,7 +423,7 @@ export function Chatbot() {
       if (!response.ok) throw new Error("Error en la respuesta");
       const data = await response.json();
       if (data.error) throw new Error(data.error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: data.content }]);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: cleanMarkdown(data.content) }]);
     } catch (error) {
       console.error("Error:", error);
       setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Lo siento, tuve un problema analizando el archivo. Por favor intenta nuevamente." }]);
@@ -516,12 +544,30 @@ export function Chatbot() {
                   }`} style={{ fontSize: `${(fontSize / 100) * 14}px`, userSelect: "text !important" as any, cursor: "text !important" as any }}>
                     {msg.role === "assistant" ? (
                       <div className="space-y-3">
-                        {/* Saludo en color distintivo */}
-                        {msg.greeting && (
-                          <div style={{ color: msg.greetingColor || undefined, fontWeight: 600, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${msg.greetingColor ? msg.greetingColor + "30" : "rgba(250,204,21,0.15)"}` }}>
-                            {msg.greeting}
-                          </div>
-                        )}
+                        {/* Saludo en color distintivo - también resaltable al leer */}
+                        {msg.greeting && (() => {
+                          const greetingWords = msg.greeting.trim().split(/\s+/).filter(Boolean);
+                          return (
+                            <div style={{ fontWeight: 600, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${msg.greetingColor ? msg.greetingColor + "30" : "rgba(16,185,129,0.2)"}` }}>
+                              {greetingWords.map((word, idx) => {
+                                const isActive = readingMessageId === msg.id && readingWordIndex === idx;
+                                return (
+                                  <span
+                                    key={"g" + idx}
+                                    className={`inline-block cursor-pointer rounded px-0.5 transition-all duration-150 ${
+                                      isActive ? "bg-emerald-400 text-slate-950 font-bold scale-105 shadow-sm" : "hover:bg-white/10"
+                                    }`}
+                                    onClick={() => handleWordClick(msg, idx)}
+                                    onDoubleClick={() => handleWordDoubleClick(msg, idx)}
+                                    style={{ color: isActive ? undefined : (msg.greetingColor || undefined) }}
+                                  >
+                                    {word}{" "}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
                         
                         {/* Contenido del mensaje */}
                         {/* Vista previa de archivo si existe */}
@@ -550,7 +596,6 @@ export function Chatbot() {
                             return contentWords.map((word, idx) => {
                               const combinedIdx = greetingWords.length + idx; // índice relativo al texto combinado
                               const isActive = readingMessageId === msg.id && readingWordIndex === combinedIdx;
-                              const colorStyle = msg.textColor || undefined;
                               return (
                                 <span
                                   key={combinedIdx}
@@ -559,7 +604,7 @@ export function Chatbot() {
                                   }`}
                                   onClick={() => handleWordClick(msg, combinedIdx)}
                                   onDoubleClick={() => handleWordDoubleClick(msg, combinedIdx)}
-                                  style={{ color: colorStyle }}
+                                  style={{ color: isActive ? undefined : BODY_TEXT_COLOR }}
                                 >
                                   {word}{" "}
                                 </span>

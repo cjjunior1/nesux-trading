@@ -10,7 +10,7 @@ const testimonials = [
   {
     name: "Emmanuel Ortega",
     role: "Empresario - México",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&q=80",
     content: "Después de perder dinero con otras plataformas, Trading Academy A Otro Nivel me enseñó a operar con disciplina. En 6 meses recuperé mi inversión y ahora genero ingresos consistentes.",
     profit: "+$8,500",
     period: "6 meses",
@@ -18,7 +18,7 @@ const testimonials = [
   {
     name: "Janet Sánchez",
     role: "Mercadóloga - República Dominicana",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=faces&q=80",
     content: "El método es increíblemente claro. Nunca pensé que alguien sin experiencia como yo pudiera aprender trading. Ahora tengo una fuente de ingresos adicional.",
     profit: "+$3,200",
     period: "4 meses",
@@ -26,7 +26,7 @@ const testimonials = [
   {
     name: "Andrés Rivera",
     role: "Ingeniero - Perú",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces&q=80",
     content: "Lo mejor es la comunidad y el soporte. Siempre hay alguien dispuesto a ayudar. El bot de trading me ahorra horas de análisis cada día.",
     profit: "+$12,800",
     period: "8 meses",
