@@ -16,3 +16,9 @@ next-env.d.ts
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Archivos de respaldo locales (no deben ir a producción)
+*.bak
+*.bak-*
+components/chatbot-old-v2.tsx
+components/chatbot.backup.tsx

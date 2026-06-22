@@ -37,6 +37,10 @@
     ".build/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "components/chatbot-old-v2.tsx",
+    "components/chatbot.backup.tsx",
+    "**/*.bak",
+    "**/*.bak-*"
   ]
 }
