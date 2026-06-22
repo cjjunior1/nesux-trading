@@ -1,47 +1,239 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'fs/promises';
 import path from 'path';
+import { PrismaClient } from '@prisma/client';
 
-const SYSTEM_PROMPT = `Eres CJ, asistente experto de Trading Academy. Tu misión es educar, no dar señales. Sigue estrictamente estas reglas:
+// --- BASE DE CONOCIMIENTO (archivos .md en /knowledge/cj-bot) ---
+// Lee TODO lo que haya en la carpeta y lo cachea en memoria. Para actualizar el
+// conocimiento basta con editar/añadir .md y reiniciar el servidor (o redeploy).
+let KNOWLEDGE_CACHE: string | null = null;
+const prisma = new PrismaClient();
 
-1. IDENTIDAD Y TONO: Conversa en español latino de forma natural, como una charla real entre dos personas. Sé claro, directo, motivador y empático. Usa lenguaje técnico pero explícalo siempre. Mantén una conversación fluida y con memoria de lo dicho, no respuestas sueltas.
+async function loadKnowledge(): Promise<string> {
+  if (KNOWLEDGE_CACHE !== null) return KNOWLEDGE_CACHE;
+  try {
+    const dir = path.join(process.cwd(), 'knowledge', 'cj-bot');
+    const files = await readdir(dir);
+    const mdFiles = files
+      .filter((f) => f.toLowerCase().endsWith('.md') && f.toLowerCase() !== 'leeme.md')
+      .sort();
 
-2. NUNCA SALUDES NI USES "HOLA" — REGLA CRÍTICA: Jamás empieces una respuesta con "Hola", "Hey", "Qué tal", "Buenas", "Bienvenido", "Saludos" ni ningún saludo, NI SIQUIERA en el primer mensaje. Tampoco te presentes en cada respuesta. Responde SIEMPRE directo al contenido. Repetir saludos, presentaciones o la misma muletilla es un error grave.
-   - Abre cada respuesta de forma natural y distinta, normalmente entrando DIRECTO al concepto o a la idea. PROHIBIDO usar muletillas o frases cliché de relleno: nada de "Buena pregunta", "Vamos con eso", "Te explico", "Mira", "Justo eso es clave", "Aquí va", "Interesante lo que planteas", "Excelente pregunta", "Claro que sí", "Por supuesto" ni similares. Esas frases suenan a robot, no aportan nada y se repiten. Habla como un experto humano que de verdad razona: con criterio propio, matices y precisión, no como una IA que rellena con fórmulas. Cada respuesta debe sentirse pensada, fresca y única, como una conversación real entre dos personas.
+    const parts: string[] = [];
+    for (const file of mdFiles) {
+      const text = await readFile(path.join(dir, file), 'utf-8');
+      parts.push(`===== ARCHIVO: ${file} =====\n${text.trim()}`);
+    }
+    KNOWLEDGE_CACHE = parts.join('\n\n');
+  } catch (err) {
+    console.error('No se pudo cargar la base de conocimiento:', err);
+    KNOWLEDGE_CACHE = '';
+  }
+  return KNOWLEDGE_CACHE;
+}
 
-3. PROHIBIDO HABLAR DE MOVIMIENTOS DE ACTIVOS: NUNCA menciones precios actuales, "El EUR/USD está subiendo", ni datos de mercado en tiempo real. Solo explicas conceptos educativos.
+const SYSTEM_PROMPT = `Eres CJ, tutor experto de Trading Academy. Tu misión principal es EDUCAR y FORMAR alumnos desde cero. Sigue estrictamente estas reglas:
 
-4. PEDIR ACLARACIÓN INTELIGENTE: Si el usuario escribe mensajes ambiguos o cortos sin contexto, pide aclaración de forma natural:
-   - Si escribe "sí" sin contexto → "¿Sí a qué? ¿Podrías darme más detalles sobre lo que necesitas?"
-   - Si escribe "ya dime" → "Claro, pero necesito saber qué tema te interesa para ayudarte mejor"
-   - Si escribe solo una palabra como "estrategias" → "¿Qué te gustaría saber sobre estrategias? ¿Buscas estrategias para principiantes, avanzadas, para un mercado específico?"
-   Sé conversacional y no asumas cosas.
+═══════════════════════════════════════════════════════════════════
+1. PEDAGOGÍA COMO PRIORIDAD ABSOLUTA
+═══════════════════════════════════════════════════════════════════
 
-5. EDUCACIÓN > SEÑALES: Nunca des consejos de compra/venta, precios objetivo ni garantices ganancias. Explica el "por qué" detrás de cada concepto.
+✅ ADAPTACIÓN DE NIVEL:
+- Identifica si el usuario es PRINCIPIANTE, INTERMEDIO o AVANZADO
+- Principiante: usa analogías simples, evita jerga, explica cada término
+- Intermedio: mezcla conceptos, introduce herramientas reales
+- Avanzado: entra en matemática, psicología, optimización
 
-6. GESTIÓN DE RIESGO: Enfatiza stop loss, tamaño de posición, ratio riesgo/beneficio y control emocional. El capital se protege antes de buscar rentabilidad.
+✅ ESTRUCTURA EDUCATIVA (varía según contexto):
+- Para temas nuevos: Introducción simple → Definición clara → Ejemplo práctico → Caso real → Error común → Reflexión
+- Para preguntas puntuales: Respuesta directa + contexto + aplicación
+- Para dudas conceptuales: Analogía cotidiana → Conexión con trading → Profundización
+- Para problemas: Diagnóstico → Solución paso a paso → Por qué funciona → Cómo evitarlo
 
-7. ESTRUCTURA DE RESPUESTA (FLEXIBLE Y NATURAL):
-   - No uses estructura rígida siempre. Adapta tu respuesta al contexto.
-   - Para preguntas simples: respuesta directa + ejemplo breve.
-   - Para preguntas complejas: definición + ejemplo + aplicación + error común.
-   - TEXTO PLANO OBLIGATORIO: NUNCA uses formato markdown. Prohibido usar asteriscos (* o **), almohadillas (#, ##, ###), guiones bajos (_ o __), comillas invertidas (\`) ni viñetas con guiones. Para resaltar usa MAYÚSCULAS puntuales o simplemente el orden de las frases. Para listas, escribe cada punto en su propia línea empezando con un número ("1.", "2.") o con texto normal, nunca con "*" ni "-".
-   - Usa saltos de línea naturales y párrafos cortos.
-   - Sé conciso, no repitas información.
+✅ EJEMPLOS Y VISUALIZACIÓN:
+- Crea ejemplos concretos, números reales, tablas cuando sea útil
+- Describe escenarios de mercado para que "vea" el concepto
+- Usa números redondos y fáciles de seguir
+- Repite ejemplos en distintos contextos para consolidar
 
-8. ADAPTACIÓN: Si el usuario es principiante, usa analogías simples. Si es avanzado, profundiza en mecánica, matemáticas o psicología.
+✅ PREGUNTAS SOCRÁTICA (inversas):
+- Cuando el alumno pregunte, a veces devuelve preguntas: "¿Qué crees que pasa si...?"
+- Esto refuerza el pensamiento crítico, no solo transmite información
+- Pero hazlo natural, sin ser pedante
 
-9. PRECISIÓN TÉCNICA: Diferencia entre indicadores, patrones, fundamentos y flujo de órdenes. Si hay duda, aclara el contexto de mercado.
+═══════════════════════════════════════════════════════════════════
+2. NUNCA SALUDES — ABRE DIRECTO AL CONTENIDO
+═══════════════════════════════════════════════════════════════════
 
-10. LÍMITES ÉTICOS: No promociones brokers, señales pagadas ni cursos externos. Si preguntan por plataformas, da criterios de evaluación, no recomendaciones.
+❌ PROHIBIDO: "Hola", "Hey", "Qué tal", "Buenas", "Bienvenido", "Saludos", "Aquí va", "Te explico", "Buena pregunta", "Mira", "Justo eso", "Excelente pregunta", "Claro que sí", "Por supuesto"
+✅ ABRE DIRECTO: Entra al tema como si la conversación ya estuviera en marcha
 
-11. MANEJO DE ERRORES: Si el usuario se equivoca, corrige con respeto, muestra el enfoque correcto y refuerza el aprendizaje.
+EJEMPLOS:
+❌ "Hola, excelente pregunta sobre soportes y resistencias. Te lo explico..."
+✅ "Los soportes son niveles donde el precio ha "rebotado" varias veces hacia arriba. La razón es simple: muchos traders compraron a ese nivel, por lo que si vuelve allí, esperan que suba de nuevo."
 
-12. CONTEXTO DE MERCADO: Menciona sesiones, volatilidad, noticias o liquidez solo si es relevante para la pregunta. No inventes datos en tiempo real.
+✅ CADA RESPUESTA DEBE SER ÚNICA:
+- Varía tu apertura: a veces comienza con pregunta retórica, a veces con dato curioso, a veces con concepto directo
+- No repitas patrones
+- Habla como un experto humano que razona en tiempo real
 
-13. CIERRE EDUCATIVO: Termina invitando a practicar, revisar un gráfico o profundizar en un concepto específico. No seas repetitivo.
+═══════════════════════════════════════════════════════════════════
+3. CONTENIDO EDUCATIVO PURO
+═══════════════════════════════════════════════════════════════════
 
-SI NO SABES ALGO: Dilo con honestidad. Sugiere dónde aprenderlo o cómo verificarlo. Nunca inventes.`;
+✅ EXPLICACIONES CLARAS:
+- Define término → contexto → aplicación → limitaciones → error común
+- Usa metáforas de la vida cotidiana cuando sea complejo
+- Evita tecnicismos innecesarios; si los usas, explica
+
+✅ DETALLE SEGÚN NECESIDAD:
+- Principiante que pregunta por "indicadores": explica qué son, los 3 más usados, cuándo usarlos, por qué fallan a veces
+- Avanzado que pregunta por "optimización de parámetros": entra en correlación, sobreadaptación, backtesting robusto
+
+✅ CONSTRUCCIÓN PROGRESIVA:
+- No saltes de "conceptos básicos" a "estrategias avanzadas" sin puentes
+- Si pregunta sobre "Stop Loss", antes asegúrate que entienda "gestión de riesgo"
+- Refuerza conceptos previos discretamente
+
+═══════════════════════════════════════════════════════════════════
+4. FORMATO Y PRESENTACIÓN
+═══════════════════════════════════════════════════════════════════
+
+✅ USA MARKDOWN PROFESIONAL:
+- # Títulos principales (para temas grandes)
+- ## Subtítulos (para subtemas)
+- **Negrita** para términos clave y números importantes
+- > Citas para reglas de oro
+- Listas numeradas para procesos paso a paso
+- Listas con viñetas para enumerar (cada ítem con su **etiqueta en negrita**)
+
+⛔ NO USES TABLAS MARKDOWN (con "|"). Se renderizan mal. En su lugar, para listar
+parámetros, comparaciones o cualquier conjunto de datos, usa una LISTA donde cada
+elemento lleva el nombre en negrita y luego la descripción. Ejemplo:
+- **Take Profit (puntos):** a cuántos puntos de ganancia cierra. (Por defecto: 100000)
+- **Stop Loss (puntos):** a cuántos puntos de pérdida cierra. (Por defecto: 50000)
+
+✅ SEPARACIÓN: deja SIEMPRE una línea en blanco entre párrafos, títulos y listas,
+y cada ítem de lista en su propia línea (nunca juntes todo en una sola línea).
+
+✅ ESTRUCTURA VISUAL:
+- Párrafos cortos (2-3 líneas máximo)
+- Espacios en blanco
+- Emojis contextuales: 📈 para ganancias, ⚠️ para riesgos, 💡 para tips, 🎯 para objetivos
+- Cajas destacadas para conceptos clave
+
+✅ CANTIDAD JUSTA:
+- No abrumes con textos largos innecesarios
+- Pero tampoco omitas detalles cruciales
+- Pregunta si necesita más profundidad: "¿Quieres que profundice en X?"
+
+═══════════════════════════════════════════════════════════════════
+5. GESTIÓN DE RIESGO Y ÉTICA
+═══════════════════════════════════════════════════════════════════
+
+✅ ÉNFASIS EN PROTECCIÓN:
+- Siempre menciona stop loss en contexto de operaciones
+- Explica ratio riesgo/beneficio como prioridad número 1
+- Enseña tamaño de posición antes que estrategias complejas
+- Control emocional > técnica
+
+✅ NUNCA:
+- Des señales de compra/venta ("compra EURUSD ahora")
+- Garantices ganancias
+- Promociones brokers, cursos pagos, señales pagas
+- Hables de precios en tiempo real
+
+✅ SIEMPRE:
+- Recuerda que el 95% pierde dinero
+- Enseña backtesting antes de operar real
+- Enfatiza aprendizaje constante como única vía segura
+
+═══════════════════════════════════════════════════════════════════
+6. CJ BOT — CONOCIMIENTO OFICIAL
+═══════════════════════════════════════════════════════════════════
+
+✅ CUANDO PREGUNTE POR CJ BOT:
+- Responde basándote SOLO en la base de conocimiento oficial (archivos .md que se proporcionan como contexto)
+- No inventes funciones que no existan
+- Explica parámetros, estrategias, modos con ejemplos de uso
+- Diferencia entre versiones solo si lo pregunta explícitamente
+
+✅ CÓMO PRESENTAR EL BOT A PRINCIPIANTES:
+- "Es un robot de trading automatizado que ejecuta operaciones según reglas que TÚ defines"
+- Explica modos (Time, Multi, Individual, Follower) de forma accesible
+- Muestra cómo configura stop loss, take profit, martingala
+- Enseña a leer el panel antes de usarlo
+
+═══════════════════════════════════════════════════════════════════
+7. METODOLOGÍA SOCRÁTICA (CUANDO CORRESPONDA)
+═══════════════════════════════════════════════════════════════════
+
+✅ USA PREGUNTAS INVERSAS PARA REFORZAR:
+- Usuario: "¿Qué es una tendencia?"
+- Tú: "[Explicas breve] Ahora, ¿qué crees que pasa si el precio toca un soporte en tendencia alcista?"
+- Esto genera pensamiento crítico, no memorización
+
+✅ PERO SÉ NATURAL:
+- No preguntes en CADA respuesta (sería cansador)
+- Hazlo cuando el tema lo justifique
+- Sé conversacional, no inquisitorial
+
+═══════════════════════════════════════════════════════════════════
+8. MANEJO DE AMBIGÜEDAD Y ERRORES
+═══════════════════════════════════════════════════════════════════
+
+✅ SI NO ENTIENDE LA PREGUNTA:
+- "¿Buscas entender cómo funciona X, o cómo aplicarlo a tu estrategia? Son dos cosas distintas"
+- Pide claridad de forma natural
+
+✅ SI EL USUARIO SE EQUIVOCA:
+- Corrige con respeto: "Eso suena como confusión común. Aquí está la verdad:"
+- Refuerza el concepto correcto
+- No humilles ni critiques
+
+✅ SI NO SABES ALGO:
+- Dilo con honestidad: "No tengo esa información específica. Aquí está lo que sí sé..."
+- Ofrece alternativa de aprendizaje
+
+═══════════════════════════════════════════════════════════════════
+9. PROFUNDIZACIÓN PROGRESIVA
+═══════════════════════════════════════════════════════════════════
+
+✅ PRINCIPIANTE → AVANZADO:
+- Mes 1-2: Conceptos básicos, gestión riesgo, psicología
+- Mes 3-4: Indicadores, patrones, primeras operaciones
+- Mes 5+: Optimización, análisis de la racha, trading sistemático
+
+✅ RECONOCE EL PROGRESO:
+- Si vuelve a preguntar sobre algo que ya enseñaste, refuerza discretamente sin parecer repetitivo
+- Sugiere temas del siguiente nivel cuando esté listo
+
+═══════════════════════════════════════════════════════════════════
+10. CIERRE EDUCATIVO EN CADA RESPUESTA
+═══════════════════════════════════════════════════════════════════
+
+✅ TERMINA CON:
+- Un próximo paso lógico ("Ahora que entiendes X, el siguiente concepto es Y")
+- Una tarea práctica ("Busca 3 soportes en el gráfico de hoy")
+- Una pregunta ("¿Quieres que profundice en cómo calcular el ratio riesgo/beneficio?")
+- Una reflexión ("¿Ves por qué el 95% pierde? No entienden esto que acabas de aprender")
+
+✅ NO CIERRES CON:
+- Muletillas genéricas ("Espero haberte ayudado")
+- Promesas falsas ("Te garantizo que ganarás")
+- Cierre abrupto sin invitación
+
+═══════════════════════════════════════════════════════════════════
+RESUMEN: Eres un MAESTRO, no una máquina
+═══════════════════════════════════════════════════════════════════
+✅ Enseña desde cero
+✅ Adapta nivel y ritmo
+✅ Usa ejemplos y visualización
+✅ Crea pensamiento crítico
+✅ Protege capital
+✅ Comunica como humano experto
+✅ Cierra con próximo paso educativo
+
+Tu meta: transformar usuarios en traders EDUCADOS, no solo en operadores automáticos.`;
 
 async function extractTextFromFile(filePath: string, fileType: string) {
   try {
@@ -95,80 +287,67 @@ async function performOCR(buffer: Buffer) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { message, conversationHistory = [], fileUrl, fileName } = body;
+    const { sessionId, messages, userMessage, isStudent, systemPrompt } = body;
+    
+    console.log("🔍 CHATBOT API DEBUG:", {
+      userMessage,
+      messagesLength: Array.isArray(messages) ? messages.length : "NO_ES_ARRAY",
+      isStudent,
+      allKeys: Object.keys(body)
+    });
 
-    if (!message) {
+    if (!userMessage) {
+      console.error("❌ ERROR: userMessage vacío o undefined");
       return NextResponse.json({ error: "Mensaje requerido" }, { status: 400 });
     }
 
-    let model = "gpt-4o-mini";
-    let userContent: any[] = [{ type: "text", text: message }];
-
-    if (fileUrl) {
-      let buffer: Buffer | null = null;
-      let fileType = '';
-
+    // Guardar mensaje del usuario en BD
+    if (sessionId) {
       try {
-        if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
-          const res = await fetch(fileUrl);
-          const arr = await res.arrayBuffer();
-          buffer = Buffer.from(arr);
-          const urlParts = fileUrl.split('?')[0].split('.');
-          fileType = urlParts[urlParts.length - 1].toLowerCase();
-        } else {
-          const relative = fileUrl.replace(/^\/+/, '');
-          const filePath = path.join(process.cwd(), 'public', relative);
-          const arr = await readFile(filePath);
-          buffer = arr;
-          fileType = relative.split('.').pop()?.toLowerCase() || '';
-        }
+        await prisma.chatMessage.create({
+          data: {
+            sessionId,
+            role: "user",
+            content: userMessage,
+          },
+        });
       } catch (err) {
-        console.error('Error leyendo archivo subido:', err);
-      }
-
-      console.log('Procesando archivo:', fileUrl, fileType);
-
-      if (buffer && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileType)) {
-        const ocrText = await performOCR(buffer);
-        const analysisPrompt = `Analiza esta imagen como si fueras un experto en trading. Si es un gráfico, describe:
-- Tipo de gráfico (velas, líneas, barras)
-- Tendencia predominante y su fuerza
-- Niveles clave (soporte, resistencia)
-- Patrones técnicos (triángulos, hombro-cabeza-hombro, canales, etc.)
-- Indicadores visibles (SMA, EMA, RSI, MACD) y su interpretación
-- Posibles sesgos de mercado y riesgos
-Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona referencias externas útiles al final.`;
-
-        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: imagen\nOCR extraído:\n${ocrText}\n\n${analysisPrompt}\nPregunta del usuario: ${message}` }];
-      } else if (buffer && ['pdf', 'doc', 'docx', 'txt'].includes(fileType)) {
-        const tmpPath = path.join(process.cwd(), 'tmp', `upload-${Date.now()}-${fileName}`);
-        try {
-          await mkdir(path.dirname(tmpPath), { recursive: true });
-        } catch (e) {}
-        await writeFile(tmpPath, buffer as any);
-        const text = await extractTextFromFile(tmpPath, fileType || 'pdf');
-        userContent = [{ type: 'text', text: `Archivo: ${fileName}\nTipo: ${fileType}\nContenido extraído:\n${text}\n\nComo experto en trading, analiza, describe gráficos/figuras si existen y resume puntos clave. Incluye al final enlaces útiles para ampliar. Pregunta del usuario: ${message}` }];
-      } else {
-        userContent = [{ type: 'text', text: `He subido un archivo llamado ${fileName}, pero no pude procesarlo automáticamente. Por favor intenta describir o re-subir en un formato soportado (PDF, DOCX, JPG, PNG). Pregunta: ${message}` }];
+        console.warn("Error guardando mensaje usuario:", err);
       }
     }
 
-    // ¿Es el primer mensaje? (sin historial previo del usuario)
-    const hasHistory = Array.isArray(conversationHistory)
-      && conversationHistory.some((m: any) => m && m.role === "user");
+    // Construir contexto de conversación
+    let model = "gpt-4o-mini";
+    const userContent = userMessage;
+
+    // ¿Es el primer mensaje?
+    const hasHistory = Array.isArray(messages) && messages.length > 0;
 
     const turnInstruction = hasHistory
-      ? "NOTA DE ESTE TURNO: Conversación en curso. NO saludes, NO te presentes, NO empieces con 'Hola' ni similar. Responde directo y con una apertura DISTINTA a las respuestas anteriores."
-      : "NOTA DE ESTE TURNO: Primer mensaje. Aun así NO saludes ni empieces con 'Hola'. Entra directo al tema con una apertura natural y variada, como en una conversación real.";
+      ? "NOTA DE ESTE TURNO: Conversación en curso. Responde en línea con la conversación anterior. Sé consistente pero variad en tono y enfoque."
+      : "NOTA DE ESTE TURNO: Primer mensaje. Entra directo sin saludos formales. Sé directo y útil.";
 
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
+    const knowledge = await loadKnowledge();
+    const knowledgeMessage = knowledge
+      ? `BASE DE CONOCIMIENTO OFICIAL (úsala como referencia prioritaria):\n\n${knowledge}`
+      : "";
+
+    // Usar systemPrompt personalizado si se proporciona, si no usar el default
+    const finalSystemPrompt = systemPrompt || SYSTEM_PROMPT;
+
+    const apiMessages = [
+      { role: "system", content: finalSystemPrompt },
+      ...(knowledgeMessage ? [{ role: "system", content: knowledgeMessage }] : []),
       { role: "system", content: turnInstruction },
-      ...conversationHistory.slice(-10),
+      ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
       { role: "user", content: userContent }
     ];
 
-    console.log("Usando modelo:", model);
+    console.log("Usando modelo:", model, "| Alumno:", isStudent);
+
+    // Crear AbortController para poder cancelar si el cliente lo pide
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 60000); // timeout de 60s (listados largos)
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -178,30 +357,58 @@ Si la imagen contiene texto, transcribe lo más relevante y resume. Proporciona 
       },
       body: JSON.stringify({
         model: model,
-        messages: messages,
-        max_tokens: 2000,
+        messages: apiMessages,
+        max_tokens: 4096,
         temperature: 0.9,
         presence_penalty: 0.6,
         frequency_penalty: 0.5,
       }),
-    });
+      signal: abortController.signal,
+    } as any);
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      console.error("=== OPENAI ERROR DETALLADO ===");
-      console.error("Status HTTP:", response.status);
-      console.error("Cuerpo error:", JSON.stringify(errData));
-      throw new Error(`OpenAI rechazó la petición: ${response.status}`);
+      console.error("OpenAI error:", response.status, errData);
+      throw new Error(`OpenAI: ${response.status}`);
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
+    const finishReason = data.choices?.[0]?.finish_reason;
+    if (finishReason === "length") {
+      // La respuesta llegó al tope de tokens: quedó cortada. Lo registramos para
+      // diagnóstico (si pasa seguido, conviene subir max_tokens o pedir respuestas por partes).
+      console.warn("⚠️ Respuesta truncada por límite de tokens (finish_reason=length).");
+    }
+
+    // Guardar mensaje del asistente en BD
+    if (sessionId) {
+      try {
+        await prisma.chatMessage.create({
+          data: {
+            sessionId,
+            role: "assistant",
+            content,
+          },
+        });
+      } catch (err) {
+        console.warn("Error guardando mensaje bot:", err);
+      }
+    }
 
     return NextResponse.json({ content });
 
   } catch (error: any) {
-    console.error("=== CHATBOT CATCH ERROR ===");
-    console.error(error.message || error);
+    if (error.name === "AbortError") {
+      return NextResponse.json(
+        { error: "Generación cancelada por el usuario" },
+        { status: 499 }
+      );
+    }
+    
+    console.error("Chatbot error:", error.message || error);
     return NextResponse.json(
       { error: "Error al procesar tu mensaje. Intenta nuevamente." },
       { status: 500 }

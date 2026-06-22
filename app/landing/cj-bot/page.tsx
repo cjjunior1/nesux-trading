@@ -47,7 +47,16 @@ export default function CjBotLanding() {
 
       {/* SECCIÓN 3: SOLUCIÓN */}
       <section className="max-w-3xl w-full mx-auto py-8 md:py-16 px-4 text-center">
-        <img src="/img/grafico-ascendente-cjbot.png" alt="Gráfico Ascendente" className="h-24 mx-auto mb-4 bg-slate-800 rounded-full"/>
+        <div className="relative w-full max-w-2xl mx-auto mb-6 aspect-video rounded-2xl overflow-hidden shadow-lg bg-slate-900">
+          <iframe
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[132%]"
+            src="https://www.youtube-nocookie.com/embed/6JZ_hLo0BTU?modestbranding=1&rel=0&controls=0&playsinline=1"
+            title="Presentamos CJ Bot v2.30"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
         <h2 className="section-title mb-1">Presentamos CJ Bot v2.30</h2>
         <div className="mb-3 text-xl text-emerald-400 font-bold">Tu Estratega Personal de Mercados</div>
         <p className="text-slate-300 mb-2">

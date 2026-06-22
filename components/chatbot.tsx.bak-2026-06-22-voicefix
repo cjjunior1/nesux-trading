@@ -360,16 +360,6 @@ export function Chatbot() {
     };
   };
 
-  // Precargar la lista de voces para que getVoices() no esté vacío al leer.
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    const synth = window.speechSynthesis;
-    const warm = () => synth.getVoices();
-    warm();
-    synth.addEventListener?.("voiceschanged", warm);
-    return () => synth.removeEventListener?.("voiceschanged", warm);
-  }, []);
-
   // Cargar saludo inicial
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -425,11 +415,13 @@ export function Chatbot() {
   // Usa EXACTAMENTE las palabras visibles que pintó el markdown (<span class="cj-word wi-N">).
   const readMessage = (msgId: string, fromIndex: number = 0) => {
     if (typeof window === "undefined") return;
+    console.log("%c[CJ] readMessage", "color:#0bf", { msgId, fromIndex, colaPendiente: readQueueRef.current.length, hora: new Date().toISOString().slice(11, 23) });
     const synth = window.speechSynthesis;
 
     if (hlTimerRef.current) { clearTimeout(hlTimerRef.current); hlTimerRef.current = null; }
-    // En una lectura nueva no hay nada que cancelar; cancel()+speak() inmediato puede
-    // duplicar el audio en algunos navegadores, así que solo cancelamos si ya había voz.
+    // CLAVE: cancel() seguido de speak() al instante hace que Edge/Chrome reproduzca
+    // la locución DOS veces. En una lectura nueva NO hay nada que cancelar, así que
+    // NO llamamos a cancel() (eso evita el doble). Solo cancelamos si ya había voz.
     const busy = synth.speaking || synth.pending;
     if (busy) synth.cancel();
 
@@ -439,6 +431,7 @@ export function Chatbot() {
     const cleanW = (w: string) => w.replace(EMOJI_RE, "").replace(/[•▪◦●]/g, "").trim();
     const spoken = slice.map(cleanW).filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
     if (!spoken) return;
+    console.log("%c[CJ] textoALeer", "color:#f0f", { largo: spoken.length, palabras: slice.length, inicio: spoken.slice(0, 60), fin: spoken.slice(-60) });
 
     setReadingMessageId(msgId);
     setReadingWordIndex(fromIndex);
@@ -446,8 +439,6 @@ export function Chatbot() {
     const u = new SpeechSynthesisUtterance(spoken);
     u.lang = "es-ES";
     u.rate = 1;
-    // Voz por defecto del navegador (la natural/"Online"): suena mejor. No forzamos
-    // una voz local; si en Edge se duplica el audio, ya lo evita el control de `busy`.
     utteranceRef.current = u;
     const isCurrent = () => utteranceRef.current === u;
 
@@ -485,24 +476,32 @@ export function Chatbot() {
       // ¿Modo "leer todo"? Encadenar el siguiente mensaje de la cola.
       if (readQueueRef.current.length > 0) {
         const nextId = readQueueRef.current.shift()!;
+        console.log("%c[CJ] done -> encadena cola", "color:#f80", { nextId, restan: readQueueRef.current.length });
         setTimeout(() => readMessage(nextId, 0), 80);
         return;
       }
+      console.log("%c[CJ] done -> fin (cola vacía)", "color:#888");
       setReadingMessageId(null);
       setReadingWordIndex(-1);
     };
-    u.onend = done;
+    u.onstart = () => console.log("%c[CJ] onstart (empieza a hablar)", "color:#0f8");
+    u.onend = () => { console.log("%c[CJ] onend", "color:#888"); done(); };
     u.onerror = (e: any) => {
+      console.log("%c[CJ] onerror", "color:#f00", e?.error);
       if (e?.error === "interrupted" || e?.error === "canceled") return;
       done();
     };
 
     hlTimerRef.current = setTimeout(advance, 300);
 
+    console.log("%c[CJ] busy=" + busy, "color:#fa0");
     if (busy) {
-      // Veníamos de otra lectura: esperar a que cancel() surta efecto antes de hablar.
-      setTimeout(() => { if (isCurrent()) { try { synth.speak(u); } catch {} } }, 130);
+      // Veníamos de otra lectura: esperar a que cancel() surta efecto antes de hablar
+      // (evita que se solapen / dupliquen).
+      setTimeout(() => { if (isCurrent()) { console.log("%c[CJ] speak() CON espera", "color:#0bf"); try { synth.speak(u); } catch {} } }, 130);
     } else {
+      // Lectura NUEVA: speak() directo, sin cancel previo → no se duplica.
+      console.log("%c[CJ] speak() DIRECTO", "color:#0bf");
       synth.speak(u);
     }
   };
@@ -518,6 +517,7 @@ export function Chatbot() {
 
   // "Leer desde aquí": lee SOLO este mensaje (sin cola).
   const readHere = (msgId: string) => {
+    console.log("%c[CJ] readHere (menú: Leer desde aquí)", "color:#0f0", msgId);
     setReadMenuId(null);
     readQueueRef.current = [];
     readMessage(msgId, 0);
@@ -529,6 +529,7 @@ export function Chatbot() {
     const startPos = Math.max(0, ids.indexOf(anchorId));
     const queue = ids.slice(startPos);
     const firstId = queue.shift();
+    console.log("%c[CJ] readAll (menú: Leer todo)", "color:#0f0", { anchorId, ids, firstId, cola: queue });
     setReadMenuId(null);
     readQueueRef.current = queue;
     if (firstId) readMessage(firstId, 0);
@@ -894,7 +895,7 @@ export function Chatbot() {
                           onDoubleClick={(e) => {
                             const el = (e.target as HTMLElement)?.closest?.(".cj-word") as HTMLElement | null;
                             const m = el ? /wi-(\d+)/.exec(el.className) : null;
-                            if (m) { e.stopPropagation(); readQueueRef.current = []; readMessage(msg.id, Number(m[1])); }
+                            if (m) { console.log("%c[CJ] doble-clic palabra", "color:#ff0", m[1]); e.stopPropagation(); readQueueRef.current = []; readMessage(msg.id, Number(m[1])); }
                           }}
                         >
                           {(() => {

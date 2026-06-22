@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, ChangeEvent, memo, MutableRefObject } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import {
-  MessageCircle, X, Send, Bot, User, Volume2, Mic, MicOff,
+import { 
+  MessageCircle, X, Send, Bot, User, Volume2, Mic, MicOff, 
   Maximize2, Minimize2, Square, Play, PhoneOff, Paperclip, FileText
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 interface Message {
   id: string;
@@ -32,133 +30,23 @@ const BODY_TEXT_COLOR = "var(--chat-text, #E2E8F0)";
 function cleanMarkdown(text: string): string {
   if (!text) return text;
   return text
-    .replace(/```[\s\S]*?```/g, (m) => m.replace(/```/g, "").trim())
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
-    .replace(/^#{1,6}\s*/gm, "")
-    .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/```[\s\S]*?```/g, (m) => m.replace(/```/g, "").trim()) // bloques de código
+    .replace(/`([^`]+)`/g, "$1")              // código en línea
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")     // imágenes markdown
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")  // enlaces -> solo el texto
+    .replace(/^#{1,6}\s*/gm, "")               // encabezados ###
+    .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")     // ***negrita-cursiva***
+    .replace(/\*\*([^*]+)\*\*/g, "$1")         // **negrita**
+    .replace(/\*([^*]+)\*/g, "$1")             // *cursiva*
     .replace(/__([^_]+)__/g, "$1")
     .replace(/~~([^~]+)~~/g, "$1")
-    .replace(/^\s*>\s?/gm, "")
-    .replace(/^\s*[-*+]\s+/gm, "• ")
-    .replace(/[*#`~]{1,}/g, "")
+    .replace(/^\s*>\s?/gm, "")                  // citas >
+    .replace(/^\s*[-*+]\s+/gm, "• ")            // viñetas -> punto
+    .replace(/[*#`~]{1,}/g, "")                 // símbolos sueltos (***), ###, etc.
     .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
-
-// --- RENDERIZADO DE MARKDOWN ENRIQUECIDO ---
-// Títulos grandes y con color, negritas, listas, tablas, citas y emojis. Cada línea
-// va en un color distinto (cicla por una paleta). Las palabras se envuelven en
-// <span class="cj-word wi-N"> para resaltar (cj-active) la que se está leyendo.
-const LINE_COLORS = [
-  "#E2E8F0", "#7DD3FC", "#86EFAC", "#FCD34D", "#F0ABFC",
-  "#FDA4AF", "#A5B4FC", "#5EEAD4", "#FDBA74",
-];
-
-// Plugin (rehype): parte cada texto en palabras envueltas en <span class="cj-word wi-N">,
-// en ORDEN del documento. A la palabra activa (activeIndex) le añade "cj-active".
-function makeWordSplitter(words: string[], activeIndex: number) {
-  return () => (tree: any) => {
-    const SKIP = new Set(["code", "pre"]);
-    const visit = (node: any) => {
-      if (!node || !Array.isArray(node.children)) return;
-      if (node.tagName && SKIP.has(node.tagName)) return;
-      const out: any[] = [];
-      for (const child of node.children) {
-        if (child.type === "text") {
-          const parts = child.value.split(/(\s+)/);
-          for (const part of parts) {
-            if (part === "") continue;
-            if (/^\s+$/.test(part)) { out.push({ type: "text", value: part }); continue; }
-            const i = words.length;
-            words.push(part);
-            const cls = ["cj-word", `wi-${i}`];
-            if (i === activeIndex) cls.push("cj-active");
-            out.push({ type: "element", tagName: "span", properties: { className: cls }, children: [{ type: "text", value: part }] });
-          }
-        } else {
-          visit(child);
-          out.push(child);
-        }
-      }
-      node.children = out;
-    };
-    visit(tree);
-  };
-}
-
-interface MarkdownProps {
-  text: string;
-  msgId: string;
-  wordsRef: MutableRefObject<Record<string, string[]>>;
-  activeIndex: number;
-}
-
-const Markdown = memo(function Markdown({ text, msgId, wordsRef, activeIndex }: MarkdownProps) {
-  const words: string[] = [];
-  wordsRef.current[msgId] = words;
-  const wordSplitter = makeWordSplitter(words, activeIndex);
-  let lineIdx = 0;
-  const nextColor = () => LINE_COLORS[lineIdx++ % LINE_COLORS.length];
-
-  const components: Record<string, any> = {
-    h1: ({ children }: any) => (
-      <h1 className="text-[2em] font-black text-emerald-300 mt-4 mb-2 pb-1.5 border-b-2 border-emerald-400/40 tracking-tight leading-tight" style={{ textShadow: "0 0 14px rgba(16,185,129,0.45)" }}>{children}</h1>
-    ),
-    h2: ({ children }: any) => (
-      <h2 className="text-[1.7em] font-extrabold text-cyan-300 mt-4 mb-2 tracking-tight leading-tight" style={{ textShadow: "0 0 12px rgba(34,211,238,0.4)" }}>{children}</h2>
-    ),
-    h3: ({ children }: any) => (
-      <h3 className="text-[1.4em] font-bold text-violet-300 mt-3 mb-1.5 leading-snug" style={{ textShadow: "0 0 10px rgba(167,139,250,0.4)" }}>{children}</h3>
-    ),
-    h4: ({ children }: any) => (
-      <h4 className="text-[1.2em] font-bold text-amber-300 mt-2 mb-1 leading-snug">{children}</h4>
-    ),
-    p: ({ children }: any) => <p className="leading-relaxed my-2" style={{ color: nextColor() }}>{children}</p>,
-    strong: ({ children }: any) => <strong className="font-bold text-white">{children}</strong>,
-    em: ({ children }: any) => <em className="italic">{children}</em>,
-    del: ({ children }: any) => <del className="text-slate-500">{children}</del>,
-    ul: ({ children }: any) => <ul className="list-disc pl-5 my-2 space-y-1 marker:text-emerald-400">{children}</ul>,
-    ol: ({ children }: any) => <ol className="list-decimal pl-5 my-2 space-y-1 marker:text-emerald-400">{children}</ol>,
-    li: ({ children }: any) => <li className="leading-relaxed pl-1" style={{ color: nextColor() }}>{children}</li>,
-    blockquote: ({ children }: any) => (
-      <blockquote className="border-l-4 border-emerald-400 bg-emerald-500/10 pl-3 pr-2 py-1.5 my-2 rounded-r-lg italic text-emerald-100">{children}</blockquote>
-    ),
-    a: ({ children, href }: any) => (
-      <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline decoration-cyan-500/50 hover:text-cyan-300">{children}</a>
-    ),
-    hr: () => <hr className="border-slate-700 my-3" />,
-    code: ({ className, children }: any) => {
-      const txt = String(children ?? "");
-      const isBlock = /language-/.test(className || "") || txt.includes("\n");
-      return isBlock
-        ? <code className="block text-[0.85em] font-mono text-emerald-200 leading-relaxed whitespace-pre">{children}</code>
-        : <code className="bg-slate-700 text-amber-200 px-1.5 py-0.5 rounded text-[0.9em] font-mono">{children}</code>;
-    },
-    pre: ({ children }: any) => <pre className="bg-slate-950 border border-slate-700 p-3 rounded-lg overflow-x-auto my-2">{children}</pre>,
-    table: ({ children }: any) => (
-      <div className="overflow-x-auto my-3 rounded-lg border border-slate-700">
-        <table className="w-full border-collapse text-[0.9em]">{children}</table>
-      </div>
-    ),
-    thead: ({ children }: any) => <thead className="bg-slate-700">{children}</thead>,
-    tr: ({ children }: any) => <tr className="even:bg-slate-800/40">{children}</tr>,
-    th: ({ children }: any) => <th className="px-3 py-2 text-left font-semibold text-emerald-200 border border-slate-600 whitespace-nowrap">{children}</th>,
-    td: ({ children }: any) => <td className="px-3 py-2 border border-slate-700 align-top" style={{ color: nextColor() }}>{children}</td>,
-  };
-
-  return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[wordSplitter]} components={components}>
-      {text}
-    </ReactMarkdown>
-  );
-}, (a, b) =>
-  a.text === b.text && a.msgId === b.msgId && a.wordsRef === b.wordsRef && a.activeIndex === b.activeIndex
-);
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -174,12 +62,6 @@ export function Chatbot() {
   // Control de lectura por mensaje
   const [readingMessageId, setReadingMessageId] = useState<string | null>(null);
   const [readingWordIndex, setReadingWordIndex] = useState<number>(0);
-  // Palabras visibles por mensaje (las llena el renderizador Markdown) para alinear
-  // la lectura con el resaltado, y temporizador de respaldo del resaltado.
-  const wordsMapRef = useRef<Record<string, string[]>>({});
-  const hlTimerRef = useRef<any>(null);
-  const [readMenuId, setReadMenuId] = useState<string | null>(null); // menú "leer desde aquí / todo"
-  const readQueueRef = useRef<string[]>([]); // cola para "leer todo" (mensaje tras mensaje)
   
   // Control de micrófono
   const [isRecording, setIsRecording] = useState(false);
@@ -189,8 +71,7 @@ export function Chatbot() {
   // Posición y tamaño
   const [size, setSize] = useState({ width: 380, height: 600 });
   const [isMaximized, setIsMaximized] = useState(false);
-  const [fontSizePercentage, setFontSizePercentage] = useState(100);
-  const [writingMessageId, setWritingMessageId] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState(100);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -310,7 +191,7 @@ export function Chatbot() {
     ];
     
     const motivationalMessages = [
-      "Recuerda: que el 95% de la gente que se dedican al trading pierden su dinero, pero tú estás aquí del lado del 5% que ganara consistentemente. ¿Cómo puedo ayudarte hoy?",
+      "Recuerda: el 95% pierde, pero tú estás aquí para estar en el 5% que gana consistentemente. ¿Cómo puedo ayudarte hoy?",
       "Cada día es una nueva oportunidad para mejorar tu trading. Estoy aquí para guiarte. ¿Por dónde empezamos?",
       "Tu transformación como trader comienza con cada pregunta que haces. ¿Qué quieres aprender hoy?",
       "El trading inteligente se construye con conocimiento y disciplina. Yo te ayudo con el conocimiento. ¿Qué necesitas?"
@@ -359,16 +240,6 @@ export function Chatbot() {
       emoji
     };
   };
-
-  // Precargar la lista de voces para que getVoices() no esté vacío al leer.
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.speechSynthesis) return;
-    const synth = window.speechSynthesis;
-    const warm = () => synth.getVoices();
-    warm();
-    synth.addEventListener?.("voiceschanged", warm);
-    return () => synth.removeEventListener?.("voiceschanged", warm);
-  }, []);
 
   // Cargar saludo inicial
   useEffect(() => {
@@ -421,117 +292,73 @@ export function Chatbot() {
     const textToCopy = msg.role === 'assistant' ? getCombinedText(msg) : (msg.content || '');
     await copyToClipboard(textToCopy);
   };
-  // === LECTURA POR VOZ (limpia): lee UNA vez y subraya lo que va leyendo ===
-  // Usa EXACTAMENTE las palabras visibles que pintó el markdown (<span class="cj-word wi-N">).
-  const readMessage = (msgId: string, fromIndex: number = 0) => {
-    if (typeof window === "undefined") return;
-    const synth = window.speechSynthesis;
-
-    if (hlTimerRef.current) { clearTimeout(hlTimerRef.current); hlTimerRef.current = null; }
-    // En una lectura nueva no hay nada que cancelar; cancel()+speak() inmediato puede
-    // duplicar el audio en algunos navegadores, así que solo cancelamos si ya había voz.
-    const busy = synth.speaking || synth.pending;
-    if (busy) synth.cancel();
-
-    const words = wordsMapRef.current[msgId] || [];
-    if (words.length === 0) return;
-    const slice = words.slice(fromIndex);
-    const cleanW = (w: string) => w.replace(EMOJI_RE, "").replace(/[•▪◦●]/g, "").trim();
-    const spoken = slice.map(cleanW).filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
-    if (!spoken) return;
-
-    setReadingMessageId(msgId);
+  const startReading = (messageId: string, content: string, fromIndex: number = 0) => {
+    if (typeof window === "undefined" || !content) return;
+    window.speechSynthesis.cancel();
+    
+    const words = content.split(/\s+/);
+    const textToRead = words.slice(fromIndex).join(" ").replace(EMOJI_RE, "").replace(/[•▪◦●]/g, " ").replace(/\s+/g, " ").trim();
+    
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = "es-ES";
+    utterance.rate = 1;
+    
+    setReadingMessageId(messageId);
     setReadingWordIndex(fromIndex);
-
-    const u = new SpeechSynthesisUtterance(spoken);
-    u.lang = "es-ES";
-    u.rate = 1;
-    // Voz por defecto del navegador (la natural/"Online"): suena mejor. No forzamos
-    // una voz local; si en Edge se duplica el audio, ya lo evita el control de `busy`.
-    utteranceRef.current = u;
-    const isCurrent = () => utteranceRef.current === u;
-
-    // Resaltado preciso por onboundary (si la voz lo soporta).
-    let boundaryWorks = false;
-    u.onboundary = (e: any) => {
-      if (!isCurrent() || e.name !== "word") return;
-      boundaryWorks = true;
-      let acc = 0, wi = 0;
-      for (let i = 0; i < slice.length; i++) {
-        const w = cleanW(slice[i]);
-        if (!w) continue;
-        if (acc >= e.charIndex) { wi = i; break; }
-        acc += w.length + 1;
-        wi = i;
+    
+    let charIndex = 0;
+    const wordLengths = words.map(w => w.length);
+    
+    utterance.onboundary = (event: any) => {
+      if (event.name === "word") {
+        let wordCount = 0;
+        let currentChar = 0;
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i].replace(EMOJI_RE, "");
+          if (word.length > 0) {
+            if (currentChar >= event.charIndex) {
+              wordCount = i;
+              break;
+            }
+            currentChar += word.length + 1;
+          }
+        }
+        setReadingWordIndex(fromIndex + wordCount);
       }
-      setReadingWordIndex(fromIndex + wi);
-    };
-
-    // Resaltado de respaldo por temporizador (voces sin onboundary).
-    let ti = 0;
-    const advance = () => {
-      if (!isCurrent() || boundaryWorks || ti >= slice.length) return;
-      setReadingWordIndex(fromIndex + ti);
-      const w = cleanW(slice[ti]) || slice[ti];
-      const dur = Math.max(160, w.length * 70) / (u.rate || 1);
-      ti++;
-      hlTimerRef.current = setTimeout(advance, dur);
-    };
-
-    const done = () => {
-      if (!isCurrent()) return;
-      if (hlTimerRef.current) { clearTimeout(hlTimerRef.current); hlTimerRef.current = null; }
-      utteranceRef.current = null;
-      // ¿Modo "leer todo"? Encadenar el siguiente mensaje de la cola.
-      if (readQueueRef.current.length > 0) {
-        const nextId = readQueueRef.current.shift()!;
-        setTimeout(() => readMessage(nextId, 0), 80);
-        return;
-      }
+    };  
+    
+    utterance.onend = () => {
       setReadingMessageId(null);
-      setReadingWordIndex(-1);
+      setReadingWordIndex(0);
     };
-    u.onend = done;
-    u.onerror = (e: any) => {
-      if (e?.error === "interrupted" || e?.error === "canceled") return;
-      done();
-    };
-
-    hlTimerRef.current = setTimeout(advance, 300);
-
-    if (busy) {
-      // Veníamos de otra lectura: esperar a que cancel() surta efecto antes de hablar.
-      setTimeout(() => { if (isCurrent()) { try { synth.speak(u); } catch {} } }, 130);
-    } else {
-      synth.speak(u);
-    }
+    
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
   };
 
   const stopReading = () => {
-    readQueueRef.current = [];
-    if (hlTimerRef.current) { clearTimeout(hlTimerRef.current); hlTimerRef.current = null; }
-    if (typeof window !== "undefined") window.speechSynthesis.cancel();
-    utteranceRef.current = null;
+    window.speechSynthesis.cancel();
     setReadingMessageId(null);
-    setReadingWordIndex(-1);
+    setReadingWordIndex(0);
   };
 
-  // "Leer desde aquí": lee SOLO este mensaje (sin cola).
-  const readHere = (msgId: string) => {
-    setReadMenuId(null);
-    readQueueRef.current = [];
-    readMessage(msgId, 0);
+  const toggleReadMessage = (msg: Message) => {
+    const combined = getCombinedText(msg);
+    if (readingMessageId === msg.id) {
+      stopReading();
+    } else {
+      startReading(msg.id, combined);
+    }
   };
 
-  // "Leer todo": lee toda la conversación, desde este mensaje en adelante, encadenando.
-  const readAll = (anchorId: string) => {
-    const ids = messages.filter((m) => m.role === "assistant").map((m) => m.id);
-    const startPos = Math.max(0, ids.indexOf(anchorId));
-    const queue = ids.slice(startPos);
-    const firstId = queue.shift();
-    setReadMenuId(null);
-    readQueueRef.current = queue;
-    if (firstId) readMessage(firstId, 0);
+  const handleWordClick = (msg: Message, wordIdx: number) => {
+    const combined = getCombinedText(msg);
+    startReading(msg.id, combined, wordIdx);
+  };
+
+  const handleWordDoubleClick = (msg: Message, wordIdx: number) => {
+    const combined = getCombinedText(msg);
+    startReading(msg.id, combined, wordIdx);
   };
 
   // --- WAKE LOCK: mantener la pantalla activa durante la conversación ---
@@ -600,9 +427,58 @@ export function Chatbot() {
   // El bot habla la respuesta y, al terminar, REANUDA automáticamente la escucha,
   // manteniendo una conversación fluida hasta que el usuario pulse "Detener".
   const speakReply = (text: string) => {
-    // DESHABILITADO: No se hace lectura automática del bot.
-    // Solo se lee cuando el usuario presiona "Escuchar" en readMessage()
-    return;
+    if (typeof window === "undefined") return;
+    const clean = (text || "")
+      .replace(EMOJI_RE, "")
+      .replace(/[•▪◦●]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // Reanuda la escucha una sola vez (lo pueden llamar onend Y el watchdog)
+    const resumeListening = () => {
+      if (resumedRef.current) return;
+      resumedRef.current = true;
+      if (speechWatchdogRef.current) { clearInterval(speechWatchdogRef.current); speechWatchdogRef.current = null; }
+      isSpeakingRef.current = false;
+      // Pequeña pausa para que el micrófono se libere antes de volver a escuchar
+      setTimeout(safeStartRecognition, 250);
+    };
+
+    if (!clean) {
+      resumeListening();
+      return;
+    }
+
+    isSpeakingRef.current = true;
+    resumedRef.current = false;
+    // Silenciar el micrófono mientras el bot habla (evita que se escuche a sí mismo)
+    try { recognitionRef.current?.stop(); } catch {}
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = "es-ES";
+    utterance.rate = 1;
+    utterance.onend = resumeListening;
+    utterance.onerror = resumeListening;
+    utteranceRef.current = utterance;
+
+    // Chrome a veces no dispara onend ni reanuda el habla pasados ~14s: lo reactivamos
+    if (speechWatchdogRef.current) clearInterval(speechWatchdogRef.current);
+    speechWatchdogRef.current = setInterval(() => {
+      if (!conversationModeRef.current) {
+        clearInterval(speechWatchdogRef.current); speechWatchdogRef.current = null; return;
+      }
+      const synth = window.speechSynthesis;
+      // Si terminó de hablar (ni hablando ni en cola), reanudamos la escucha
+      if (!synth.speaking && !synth.pending) {
+        resumeListening();
+      } else if (synth.speaking && !synth.paused) {
+        // Truco anti-corte de Chrome en textos largos
+        try { synth.pause(); synth.resume(); } catch {}
+      }
+    }, 500);
+
+    window.speechSynthesis.speak(utterance);
   };
 
   // --- FUNCIONES DE MICRÓFONO (conversación continua manos libres) ---
@@ -655,7 +531,7 @@ export function Chatbot() {
       const response = await fetch("/api/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: msg, messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })) }),
+        body: JSON.stringify({ message: msg, conversationHistory: messages.slice(-10).map(m => ({ role: m.role, content: m.content })) }),
       });
       if (!response.ok) throw new Error("Error");
       const data = await response.json();
@@ -669,7 +545,10 @@ export function Chatbot() {
     } finally {
       setIsLoading(false);
       processingRef.current = false;
-      // NO se hace lectura automática. Solo se lee cuando presionas "Escuchar"
+      // En modo conversación, el bot responde con voz y luego vuelve a escuchar
+      if (conversationModeRef.current) {
+        speakReply(replyText);
+      }
     }
   };
 
@@ -729,8 +608,8 @@ export function Chatbot() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userMessage: `Analiza este archivo: ${fileName} (${fileUrl})`,
-          messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+          message: `Analiza este archivo: ${fileName} (${fileUrl})`,
+          conversationHistory: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
           fileUrl: fileUrl,
           fileName: fileName
         }),
@@ -825,9 +704,9 @@ export function Chatbot() {
                 {/* Zoom + Maximizar + Cerrar */}
                 <div className="flex items-center gap-2">
                   <div className="flex items-center bg-black/20 rounded-full px-1 py-1 border border-white/10 cursor-default">
-                    <button onClick={(e) => { e.stopPropagation(); setFontSizePercentage(p => Math.max(60, p - 10)); }} className="text-white hover:text-emerald-200 px-2 py-1 text-xs font-bold cursor-pointer select-none">A-</button>
-                    <span className="text-white/90 text-[10px] w-8 text-center font-medium">{fontSizePercentage}%</span>
-                    <button onClick={(e) => { e.stopPropagation(); setFontSizePercentage(p => Math.min(200, p + 10)); }} className="text-white hover:text-emerald-200 px-2 py-1 text-xs font-bold cursor-pointer select-none">A+</button>
+                    <button onClick={(e) => { e.stopPropagation(); setFontSize(p => Math.max(60, p - 10)); }} className="text-white hover:text-emerald-200 px-2 py-1 text-xs font-bold cursor-pointer select-none">A-</button>
+                    <span className="text-white/90 text-[10px] w-8 text-center font-medium">{fontSize}%</span>
+                    <button onClick={(e) => { e.stopPropagation(); setFontSize(p => Math.min(200, p + 10)); }} className="text-white hover:text-emerald-200 px-2 py-1 text-xs font-bold cursor-pointer select-none">A+</button>
                   </div>
                   <button onClick={toggleMaximize} className="text-white/70 hover:text-white p-1.5 bg-white/10 rounded-lg transition-colors">
                     {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
@@ -871,9 +750,35 @@ export function Chatbot() {
                     msg.role === "user" 
                       ? "bg-emerald-600 text-white rounded-br-md shadow-lg shadow-emerald-900/30" 
                       : "bg-slate-800 rounded-bl-md border border-slate-700 shadow-lg"
-                  }`} style={{ fontSize: `${fontSizePercentage * 0.16}px`, userSelect: "text !important" as any, cursor: "text !important" as any }}>
+                  }`} style={{ fontSize: `${(fontSize / 100) * 14}px`, userSelect: "text !important" as any, cursor: "text !important" as any }}>
                     {msg.role === "assistant" ? (
                       <div className="space-y-3">
+                        {/* Saludo en color distintivo - también resaltable al leer */}
+                        {msg.greeting && (() => {
+                          const greetingWords = msg.greeting.trim().split(/\s+/).filter(Boolean);
+                          return (
+                            <div style={{ fontWeight: 600, marginBottom: 8, paddingBottom: 8, borderBottom: `1px solid ${msg.greetingColor ? msg.greetingColor + "30" : "rgba(16,185,129,0.2)"}` }}>
+                              {greetingWords.map((word, idx) => {
+                                const isActive = readingMessageId === msg.id && readingWordIndex === idx;
+                                return (
+                                  <span
+                                    key={"g" + idx}
+                                    className={`inline-block cursor-pointer rounded px-0.5 transition-all duration-150 ${
+                                      isActive ? "bg-emerald-400 text-slate-950 font-bold scale-105 shadow-sm" : "hover:bg-white/10"
+                                    }`}
+                                    onClick={() => handleWordClick(msg, idx)}
+                                    onDoubleClick={() => handleWordDoubleClick(msg, idx)}
+                                    style={{ color: isActive ? undefined : (msg.greetingColor || undefined) }}
+                                  >
+                                    {word}{" "}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
+                        
+                        {/* Contenido del mensaje */}
                         {/* Vista previa de archivo si existe */}
                         {msg.fileUrl && (
                           <div className="mb-2">
@@ -885,74 +790,47 @@ export function Chatbot() {
                           </div>
                         )}
 
-                        {/* Contenido enriquecido (markdown elegante: títulos, negritas, listas,
-                            tablas, colores por línea y tamaños). Doble clic en una palabra = leer desde ahí. */}
-                        <div
-                          className="chat-text-selectable markdown-body"
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onTouchStart={(e) => e.stopPropagation()}
-                          onDoubleClick={(e) => {
-                            const el = (e.target as HTMLElement)?.closest?.(".cj-word") as HTMLElement | null;
-                            const m = el ? /wi-(\d+)/.exec(el.className) : null;
-                            if (m) { e.stopPropagation(); readQueueRef.current = []; readMessage(msg.id, Number(m[1])); }
-                          }}
-                        >
+                        <div className="leading-relaxed chat-text-selectable" onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
                           {(() => {
                             const greeting = (msg.greeting || "").trim();
                             let content = (msg.content || "").trim();
+                            // Evitar duplicación: si content arranca con greeting, lo eliminamos
                             if (greeting) {
                               const re = new RegExp('^' + greeting.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '[\\s\\.:,-–—]*', 'i');
                               content = content.replace(re, '').trim();
                             }
-                            // El saludo va como primera línea del markdown (se lee desde el inicio).
-                            let fullText = greeting ? `${greeting}\n\n${content}` : content;
-                            // Evita que tablas con sangría se vean como bloque de código.
-                            fullText = fullText.replace(/^[ \t]+(\|)/gm, '$1');
-                            const activeIndex = readingMessageId === msg.id ? readingWordIndex : -1;
-                            return (
-                              <Markdown text={fullText} msgId={msg.id} wordsRef={wordsMapRef} activeIndex={activeIndex} />
-                            );
+                            const greetingWords = greeting ? greeting.split(/\s+/).filter(Boolean) : [];
+                            const contentWords = content ? content.split(/\s+/).filter(Boolean) : [];
+                            // Renderizamos solo el cuerpo (contentWords) para evitar duplicar el saludo
+                            return contentWords.map((word, idx) => {
+                              const combinedIdx = greetingWords.length + idx; // índice relativo al texto combinado
+                              const isActive = readingMessageId === msg.id && readingWordIndex === combinedIdx;
+                              return (
+                                <span
+                                  key={combinedIdx}
+                                  className={`inline-block cursor-pointer rounded px-0.5 transition-all duration-150 ${
+                                    isActive ? "bg-emerald-400 text-slate-950 font-bold scale-105 shadow-sm" : "hover:bg-white/10"
+                                  }`}
+                                  onClick={() => handleWordClick(msg, combinedIdx)}
+                                  onDoubleClick={() => handleWordDoubleClick(msg, combinedIdx)}
+                                  style={{ color: isActive ? undefined : BODY_TEXT_COLOR }}
+                                >
+                                  {word}{" "}
+                                </span>
+                              );
+                            });
                           })()}
                         </div>
                         
                         {/* Botones: Escuchar + Copiar */}
                         <div className="relative flex gap-2 mt-2 pt-2 border-t border-slate-700">
-                          {readingMessageId === msg.id ? (
-                            /* Mientras lee: botón ROJO para detener */
-                            <button
-                              onClick={stopReading}
-                              className="flex-1 flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-300 font-semibold transition-colors"
-                            >
-                              <Square size={14} /> Detener
-                            </button>
-                          ) : (
-                            /* En reposo: menú "leer desde aquí / todo" */
-                            <div className="relative flex-1">
-                              <button
-                                onClick={() => setReadMenuId(readMenuId === msg.id ? null : msg.id)}
-                                className="w-full flex items-center justify-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
-                              >
-                                <Play size={14} /> Escuchar
-                              </button>
-                              {readMenuId === msg.id && (
-                                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 w-52 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl p-1.5">
-                                  <div className="text-[10px] text-slate-400 px-2 py-1 text-center">¿Qué quieres escuchar?</div>
-                                  <button
-                                    onClick={() => readHere(msg.id)}
-                                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-emerald-600/30 rounded-lg transition-colors"
-                                  >
-                                    📍 Leer desde aquí
-                                  </button>
-                                  <button
-                                    onClick={() => readAll(msg.id)}
-                                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-emerald-600/30 rounded-lg transition-colors"
-                                  >
-                                    📚 Leer todo
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          <button
+                            onClick={() => toggleReadMessage(msg)}
+                            className="flex-1 flex items-center justify-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                          >
+                            {readingMessageId === msg.id ? <Square size={14} /> : <Play size={14} />}
+                            {readingMessageId === msg.id ? "Detener" : "Escuchar"}
+                          </button>
                           <button
                             onClick={() => copyMessage(msg)}
                             className="flex-1 flex items-center justify-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
@@ -1026,24 +904,6 @@ export function Chatbot() {
                   )}
                 </div>
               ))}
-              
-              {/* Indicador "Pensando..." */}
-              {isLoading && (
-                <div className="flex gap-2 justify-start">
-                  <div className="bg-emerald-600/20 p-1.5 rounded-full h-fit flex-shrink-0 flex items-center justify-center">
-                    <span style={{ fontSize: 16 }}>🤖</span>
-                  </div>
-                  <div className="bg-slate-800 rounded-bl-md border border-slate-700 shadow-lg p-3 max-w-[85%] flex items-center gap-2">
-                    <span style={{ color: "#10B981" }} className="text-sm font-medium">Pensando</span>
-                    <span className="flex gap-1">
-                      <span className="animate-bounce" style={{animationDelay: "0ms"}}>•</span>
-                      <span className="animate-bounce" style={{animationDelay: "150ms"}}>•</span>
-                      <span className="animate-bounce" style={{animationDelay: "300ms"}}>•</span>
-                    </span>
-                  </div>
-                </div>
-              )}
-              
               <div ref={messagesEndRef} />
             </div>
 

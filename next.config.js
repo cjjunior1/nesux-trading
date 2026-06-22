@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Asegura que la base de conocimiento del chatbot (archivos .md de /knowledge)
+  // se empaquete en la funcion serverless de Vercel y el bot pueda leerla en produccion.
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/chatbot': ['./knowledge/**/*'],
+    },
+  },
   images: {
     remotePatterns: [
       {

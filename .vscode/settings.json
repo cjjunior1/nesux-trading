@@ -1,5 +1,6 @@
 {
   "terminal.integrated.links.enabled": true,
   "terminal.integrated.copyOnSelection": false,
-  "terminal.integrated.enableFileLinks": true
+  "terminal.integrated.enableFileLinks": true,
+  "workbench.panel.alignment": "center"
 }

@@ -161,6 +161,43 @@ h1.title-anim .gradient-text {
 :root { --chat-text: #E2E8F0; }
 html.light { --chat-text: #1e293b; }
 
+/* Indicador "pensando": el mensaje que el usuario acaba de enviar cicla colores
+   en bucle mientras el bot procesa la respuesta. */
+@keyframes thinking-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.thinking-text {
+  background-image: linear-gradient(90deg, #ffffff, #a7f3d0, #67e8f9, #c4b5fd, #fcd34d, #ffffff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: thinking-shimmer 1.5s linear infinite;
+}
+/* Puntitos animados del "pensando…" */
+@keyframes thinking-dots { 0%, 20% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+.thinking-dot { animation: thinking-dots 1.2s infinite; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Palabras del chat (lectura): cada palabra es clicable y la que se lee se resalta. */
+.cj-word {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.cj-word:hover { background: rgba(255, 255, 255, 0.12); }
+/* SOMBREADO de la palabra que se está leyendo */
+.cj-active {
+  background: #fcd34d !important;       /* ámbar */
+  color: #0f172a !important;            /* texto oscuro legible */
+  font-weight: 600;
+  padding: 0 2px;
+  box-shadow: 0 0 0 1px rgba(252, 211, 77, 0.7);
+}
+
 /* Color de REPOSO del título animado: blanco en oscuro, gris oscuro en claro.
    Evita que en modo claro el título blanco quede invisible (parpadeo). */
 :root { --title-rest: #ffffff; }
