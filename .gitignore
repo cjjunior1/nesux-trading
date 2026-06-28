@@ -22,3 +22,6 @@ Thumbs.db
 *.bak-*
 components/chatbot-old-v2.tsx
 components/chatbot.backup.tsx
+
+# Paquete de migración a Nesux (no pertenece al build de este proyecto)
+_export-nesux/

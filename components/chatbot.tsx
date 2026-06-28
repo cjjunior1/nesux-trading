@@ -193,6 +193,7 @@ export function Chatbot() {
   const [writingMessageId, setWritingMessageId] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const dragControls = useDragControls();
@@ -390,6 +391,11 @@ export function Chatbot() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Al vaciarse el input (tras enviar), devolver el textarea a su altura de una línea
+  useEffect(() => {
+    if (input === "" && inputRef.current) inputRef.current.style.height = "auto";
+  }, [input]);
 
   // Mantener sendMessage siempre actualizado para usarlo dentro del reconocimiento de voz
   useEffect(() => {
@@ -673,6 +679,44 @@ export function Chatbot() {
     }
   };
 
+  // Reenviar un mensaje del usuario tras editarlo: actualiza su texto, descarta
+  // la conversación posterior (respuestas viejas) y pide al bot una nueva respuesta.
+  const resendEditedMessage = async (msgId: string, newText: string) => {
+    const text = (newText || "").trim();
+    if (!text || isLoading) return;
+    const idx = messages.findIndex(m => m.id === msgId);
+    if (idx === -1) return;
+
+    // Conversación recortada hasta el mensaje editado (incluido), con el texto nuevo.
+    const truncated = messages
+      .slice(0, idx + 1)
+      .map(m => (m.id === msgId ? { ...m, content: text } : m));
+
+    setMessages(truncated);
+    setEditingMessageId(null);
+    setEditingText("");
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userMessage: text,
+          messages: truncated.slice(0, -1).slice(-10).map(m => ({ role: m.role, content: m.content })),
+        }),
+      });
+      if (!response.ok) throw new Error("Error");
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: cleanMarkdown(data.content) }]);
+    } catch (error) {
+      console.error("Error al reenviar:", error);
+      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Lo siento, tuve un problema al procesar. ¿Puedes repetirlo?" }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -782,13 +826,17 @@ export function Chatbot() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1, ...(isMaximized ? { x: 0, y: 0 } : {}) }}
             exit={{ opacity: 0, scale: 0.8 }}
-            drag dragListener={false} dragControls={dragControls}
+            drag={!isMaximized} dragListener={false} dragControls={dragControls} dragMomentum={false}
             style={{
               position: "fixed",
-              left: isMaximized ? 20 : (typeof window !== "undefined" ? window.innerWidth - 390 : "auto"), 
-              top: isMaximized ? 20 : (typeof window !== "undefined" ? window.innerHeight - 610 : "auto"),
+              left: isMaximized
+                ? (typeof window !== "undefined" ? Math.max(0, (window.innerWidth - size.width) / 2) : 20)
+                : (typeof window !== "undefined" ? window.innerWidth - 390 : "auto"),
+              top: isMaximized
+                ? (typeof window !== "undefined" ? Math.max(0, (window.innerHeight - size.height) / 2) : 20)
+                : (typeof window !== "undefined" ? window.innerHeight - 610 : "auto"),
               width: size.width,
               height: size.height,
               zIndex: 50,
@@ -796,7 +844,7 @@ export function Chatbot() {
             className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-700"
           >
             {/* HEADER CON CONTROLES - Zona de arrastre */}
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-800 p-4 select-none cursor-grab active:cursor-grabbing" onPointerDown={(e) => dragControls.start(e)}>
+            <div className={`bg-gradient-to-r from-emerald-600 to-emerald-800 p-4 select-none ${isMaximized ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`} onPointerDown={(e) => { if (!isMaximized) dragControls.start(e); }}>
               {/* Primera fila: Título */}
               <div className="flex items-center gap-3 mb-3">
                 <Bot className="text-white flex-shrink-0" size={28} />
@@ -929,28 +977,11 @@ export function Chatbot() {
                             /* En reposo: menú "leer desde aquí / todo" */
                             <div className="relative flex-1">
                               <button
-                                onClick={() => setReadMenuId(readMenuId === msg.id ? null : msg.id)}
+                                onClick={() => readHere(msg.id)}
                                 className="w-full flex items-center justify-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
                               >
                                 <Play size={14} /> Escuchar
                               </button>
-                              {readMenuId === msg.id && (
-                                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 w-52 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl p-1.5">
-                                  <div className="text-[10px] text-slate-400 px-2 py-1 text-center">¿Qué quieres escuchar?</div>
-                                  <button
-                                    onClick={() => readHere(msg.id)}
-                                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-emerald-600/30 rounded-lg transition-colors"
-                                  >
-                                    📍 Leer desde aquí
-                                  </button>
-                                  <button
-                                    onClick={() => readAll(msg.id)}
-                                    className="w-full text-left px-3 py-2 text-xs text-slate-200 hover:bg-emerald-600/30 rounded-lg transition-colors"
-                                  >
-                                    📚 Leer todo
-                                  </button>
-                                </div>
-                              )}
                             </div>
                           )}
                           <button
@@ -986,12 +1017,13 @@ export function Chatbot() {
                               rows={4}
                             />
                             <div className="flex gap-2 mt-2">
-                              <button onClick={() => {
-                                // Guardar edición
-                                setMessages(prev => prev.map(m => m.id === editingMessageId ? { ...m, content: editingText } : m));
-                                setEditingMessageId(null);
-                                setEditingText("");
-                              }} className="bg-emerald-600 text-white px-3 py-1 rounded">Guardar</button>
+                              <button
+                                onClick={() => resendEditedMessage(msg.id, editingText)}
+                                disabled={isLoading || !editingText.trim()}
+                                className="bg-emerald-600 text-white px-3 py-1 rounded disabled:opacity-50"
+                              >
+                                Reenviar
+                              </button>
                               <button onClick={() => { setEditingMessageId(null); setEditingText(""); }} className="bg-slate-700 text-white px-3 py-1 rounded">Cancelar</button>
                             </div>
                           </div>
@@ -1070,13 +1102,25 @@ export function Chatbot() {
               </div>
               
               <div className="flex gap-2">
-                <input
-                  type="text"
+                <textarea
+                  ref={inputRef}
+                  rows={1}
                   value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && sendMessage()}
+                  onChange={e => {
+                    setInput(e.target.value);
+                    const t = e.currentTarget;
+                    t.style.height = "auto";
+                    t.style.height = Math.min(t.scrollHeight, 120) + "px";
+                  }}
+                  onKeyDown={e => {
+                    // Enter envía; Shift+Enter hace un salto de línea para seguir escribiendo
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
                   placeholder="Escribe tu pregunta..."
-                  className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none overflow-y-auto"
                   disabled={isLoading || isUploading}
                 />
                 <button

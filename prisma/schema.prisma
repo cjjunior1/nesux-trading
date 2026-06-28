@@ -21,9 +21,131 @@ model User {
   tokenExpiry       DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  // --- Gestión de cuenta (panel admin) ---
+  status            String    @default("active") // active | suspended | deleted
+  suspendedReason   String?
+  suspendedUntil    DateTime?
+  deletedAt         DateTime? // soft delete (restaurable)
+  lastLoginAt       DateTime?
+
+  // --- Identidad y credenciales generadas ---
+  clientId           String?   @unique // ID legible tipo "JH1001"
+  tempPassword       String?            // clave temporal generada (visible para admin hasta el 1er cambio)
+  mustChangePassword Boolean   @default(false)
+  passwordChangedAt  DateTime?
+
   chatSessions      ChatSession[]
   courseAccess      UserCourseAccess[]
   progress          UserProgress[]
+  subscriptions     Subscription[]
+  payments          Payment[]
+  notes             UserNote[]    @relation("UserNotes")
+  pageVisits        PageVisit[]
+
+  @@index([status])
+  @@index([role])
+  @@index([createdAt])
+}
+
+// Suscripción de un usuario a un plan. currentPeriodEnd define el vencimiento:
+// si ya pasó y no se renovó, el usuario está "moroso".
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan             String    // basico | intermedio | profesional | vip
+  status           String    @default("active") // active | past_due | canceled | expired
+  amount           Float     @default(0)
+  startedAt        DateTime  @default(now())
+  currentPeriodEnd DateTime
+  canceledAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  payments         Payment[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([currentPeriodEnd])
+}
+
+// Cada cobro realizado (para reportes financieros y estado al-día/moroso).
+model Payment {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId    String?
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  courseId          String?       // producto/curso comprado
+  amount            Float
+  currency          String        @default("USD")
+  method            String        // crypto | stripe | paypal | bank_transfer | manual
+  status            String        @default("pending") // pending | paid | failed | refunded
+  reference         String?       // referencia/concepto (ej. ID del alumno en transferencia)
+  providerPaymentId String?       // ID del procesador (NOWPayments/Stripe/PayPal)
+  providerMetadata  Json?         // respuesta completa del procesador
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([paidAt])
+  @@index([providerPaymentId])
+}
+
+// Notas internas del administrador sobre un usuario.
+model UserNote {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
+  authorId  String   // id del admin que la escribió
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Registro de acciones administrativas (auditoría: quién hizo qué y cuándo).
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorEmail String?
+  action     String   // p.ej. user.suspend, user.update, payment.create
+  targetType String?  // user | course | payment | ...
+  targetId   String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+// Tracking de navegación: páginas visitadas y tiempo en cada una.
+model PageVisit {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  sessionId String?   // id de sesión de navegador
+  path      String
+  enteredAt DateTime  @default(now())
+  leftAt    DateTime?
+  durationMs Int      @default(0)
+  referrer  String?
+  userAgent String?
+
+  @@index([userId])
+  @@index([enteredAt])
+  @@index([path])
+}
+
+// Ajustes globales configurables desde el panel (clave/valor).
+// Ej: "password_change_days" = "15", "client_seq" = "1000".
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Lead {
@@ -142,7 +264,8 @@ model UserCourseAccess {
   grantedAt   DateTime @default(now())
   expiresAt   DateTime?
   paymentInfo String?
-  
+  paymentId   String?  // pago que originó este acceso
+
   @@unique([userId, courseId])
 }
 

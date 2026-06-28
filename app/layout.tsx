@@ -2,6 +2,7 @@ import { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import LayoutShell from '@/components/layout-shell';
+import PageTracker from '@/components/page-tracker';
 import Script from 'next/script';
 import './globals.css';
 
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
+          <PageTracker />
           <LayoutShell>{children}</LayoutShell>
         </Providers>
       </body>

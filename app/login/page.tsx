@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Mail, Lock, ArrowRight, AlertCircle, Loader2, TrendingUp } from "lucide-react";
 
 export default function LoginPage() {
@@ -37,7 +37,10 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.replace("/dashboard");
+        // Si el usuario debe cambiar la contraseña (1ª vez o cada N días), lo enviamos ahí.
+        const session = await getSession();
+        const mustChange = (session?.user as any)?.mustChangePassword;
+        router.replace(mustChange ? "/cambiar-clave" : "/dashboard");
       }
     } catch (err) {
       setError("Error al iniciar sesión");
@@ -75,16 +78,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Email
+                Email o ID de usuario
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <input
-                  type="email"
+                  type="text"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input-field pl-10"
-                  placeholder="tu@email.com"
+                  placeholder="tu@email.com o JH1001"
                 />
               </div>
             </div>

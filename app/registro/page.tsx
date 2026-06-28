@@ -3,83 +3,69 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  User,
-  Mail,
-  Phone,
-  ArrowRight,
-  CheckCircle,
-  Shield,
-  Gift,
-  AlertCircle,
-  Loader2,
+  User, Mail, Phone, ArrowRight, CheckCircle, Shield, Gift, AlertCircle, Loader2,
 } from "lucide-react";
+import { COUNTRIES, flagOf } from "@/lib/countries";
 
 export default function RegistroPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    whatsappNumber: "",
-  });
+  const [formData, setFormData] = useState({ fullName: "", email: "", country: "DO", localNumber: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [creds, setCreds] = useState<{ clientId?: string; tempPassword?: string }>({});
   const [apiError, setApiError] = useState("");
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const dialOf = (c: string) => COUNTRIES.find((x) => x.c === c)?.d || "+1";
+  const fullWhatsapp = (data = formData) => dialOf(data.country) + data.localNumber.replace(/\D/g, "");
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "El nombre es obligatorio";
+  const validate = (data = formData) => {
+    const e: Record<string, string> = {};
+
+    const words = data.fullName.trim().split(/\s+/).filter(Boolean);
+    if (words.length < 2) {
+      e.fullName = "Por favor, ingresa tu nombre y apellido completos. Necesitamos ambos para generar tu ID de usuario.";
     }
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "El apellido es obligatorio";
-    }
+    if (!data.email.trim()) e.email = "El correo electrónico es obligatorio";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) e.email = "El formato del correo no es válido";
 
-    if (!formData.email.trim()) {
-      newErrors.email = "El email es obligatorio";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "El formato del email no es válido";
-    }
+    const digits = data.localNumber.replace(/\D/g, "");
+    if (!digits) e.localNumber = "Ingresa tu número de WhatsApp";
+    else if (digits.length < 7 || digits.length > 14) e.localNumber = "El número no parece válido. Escribe solo tu número, sin el código de país.";
 
-    if (!formData.whatsappNumber.trim()) {
-      newErrors.whatsappNumber = "El número de WhatsApp es obligatorio";
-    } else {
-      const cleanNumber = formData.whatsappNumber.replace(/[\s-]/g, "");
-      if (!/^\+?[1-9]\d{7,14}$/.test(cleanNumber)) {
-        newErrors.whatsappNumber = "Ingresa un número válido con código de país (ej: +521234567890)";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return e;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setApiError("");
+  const onChange = (field: string, value: string) => {
+    const next = { ...formData, [field]: value };
+    setFormData(next);
+    if (touched) setErrors(validate(next));
+  };
 
-    if (!validateForm()) return;
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setApiError("");
+    setTouched(true);
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
 
     setIsLoading(true);
-
     try {
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          fullName: formData.fullName.trim(),
+          email: formData.email.trim(),
+          whatsappNumber: fullWhatsapp(),
+        }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al registrar");
-      }
-
+      if (!response.ok) throw new Error(data.error || "Error al registrar");
+      setCreds({ clientId: data.clientId, tempPassword: data.tempPassword });
       setSuccess(true);
     } catch (error: any) {
       setApiError(error.message || "Error al procesar el registro");
@@ -91,41 +77,33 @@ export default function RegistroPage() {
   if (success) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full card text-center"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full card text-center">
           <div className="bg-emerald-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-10 w-10 text-emerald-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">¡Registro Exitoso!</h1>
-          <p className="text-slate-300 mb-6">
-            Hemos enviado un email de verificación a <strong className="text-emerald-400">{formData.email}</strong>
+          <h1 className="text-2xl font-bold text-white mb-4">¡Registro exitoso!</h1>
+          <p className="text-slate-300 mb-4">
+            Revisa tu WhatsApp y tu correo electrónico. Te hemos enviado tu <strong className="text-emerald-400">ID de usuario</strong> y tu <strong className="text-amber-300">contraseña temporal</strong>.
           </p>
+
+          {(creds.clientId || creds.tempPassword) && (
+            <div className="bg-slate-800/70 border border-slate-700 rounded-xl p-4 mb-4 text-left">
+              <p className="text-xs text-slate-400 mb-2 text-center">Guarda estos datos para iniciar sesión:</p>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-slate-400 text-sm">ID de usuario</span>
+                <span className="font-mono text-cyan-300 font-bold">{creds.clientId}</span>
+              </div>
+              <div className="flex justify-between items-center py-1 border-t border-slate-700">
+                <span className="text-slate-400 text-sm">Contraseña temporal</span>
+                <span className="font-mono text-amber-300 font-bold">{creds.tempPassword}</span>
+              </div>
+            </div>
+          )}
+
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-6">
-            <p className="text-sm text-amber-300">
-              <strong>📱 Tu contraseña será enviada por WhatsApp</strong> al número {formData.whatsappNumber} una vez que verifiques tu email.
-            </p>
+            <p className="text-sm text-amber-300">⚠️ Por seguridad, deberás cambiar tu contraseña la primera vez que inicies sesión.</p>
           </div>
-          <div className="space-y-3">
-            <p className="text-sm text-slate-400">Pasos a seguir:</p>
-            <ol className="text-left text-sm text-slate-300 space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="bg-emerald-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">1</span>
-                Revisa tu bandeja de entrada (y spam)
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="bg-emerald-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">2</span>
-                Haz clic en el enlace de verificación
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="bg-emerald-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">3</span>
-                Recibe tu contraseña por WhatsApp
-              </li>
-            </ol>
-          </div>
-          <Link href="/login" className="btn-primary w-full mt-6 flex items-center justify-center gap-2">
+          <Link href="/login" className="btn-primary w-full flex items-center justify-center gap-2">
             Ir a Iniciar Sesión <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
@@ -137,55 +115,32 @@ export default function RegistroPage() {
     <div className="min-h-screen pt-20 py-12">
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Benefits */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="hidden lg:block"
-          >
+          {/* Beneficios */}
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="hidden lg:block">
             <h1 className="title-anim text-4xl font-bold text-white mb-6">
-              Comienza tu camino hacia la{" "}
-              <span className="gradient-text">libertad financiera</span>
+              Comienza tu camino hacia la <span className="gradient-text">libertad financiera</span>
             </h1>
             <p className="text-lg text-slate-300 mb-8">
-              Regístrate gratis y obtén acceso a contenido exclusivo, comunidad de traders y más.
+              Regístrate y recibe al instante tu ID de usuario y tu acceso. Sin complicaciones.
             </p>
-
             <div className="space-y-4">
-              {[
-                "Acceso gratuito a webinars semanales",
-                "Comunidad exclusiva de traders",
-                "Guía de inicio rápido en trading",
-                "Descuentos especiales en cursos",
-                "Soporte prioritario por WhatsApp",
-              ].map((benefit) => (
-                <div key={benefit} className="flex items-center gap-3">
+              {["Acceso a webinars semanales", "Comunidad exclusiva de traders", "Guía de inicio rápido", "Descuentos especiales en cursos", "Soporte prioritario por WhatsApp"].map((b) => (
+                <div key={b} className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" />
-                  <span className="text-slate-300">{benefit}</span>
+                  <span className="text-slate-300">{b}</span>
                 </div>
               ))}
             </div>
-
             <div className="mt-8 flex items-center gap-6">
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
-                <Shield className="h-5 w-5 text-emerald-500" />
-                <span>Datos protegidos</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
-                <Gift className="h-5 w-5 text-emerald-500" />
-                <span>Sin spam</span>
-              </div>
+              <div className="flex items-center gap-2 text-slate-400 text-sm"><Shield className="h-5 w-5 text-emerald-500" /><span>Datos protegidos</span></div>
+              <div className="flex items-center gap-2 text-slate-400 text-sm"><Gift className="h-5 w-5 text-emerald-500" /><span>Sin spam</span></div>
             </div>
           </motion.div>
 
-          {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="card"
-          >
+          {/* Formulario */}
+          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} className="card">
             <h2 className="text-2xl font-bold text-white mb-2">Crear Cuenta</h2>
-            <p className="text-slate-400 mb-6">Completa todos los campos para registrarte</p>
+            <p className="text-slate-400 mb-6">Te generaremos un ID de usuario y una contraseña automáticamente.</p>
 
             {apiError && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
@@ -194,112 +149,77 @@ export default function RegistroPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Nombre *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                    <input
-                      type="text"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className={`input-field pl-10 ${errors.firstName ? "border-red-500" : ""}`}
-                      placeholder="Tu nombre"
-                    />
-                  </div>
-                  {errors.firstName && (
-                    <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>
-                  )}
+            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              {/* Nombre y Apellido */}
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Nombre y Apellido *</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(e) => onChange("fullName", e.target.value)}
+                    className={`input-field pl-10 ${errors.fullName ? "border-red-500" : ""}`}
+                    placeholder="Ej: Juan Hernández"
+                  />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Apellido *
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                    <input
-                      type="text"
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className={`input-field pl-10 ${errors.lastName ? "border-red-500" : ""}`}
-                      placeholder="Tu apellido"
-                    />
-                  </div>
-                  {errors.lastName && (
-                    <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>
-                  )}
-                </div>
+                {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
               </div>
 
+              {/* Correo */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Email *
-                </label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Correo Electrónico *</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) => onChange("email", e.target.value)}
                     className={`input-field pl-10 ${errors.email ? "border-red-500" : ""}`}
                     placeholder="tu@email.com"
                   />
                 </div>
-                {errors.email && (
-                  <p className="text-red-400 text-xs mt-1">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
               </div>
 
+              {/* WhatsApp: país (con código) + número local */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Número de WhatsApp *
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <input
-                    type="tel"
-                    value={formData.whatsappNumber}
-                    onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
-                    className={`input-field pl-10 ${errors.whatsappNumber ? "border-red-500" : ""}`}
-                    placeholder="+52 123 456 7890"
-                  />
+                <label className="block text-sm font-medium text-slate-300 mb-2">WhatsApp *</label>
+                <div className="flex gap-2">
+                  <select
+                    value={formData.country}
+                    onChange={(e) => onChange("country", e.target.value)}
+                    className="input-field w-auto max-w-[42%]"
+                    title="Selecciona tu país"
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.c} value={c.c}>{c.n} {flagOf(c.c)} ({c.d})</option>
+                    ))}
+                  </select>
+                  <div className="relative flex-1">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                    <input
+                      type="tel"
+                      value={formData.localNumber}
+                      onChange={(e) => onChange("localNumber", e.target.value.replace(/\D/g, ""))}
+                      className={`input-field pl-10 ${errors.localNumber ? "border-red-500" : ""}`}
+                      placeholder="Tu número (sin código de país)"
+                    />
+                  </div>
                 </div>
-                {errors.whatsappNumber && (
-                  <p className="text-red-400 text-xs mt-1">{errors.whatsappNumber}</p>
-                )}
+                {errors.localNumber && <p className="text-red-400 text-xs mt-1">{errors.localNumber}</p>}
                 <p className="text-xs text-slate-500 mt-1">
-                  Incluye el código de país. Aquí recibirás tu contraseña.
+                  Tu WhatsApp completo: <span className="text-emerald-400 font-mono">{dialOf(formData.country)} {formData.localNumber || "…"}</span>. Aquí recibirás tu ID.
                 </p>
               </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Registrando...
-                  </>
-                ) : (
-                  <>
-                    Crear Mi Cuenta
-                    <ArrowRight className="h-5 w-5" />
-                  </>
-                )}
+              <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50">
+                {isLoading ? (<><Loader2 className="h-5 w-5 animate-spin" /> Registrando...</>) : (<>Registrarme y recibir mis accesos <ArrowRight className="h-5 w-5" /></>)}
               </button>
             </form>
 
             <p className="text-center text-sm text-slate-400 mt-6">
-              ¿Ya tienes cuenta?{" "}
-              <Link href="/login" className="text-emerald-400 hover:underline">
-                Inicia sesión
-              </Link>
+              ¿Ya tienes cuenta? <Link href="/login" className="text-emerald-400 hover:underline">Inicia sesión</Link>
             </p>
           </motion.div>
         </div>
