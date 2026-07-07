@@ -325,7 +325,7 @@ export default function CursosPage() {
                 </div>
 
                 <Link
-                  href={`/checkout?amount=${course.price}&name=${encodeURIComponent(course.title)}`}
+                  href={`/checkout?product=${course.id}&amount=${course.price}&name=${encodeURIComponent(course.title)}`}
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
                     course.popular
                       ? "btn-primary"
@@ -368,7 +368,7 @@ export default function CursosPage() {
                   <span className="text-lg text-slate-400">/{membership.period}</span>
                 </div>
                 <p className="text-slate-400 mb-6">Ahorra $791 vs comprar por separado</p>
-                <Link href={`/checkout?amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="btn-secondary inline-flex items-center gap-2">
+                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="btn-secondary inline-flex items-center gap-2">
                   Unirse a VIP <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
