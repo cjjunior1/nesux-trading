@@ -38,12 +38,12 @@ export function IntroSection() {
               Bienvenido a la <span className="gradient-text">Era Digital</span>
             </h2>
 
-            <div className="space-y-4 text-slate-300 mb-8">
+            <div className="space-y-4 text-slate-300 mb-8 text-justify">
               <p>
-                Este módulo está dirigido a aquellas personas interesadas en <strong className="text-white">cambiar de rumbo</strong> con relación a su situación económica y la manera en que generan ingresos para su subsistencia.
+                Nuestra plataforma está dirigida a aquellas personas interesadas en <strong className="text-white">cambiar de rumbo</strong> con relación a su situación económica y la manera en que generan ingresos para su subsistencia.
               </p>
               <p>
-                Las personas en su gran mayoría viven en la <strong className="text-amber-400">esclavitud moderna</strong>: aquella donde venden su tiempo, capacidad, conocimiento y su salud por un salario.
+                Las personas en su gran mayoría viven en la <strong className="text-sky-400">esclavitud moderna</strong>: aquella donde venden su tiempo, capacidad, conocimiento y su salud por un salario.
               </p>
               <p>
                 No tiene nada de malo ser empleado, pero estamos en el tiempo de <strong className="text-emerald-400">LA ERA DIGITAL</strong> donde a través del internet y un celular tienes el mundo en tus manos. Solo tienes que aprender a manejarte y luego lo manejarás a él.
@@ -65,15 +65,15 @@ export function IntroSection() {
                 <span className="text-sm text-slate-300">Tú decides tu horario</span>
               </div>
               <div className="flex items-center gap-3 bg-slate-800/50 p-4 rounded-xl">
-                <Zap className="h-6 w-6 text-amber-400" />
+                <Zap className="h-6 w-6 text-emerald-400" />
                 <span className="text-sm text-slate-300">Resultados rápidos</span>
               </div>
             </div>
 
             {/* Disclaimer */}
             <div className="mt-6 p-4 bg-slate-800/30 border-l-4 border-purple-500 rounded-r-xl">
-              <p className="text-xs text-slate-400">
-                <strong className="text-purple-400">Nota:</strong> Con este módulo en nada ofrecemos hacerte unTrader profesional o garantizarle que no hay riesgos de pérdida de su capital, sino de darle las herramientas yel conocimiento básico para que usted se desarrolle y emprenda en camino del conocimiento del MUNDO DEL TRADING. No olvides que la universidad no hace al profesional, solo es una base de introducción al conocimiento.
+              <p className="text-xs text-slate-400 text-justify">
+                <strong className="text-purple-400">Recuerda:</strong> Así como una universidad brinda los conocimientos y las herramientas, pero no garantiza el éxito profesional, nuestra plataforma te proporciona las bases, el acompañamiento y la metodología para desarrollar tus habilidades como trader. Tus resultados dependerán de tu disciplina, práctica, compromiso y aplicación de lo aprendido.
               </p>
             </div>
           </motion.div>
