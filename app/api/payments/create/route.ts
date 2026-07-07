@@ -23,13 +23,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Método de pago inválido" }, { status: 400 });
   }
 
-  // Precio autoritativo: si hay curso, usamos su precio (no se confía en el cliente).
+  // Precio AUTORITATIVO desde la base (nunca se confía en el monto del cliente).
   let amount = Number(body.amount) || 0;
   let currency = (body.currency || "USD").toUpperCase();
   let productName = "Trading a Otro Nivel";
+  let resolvedProductId: string | null = null;
+  let grantsCourseId: string | null = null;
+
   if (productId) {
-    const course = await prisma.course.findUnique({ where: { id: productId } });
-    if (course) { amount = course.price; productName = course.title; }
+    // 1) Catálogo unificado (course | bot | plan), por id o por slug.
+    const product = await prisma.product.findFirst({
+      where: { OR: [{ id: productId }, { slug: productId }], isPublished: true },
+    });
+    if (product) {
+      amount = product.price;
+      currency = (product.currency || currency).toUpperCase();
+      productName = product.name;
+      resolvedProductId = product.id;
+      grantsCourseId = product.grantsCourseId || null;
+    } else {
+      // 2) Compatibilidad: curso antiguo por id.
+      const course = await prisma.course.findUnique({ where: { id: productId } });
+      if (course) { amount = course.price; productName = course.title; grantsCourseId = course.id; }
+    }
   }
   if (amount <= 0) return NextResponse.json({ error: "Monto inválido" }, { status: 400 });
 
@@ -38,7 +54,7 @@ export async function POST(req: Request) {
 
   // Crear el registro de pago (pending)
   const payment = await prisma.payment.create({
-    data: { userId, courseId: productId, method, amount, currency, status: "pending" },
+    data: { userId, productId: resolvedProductId, courseId: grantsCourseId, method, amount, currency, status: "pending" },
   });
 
   try {
