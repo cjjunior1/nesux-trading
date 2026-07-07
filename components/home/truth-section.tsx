@@ -14,23 +14,23 @@ export function TruthSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="card bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-amber-500/30"
+          className="card bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-rose-500/30"
         >
           <div className="flex items-start gap-4 mb-6">
-            <div className="bg-amber-500/20 p-3 rounded-xl">
-              <AlertTriangle className="h-8 w-8 text-amber-400" />
+            <div className="bg-rose-500/20 p-3 rounded-xl">
+              <AlertTriangle className="h-8 w-8 text-rose-400" />
             </div>
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 La Verdad que Nadie Te Dice
               </h2>
-              <p className="text-amber-400 font-semibold">No tengas miedo, ni te asustes con lo que vas a leer ahora mismo...</p>
+              <p className="text-slate-300 font-semibold">No tengas miedo, ni te asustes con lo que vas a leer ahora mismo...</p>
             </div>
           </div>
 
-          <div className="space-y-6 text-lg text-slate-300 leading-relaxed">
+          <div className="space-y-6 text-lg text-slate-300 leading-relaxed text-justify">
             <p>
-              <strong className="text-red-400">El 95% de las personas que se dedican al trading pierden su dinero.</strong>
+              <strong className="text-white">El <span className="text-red-400">95%</span> de las personas que se dedican al trading pierden su dinero.</strong>
             </p>
 
             <p>
