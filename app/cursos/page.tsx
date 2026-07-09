@@ -343,7 +343,7 @@ export default function CursosPage() {
           >
             {/* VIP Title Inside */}
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">
+              <h2 className="text-2xl md:text-3xl font-bold text-white whitespace-nowrap overflow-hidden text-ellipsis">
                 🎁 <span className="gradient-text">¡GRANDES SORPRESAS TE ESPERAN EN NUESTROS PLANES VIP!</span> 💎
               </h2>
             </div>
@@ -351,7 +351,7 @@ export default function CursosPage() {
             <div className="grid md:grid-cols-3 gap-8 items-stretch">
               {/* Left Column - Membresía VIP */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6 text-center">Membresía VIP</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-left">Membresía VIP</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
@@ -382,7 +382,7 @@ export default function CursosPage() {
 
               {/* Center Column - Planes VIP */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6 text-center">Planes VIP</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-left">Planes VIP</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
@@ -415,8 +415,8 @@ export default function CursosPage() {
               <div className="flex flex-col items-center justify-between bg-gradient-to-b from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-400/40">
                 <div className="text-center w-full">
                   <p className="text-sm text-slate-300 mb-2">Planes desde</p>
-                  <div className="text-5xl font-bold text-white mb-1">$999.99</div>
-                  <p className="text-lg text-blue-300 font-semibold mb-4">a 4,999.99</p>
+                  <div className="text-3xl font-bold text-white mb-1">$999.99</div>
+                  <p className="text-5xl text-blue-300 font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
                 <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full inline-flex items-center justify-center gap-2 py-3 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all">
