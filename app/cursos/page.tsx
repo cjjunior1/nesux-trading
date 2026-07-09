@@ -416,7 +416,7 @@ export default function CursosPage() {
                 <div className="text-center w-full">
                   <p className="text-sm text-slate-300 mb-2">Planes desde</p>
                   <div className="text-4xl font-bold text-white mb-1">$999.99</div>
-                  <p className="text-3xl text-blue-300 font-semibold mb-4">a 4,999.99</p>
+                  <p className="text-2xl text-blue-400 font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
                 <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full inline-flex items-center justify-center gap-2 py-3 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all">
