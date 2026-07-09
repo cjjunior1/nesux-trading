@@ -110,6 +110,7 @@ const membership = {
 };
 
 export default function CursosPage() {
+  // Auto-deploy test - 2026-07-09
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
