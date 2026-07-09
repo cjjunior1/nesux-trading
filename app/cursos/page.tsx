@@ -341,52 +341,90 @@ export default function CursosPage() {
             </h2>
           </div>
 
-          {/* VIP Plans Card */}
+          {/* VIP Main Container */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.45 }}
-            className="max-w-3xl mx-auto bg-gradient-to-br from-purple-900/40 to-blue-900/40 rounded-3xl p-8 md:p-12 border border-purple-500/50 shadow-2xl mt-8"
+            className="mt-8 bg-gradient-to-r from-purple-900/50 to-blue-900/40 rounded-3xl p-8 md:p-12 border border-purple-500/40 shadow-2xl"
           >
-            <h3 className="text-2xl font-bold text-white mb-8 text-center">Planes VIP</h3>
+            <div className="grid md:grid-cols-3 gap-8 items-stretch">
+              {/* Left Column - Membresía VIP */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white mb-1">Membresía VIP</h3>
+                <p className="text-purple-300 mb-6 text-sm font-semibold">Todo Incluido</p>
+                <ul className="space-y-3 flex-grow">
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Acceso a TODOS los cursos actuales</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Trading en vivo programado</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Comunidad VIP exclusiva</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Mentoría grupal semanal</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Bot Pro incluido</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Soporte prioritario 24/7</span>
+                  </li>
+                </ul>
+              </div>
 
-            <ul className="space-y-4 mb-12">
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Garantía de recuperación de inversión</span>
-              </li>
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Acceso a nuestros Bots</span>
-              </li>
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Crear tu Bot con tus estrategias</span>
-              </li>
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Te creamos un bot para ti</span>
-              </li>
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Contenido premium y cursos ilimitados</span>
-              </li>
-              <li className="flex items-start gap-3 text-slate-300">
-                <CheckCircle className="h-5 w-5 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                <span>Soporte prioritario y dedicado</span>
-              </li>
-            </ul>
+              {/* Center Column - Planes VIP */}
+              <div className="flex flex-col">
+                <h3 className="text-2xl font-bold text-white mb-6">Planes VIP</h3>
+                <ul className="space-y-3 flex-grow">
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Garantía de recuperación de inversión</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Acceso a nuestros Bots</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Crear tu Bot con tus estrategias</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Te creamos un bot para ti</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Contenido premium y cursos ilimitados</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-slate-300 text-sm">
+                    <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span>Soporte prioritario y dedicado</span>
+                  </li>
+                </ul>
+              </div>
 
-            <div className="bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/50 rounded-2xl p-8 text-center">
-              <p className="text-sm text-slate-300 mb-3 font-semibold">PLANES DESDE</p>
-              <div className="text-6xl font-bold text-white mb-2">$999.99</div>
-              <p className="text-lg text-blue-300 font-semibold">hasta $4,999.99</p>
-              <p className="text-xs text-slate-400 mt-4">Según el nivel de beneficios</p>
+              {/* Right Column - Pricing & CTA */}
+              <div className="flex flex-col items-center justify-between bg-gradient-to-b from-blue-500/20 to-purple-500/20 rounded-2xl p-6 border border-blue-400/40">
+                <div className="text-center w-full">
+                  <p className="text-sm text-slate-300 mb-2">Planes desde</p>
+                  <div className="text-5xl font-bold text-white mb-1">$999.99</div>
+                  <p className="text-lg text-blue-300 font-semibold mb-4">a 4,999.99</p>
+                  <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
+                </div>
+                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full btn-secondary inline-flex items-center justify-center gap-2 py-3 mt-4">
+                  Quiero verlos <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
-
-            <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full btn-secondary inline-flex items-center justify-center gap-2 mt-8 py-4">
-              Quiero Verlos <ArrowRight className="h-5 w-5" />
-            </Link>
           </motion.div>
         </div>
       </section>
