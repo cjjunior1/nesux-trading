@@ -334,6 +334,58 @@ export default function CursosPage() {
             ))}
           </div>
 
+          {/* VIP Sorpresas Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.45 }}
+            className="mt-12 bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-3xl p-8 md:p-12 border border-blue-500/30"
+          >
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+                  🎁 <span className="gradient-text">¡SORPRESAS GIGANTES</span> TE ESPERAN EN NUESTROS PLANES VIP! 💎
+                </h2>
+
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Garantía de recuperación de inversión</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Acceso a comunidad y networking exclusivo</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Puedes invitar a otros miembros</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Actualizaciones y sorpresas mensuales</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Contenido premium y cursos ilimitados</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-300">
+                    <CheckCircle className="h-6 w-6 text-[#0194F6] flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Soporte prioritario 24/7</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="text-center md:text-right">
+                <div className="text-6xl font-bold text-white mb-3">
+                  $999.99<span className="text-2xl text-slate-400">-$4999.99</span>
+                </div>
+                <p className="text-slate-400 mb-8 text-lg">Planes VIP desde $999.99 a $4999.99</p>
+                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="btn-secondary inline-flex items-center gap-2 px-8 py-4 text-lg">
+                  Únirse a VIP <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+
           {/* VIP Membership */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
