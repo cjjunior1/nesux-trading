@@ -11,7 +11,6 @@ import {
   Clock,
   CheckCircle,
   ArrowRight,
-  Play,
   Award,
   Shield,
   Zap,
@@ -23,17 +22,18 @@ const courses = [
     title: "Curso Básico",
     subtitle: "Fundamentos del Trading",
     description:
-      "Ideal para principiantes. Todo tipo de trading con énfasis en trading binario y diferentes plataformas. Aquí no tenemos límites, lleguemos más allá de la meta porque no hay fronteras que nos detenga.",
-    price: 99.99,
-    originalPrice: 197,
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop",
+      "Ideal para principiantes. Todo tipo de trading con énfasis en trading binario y diferentes plataformas. Construye las bases sólidas que necesitas.",
+    price: 149.99,
+    originalPrice: 255,
+    image: "/curso-basico.png",
     duration: "Sin límite de tiempo",
     lessons: 24,
     students: "850+",
     rating: 4.8,
     modules: [
+      "Unipersonal",
       "Análisis técnico básico",
-      "Gestión de riesgo",
+      "Gestión de Riesgo Básico",
       "Acceso a Una Plataforma de trading Binario",
     ],
     bonuses: ["Sin límite de tiempo", "Acceso a comunidad básica", "Certificado de finalización"],
@@ -44,21 +44,19 @@ const courses = [
     subtitle: "Estrategias Avanzadas",
     description:
       "Lleva tu trading al siguiente nivel con estrategias probadas. Todo tipo de trading con énfasis en trading binario en diferentes plataformas.",
-    price: 199.99,
-    originalPrice: 397,
-    image: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=800&h=450&fit=crop",
+    price: 239.99,
+    originalPrice: 407,
+    image: "/curso-intermedio.png",
     duration: "Sin límite de tiempo",
     lessons: 42,
     students: "520+",
     rating: 4.9,
     popular: true,
     modules: [
-      "Análisis técnico básico",
-      "Gestión de riesgo",
-      "Patrones de velas",
-      "Indicadores técnicos",
-      "Psicología del trader",
-      "Acceso a Tres Plataformas de trading Binario",
+      "Bi-personal",
+      "Todo lo del Básico",
+      "Acceso a Una Plataforma de trading Binario",
+      "Estrategias Avanzadas",
     ],
     bonuses: [
       "Sin límite de tiempo",
@@ -72,19 +70,19 @@ const courses = [
     title: "Curso Profesional",
     subtitle: "Trading Institucional",
     description:
-      "Todo lo del Curso Básico y del Intermedio más Trading Institucional. Incluye mentoría personalizada, automatización y acceso a bot de trading automático para Forex.",
-    price: 499.99,
-    originalPrice: 997,
-    image: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=800&h=450&fit=crop",
+      "Todo lo del Curso Básico y del Intermedio más Trading Institucional. Incluye mentoría personalizada y acceso a bots automáticos.",
+    price: 379.99,
+    originalPrice: 645,
+    image: "/curso-profesional.png",
     duration: "Sin límite de tiempo",
     lessons: 78,
     students: "230+",
     rating: 5.0,
     modules: [
+      "Tri-personal",
       "Todo lo del Curso Básico y del Intermedio",
-      "Análisis institucional",
-      "Automatización, Acceso a uno de nuestros Bot de trading en automático para Forex",
-      "Mentoría avanzada",
+      "Mentoría y Análisis Avanzado",
+      "Herramientas de Trading Avanzado",
     ],
     bonuses: [
       "Sin límite de tiempo",
@@ -138,7 +136,7 @@ export default function CursosPage() {
 
             <div className="max-w-4xl mx-auto mb-8">
               <div className="bg-gradient-to-br from-blue-900/30 via-slate-800/50 to-blue-900/30 border-2 border-[#0194F6]/50 rounded-2xl p-8 mb-6 shadow-2xl">
-                <h3 className="text-2xl font-bold text-[#0194F6] mb-4 text-center">Nuestra Estrategia: Trading Binario Como Base</h3>
+                <h3 className="text-2xl font-bold text-[#9D4EDD] mb-4 text-center">Nuestra Estrategia: Trading Binario Como Base</h3>
                 
                 <p className="text-base text-slate-200 leading-relaxed mb-4">
                   El trading en Forex es poderoso, pero requiere mucho tiempo, capital y experiencia para dominarlo. <strong className="text-white">Por eso revolucionamos la forma de enseñar trading</strong>: comenzamos con <strong className="text-[#0194F6]">Trading Binario</strong>, la puerta de entrada perfecta que te permite <strong className="text-yellow-300">generar resultados desde las primeras semanas</strong> mientras construyes las bases sólidas que necesitas.
@@ -178,7 +176,7 @@ export default function CursosPage() {
               </div>
 
               <p className="text-base text-slate-300 leading-relaxed">
-                Con un enfoque 100% práctico, aplicación real del conocimiento y acompañamiento continuo, desarrollarás las habilidades que te permitirán operar con confianza y consistencia. <strong className="text-[#0194F6]">No se trata solo de enseñarte a hacer trading</strong>, sino de acompañarte hasta que logres <strong className="text-yellow-300">resultados reales y sostenibles</strong>.
+                Con un enfoque <strong>100%</strong> práctico, aplicación real del conocimiento y acompañamiento continuo, desarrollarás las habilidades que te permitirán operar con confianza y consistencia. <strong className="text-[#0194F6]">No se trata solo de enseñarte a hacer trading</strong>, sino de acompañarte hasta que logres <strong className="text-yellow-300">resultados reales y sostenibles</strong>.
               </p>
             </div>
 
@@ -195,10 +193,13 @@ export default function CursosPage() {
                 </p>
 
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-slate-900/60 rounded-xl p-5 border border-blue-500/40 text-center">
+                  <div className="bg-slate-900/60 rounded-xl p-5 border border-[#0194F6]/40 text-center">
                     <div className="text-4xl mb-3">💱</div>
                     <h4 className="font-bold text-white mb-2">Forex</h4>
-                    <p className="text-sm text-slate-300">Bots especializados para operar en el mercado de divisas con estrategias probadas y optimizadas.</p>
+                    <div className="inline-block bg-emerald-500/20 border border-[#0194F6]/50 rounded-full px-3 py-1 mb-2">
+                      <span className="text-[#0194F6] font-bold text-xs">⚡ 24/5</span>
+                    </div>
+                    <p className="text-sm text-slate-300">Bots especializados para operar en el mercado de divisas con estrategias probadas y optimizadas. Operación de lunes a viernes.</p>
                   </div>
                   
                   <div className="bg-slate-900/60 rounded-xl p-5 border border-[#0194F6]/40 text-center">
@@ -207,7 +208,7 @@ export default function CursosPage() {
                     <div className="inline-block bg-emerald-500/20 border border-[#0194F6]/50 rounded-full px-3 py-1 mb-2">
                       <span className="text-[#0194F6] font-bold text-xs">⚡ 24/7</span>
                     </div>
-                    <p className="text-sm text-slate-300">Operación continua en el mercado cripto, capturando oportunidades en todo momento.</p>
+                    <p className="text-sm text-slate-300">Operación continua en el mercado cripto, capturando oportunidades en todo momento. Nunca para, ni descanza y esta disponible 24/7.</p>
                   </div>
                   
                   <div className="bg-slate-900/60 rounded-xl p-5 border border-[#0194F6]/40 text-center">
@@ -216,7 +217,7 @@ export default function CursosPage() {
                     <div className="inline-block bg-emerald-500/20 border border-[#0194F6]/50 rounded-full px-3 py-1 mb-2">
                       <span className="text-[#0194F6] font-bold text-xs">⚡ 24/7</span>
                     </div>
-                    <p className="text-sm text-slate-300">Bots que operan sin parar en índices sintéticos, mercados disponibles 24 horas al día.</p>
+                    <p className="text-sm text-slate-300">Bots que operan sin parar en índices sintéticos, mercados disponibles 24 horas. Estrategias optimizadas para máxima rentabilidad.</p>
                   </div>
                 </div>
 
@@ -261,11 +262,6 @@ export default function CursosPage() {
                   course.popular ? "border-[#0194F6]/50 ring-2 ring-emerald-500/20" : ""
                 }`}
               >
-                {course.popular && (
-                  <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-bl-lg z-10">
-                    MÁS POPULAR
-                  </div>
-                )}
 
                 <div className="relative aspect-video rounded-xl overflow-hidden mb-6">
                   <Image 
@@ -276,12 +272,6 @@ export default function CursosPage() {
                     className="object-cover" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                    <div className="bg-emerald-500 p-2 rounded-full">
-                      <Play className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-white text-sm font-medium">{course.lessons} lecciones</span>
-                  </div>
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-1">{course.title}</h3>
@@ -326,13 +316,19 @@ export default function CursosPage() {
 
                 <Link
                   href={`/checkout?product=${course.id}&amount=${course.price}&name=${encodeURIComponent(course.title)}`}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                    course.popular
-                      ? "btn-primary"
-                      : "bg-slate-700 hover:bg-slate-600 text-white"
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white ${
+                    course.id === "basico"
+                      ? "bg-[#0194F6] hover:bg-[#0178d4]"
+                      : course.id === "intermedio"
+                      ? "bg-[#9D4EDD] hover:bg-[#8b3fc8]"
+                      : "bg-orange-500 hover:bg-orange-600"
                   }`}
                 >
-                  Inscribirse <ArrowRight className="h-4 w-4" />
+                  {course.id === "basico"
+                    ? "Inicia Ya"
+                    : course.id === "intermedio"
+                    ? "Avanza Ya"
+                    : "Activa Todo Ya"} <ArrowRight className="h-4 w-4" />
                 </Link>
               </motion.div>
             ))}
@@ -367,7 +363,7 @@ export default function CursosPage() {
                   ${membership.price}
                   <span className="text-lg text-slate-400">/{membership.period}</span>
                 </div>
-                <p className="text-slate-400 mb-6">Ahorra $791 vs comprar por separado</p>
+                <p className="text-slate-400 mb-6">Ahorra desde $791 a $2450 vs comprar por separado</p>
                 <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="btn-secondary inline-flex items-center gap-2">
                   Unirse a VIP <ArrowRight className="h-5 w-5" />
                 </Link>
