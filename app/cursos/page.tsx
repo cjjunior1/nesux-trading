@@ -123,9 +123,9 @@ export default function CursosPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-2 mb-6">
-              <BookOpen className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm text-emerald-400">Educación de Calidad</span>
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-[#0194F6]/30 rounded-full px-4 py-2 mb-6">
+              <BookOpen className="h-4 w-4 text-[#0194F6]" />
+              <span className="text-sm text-[#0194F6]">Educación de Calidad</span>
             </div>
 
             <h1 className="title-anim text-4xl md:text-5xl font-bold text-white mb-6">
@@ -137,34 +137,34 @@ export default function CursosPage() {
             </p>
 
             <div className="max-w-4xl mx-auto mb-8">
-              <div className="bg-gradient-to-br from-emerald-900/30 via-slate-800/50 to-blue-900/30 border-2 border-emerald-500/50 rounded-2xl p-8 mb-6 shadow-2xl">
-                <h3 className="text-2xl font-bold text-emerald-300 mb-4 text-center">Nuestra Estrategia: Trading Binario Como Base</h3>
+              <div className="bg-gradient-to-br from-blue-900/30 via-slate-800/50 to-blue-900/30 border-2 border-[#0194F6]/50 rounded-2xl p-8 mb-6 shadow-2xl">
+                <h3 className="text-2xl font-bold text-[#0194F6] mb-4 text-center">Nuestra Estrategia: Trading Binario Como Base</h3>
                 
                 <p className="text-base text-slate-200 leading-relaxed mb-4">
-                  El trading en Forex es poderoso, pero requiere mucho tiempo, capital y experiencia para dominarlo. <strong className="text-white">Por eso revolucionamos la forma de enseñar trading</strong>: comenzamos con <strong className="text-emerald-300">Trading Binario</strong>, la puerta de entrada perfecta que te permite <strong className="text-yellow-300">generar resultados desde las primeras semanas</strong> mientras construyes las bases sólidas que necesitas.
+                  El trading en Forex es poderoso, pero requiere mucho tiempo, capital y experiencia para dominarlo. <strong className="text-white">Por eso revolucionamos la forma de enseñar trading</strong>: comenzamos con <strong className="text-[#0194F6]">Trading Binario</strong>, la puerta de entrada perfecta que te permite <strong className="text-yellow-300">generar resultados desde las primeras semanas</strong> mientras construyes las bases sólidas que necesitas.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-4 my-6">
-                  <div className="bg-slate-900/60 rounded-xl p-4 border border-emerald-500/30">
-                    <div className="text-emerald-400 text-3xl mb-2">⚡</div>
+                  <div className="bg-slate-900/60 rounded-xl p-4 border border-[#0194F6]/30">
+                    <div className="text-[#0194F6] text-3xl mb-2">⚡</div>
                     <h4 className="font-bold text-white mb-2">Resultados Inmediatos</h4>
                     <p className="text-sm text-slate-300">Opera hoy, ve resultados hoy. Las operaciones duran minutos u horas, no días. Tu aprendizaje se acelera porque ves la aplicación inmediata de cada concepto.</p>
                   </div>
                   
-                  <div className="bg-slate-900/60 rounded-xl p-4 border border-emerald-500/30">
-                    <div className="text-emerald-400 text-3xl mb-2">🎯</div>
+                  <div className="bg-slate-900/60 rounded-xl p-4 border border-[#0194F6]/30">
+                    <div className="text-[#0194F6] text-3xl mb-2">🎯</div>
                     <h4 className="font-bold text-white mb-2">Simplicidad que Funciona</h4>
                     <p className="text-sm text-slate-300">Sin complicaciones técnicas abrumadoras. Enfoque directo que te permite dominar los fundamentos del análisis técnico sin perderte en complejidades innecesarias.</p>
                   </div>
                   
-                  <div className="bg-slate-900/60 rounded-xl p-4 border border-emerald-500/30">
-                    <div className="text-emerald-400 text-3xl mb-2">💪</div>
+                  <div className="bg-slate-900/60 rounded-xl p-4 border border-[#0194F6]/30">
+                    <div className="text-[#0194F6] text-3xl mb-2">💪</div>
                     <h4 className="font-bold text-white mb-2">Experiencia Práctica Real</h4>
                     <p className="text-sm text-slate-300">No solo teoría interminable. Desde la primera semana estarás operando en plataformas reales, desarrollando la intuición y disciplina del trader exitoso.</p>
                   </div>
                   
-                  <div className="bg-slate-900/60 rounded-xl p-4 border border-emerald-500/30">
-                    <div className="text-emerald-400 text-3xl mb-2">🚀</div>
+                  <div className="bg-slate-900/60 rounded-xl p-4 border border-[#0194F6]/30">
+                    <div className="text-[#0194F6] text-3xl mb-2">🚀</div>
                     <h4 className="font-bold text-white mb-2">Plataforma de Despegue</h4>
                     <p className="text-sm text-slate-300">El trading binario no es el destino, es tu rampa de lanzamiento. Una vez domines la disciplina y la estrategia, el salto a Forex será natural y con confianza.</p>
                   </div>
@@ -172,13 +172,13 @@ export default function CursosPage() {
 
                 <div className="bg-yellow-500/10 border border-yellow-500/40 rounded-xl p-5 mt-6">
                   <p className="text-base text-white leading-relaxed font-medium">
-                    💡 <strong>La Diferencia Clave:</strong> Mientras otras academias te tienen estudiando meses sin tocar un mercado real, tú estarás <strong className="text-emerald-300">operando, aprendiendo y generando oportunidades de ingresos desde el inicio</strong>. No es solo educación, es transformación con resultados reales.
+                    💡 <strong>La Diferencia Clave:</strong> Mientras otras academias te tienen estudiando meses sin tocar un mercado real, tú estarás <strong className="text-[#0194F6]">operando, aprendiendo y generando oportunidades de ingresos desde el inicio</strong>. No es solo educación, es transformación con resultados reales.
                   </p>
                 </div>
               </div>
 
               <p className="text-base text-slate-300 leading-relaxed">
-                Con un enfoque 100% práctico, aplicación real del conocimiento y acompañamiento continuo, desarrollarás las habilidades que te permitirán operar con confianza y consistencia. <strong className="text-emerald-300">No se trata solo de enseñarte a hacer trading</strong>, sino de acompañarte hasta que logres <strong className="text-yellow-300">resultados reales y sostenibles</strong>.
+                Con un enfoque 100% práctico, aplicación real del conocimiento y acompañamiento continuo, desarrollarás las habilidades que te permitirán operar con confianza y consistencia. <strong className="text-[#0194F6]">No se trata solo de enseñarte a hacer trading</strong>, sino de acompañarte hasta que logres <strong className="text-yellow-300">resultados reales y sostenibles</strong>.
               </p>
             </div>
 
@@ -201,20 +201,20 @@ export default function CursosPage() {
                     <p className="text-sm text-slate-300">Bots especializados para operar en el mercado de divisas con estrategias probadas y optimizadas.</p>
                   </div>
                   
-                  <div className="bg-slate-900/60 rounded-xl p-5 border border-emerald-500/40 text-center">
+                  <div className="bg-slate-900/60 rounded-xl p-5 border border-[#0194F6]/40 text-center">
                     <div className="text-4xl mb-3">₿</div>
                     <h4 className="font-bold text-white mb-2">Criptomonedas</h4>
-                    <div className="inline-block bg-emerald-500/20 border border-emerald-500/50 rounded-full px-3 py-1 mb-2">
-                      <span className="text-emerald-300 font-bold text-xs">⚡ 24/7</span>
+                    <div className="inline-block bg-emerald-500/20 border border-[#0194F6]/50 rounded-full px-3 py-1 mb-2">
+                      <span className="text-[#0194F6] font-bold text-xs">⚡ 24/7</span>
                     </div>
                     <p className="text-sm text-slate-300">Operación continua en el mercado cripto, capturando oportunidades en todo momento.</p>
                   </div>
                   
-                  <div className="bg-slate-900/60 rounded-xl p-5 border border-emerald-500/40 text-center">
+                  <div className="bg-slate-900/60 rounded-xl p-5 border border-[#0194F6]/40 text-center">
                     <div className="text-4xl mb-3">📊</div>
                     <h4 className="font-bold text-white mb-2">Índices Sintéticos</h4>
-                    <div className="inline-block bg-emerald-500/20 border border-emerald-500/50 rounded-full px-3 py-1 mb-2">
-                      <span className="text-emerald-300 font-bold text-xs">⚡ 24/7</span>
+                    <div className="inline-block bg-emerald-500/20 border border-[#0194F6]/50 rounded-full px-3 py-1 mb-2">
+                      <span className="text-[#0194F6] font-bold text-xs">⚡ 24/7</span>
                     </div>
                     <p className="text-sm text-slate-300">Bots que operan sin parar en índices sintéticos, mercados disponibles 24 horas al día.</p>
                   </div>
@@ -222,7 +222,7 @@ export default function CursosPage() {
 
                 <div className="bg-blue-500/10 border border-blue-500/40 rounded-xl p-5">
                   <p className="text-sm text-white leading-relaxed">
-                    <strong className="text-yellow-300">⚠️ Importante:</strong> Hasta el momento <strong className="text-white">no contamos con bots para trading binario</strong>. Nuestros bots están enfocados exclusivamente en Forex, Criptomonedas e Índices Sintéticos, donde la automatización genera los mejores resultados. En trading binario, el enfoque es en tu aprendizaje y operación manual para desarrollar habilidades fundamentales.
+                    <strong className="text-yellow-300">⚠️ Importante:</strong> En este momento <strong className="text-white">solo ofrecemos bots para trading en Forex, no para binario</strong>. Nuestros bots están enfocados exclusivamente en Forex, Criptomonedas, Índices Sintéticos y otros mercados, donde la automatización genera los mejores resultados. En trading binario, el enfoque es en tu aprendizaje y operación manual para desarrollar habilidades fundamentales.
                   </p>
                 </div>
               </div>
@@ -231,15 +231,15 @@ export default function CursosPage() {
             {/* Trust indicators */}
             <div className="flex flex-wrap justify-center gap-8">
               <div className="flex items-center gap-2 text-slate-400">
-                <Shield className="h-5 w-5 text-emerald-400" />
+                <Shield className="h-5 w-5 text-[#0194F6]" />
                 <span>Garantía Total</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
-                <Clock className="h-5 w-5 text-emerald-400" />
+                <Clock className="h-5 w-5 text-[#0194F6]" />
                 <span>Acceso de por vida</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
-                <Award className="h-5 w-5 text-emerald-400" />
+                <Award className="h-5 w-5 text-[#0194F6]" />
                 <span>Certificación incluida</span>
               </div>
             </div>
@@ -258,7 +258,7 @@ export default function CursosPage() {
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: idx * 0.15 }}
                 className={`card relative overflow-hidden ${
-                  course.popular ? "border-emerald-500/50 ring-2 ring-emerald-500/20" : ""
+                  course.popular ? "border-[#0194F6]/50 ring-2 ring-emerald-500/20" : ""
                 }`}
               >
                 {course.popular && (
@@ -285,7 +285,7 @@ export default function CursosPage() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-1">{course.title}</h3>
-                <p className="text-emerald-400 font-medium mb-3">{course.subtitle}</p>
+                <p className="text-[#0194F6] font-medium mb-3">{course.subtitle}</p>
                 <p className="text-slate-400 text-sm mb-4">{course.description}</p>
 
                 {/* Stats */}
@@ -307,12 +307,12 @@ export default function CursosPage() {
                   <ul className="space-y-2">
                     {course.modules.slice(0, 4).map((module) => (
                       <li key={module} className="text-sm text-slate-400 flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
                         {module}
                       </li>
                     ))}
                     {course.modules.length > 4 && (
-                      <li className="text-sm text-emerald-400">+{course.modules.length - 4} más...</li>
+                      <li className="text-sm text-[#0194F6]">+{course.modules.length - 4} más...</li>
                     )}
                   </ul>
                 </div>
@@ -321,7 +321,7 @@ export default function CursosPage() {
                 <div className="flex items-end gap-2 mb-4">
                   <span className="text-3xl font-bold text-white">${course.price}</span>
                   <span className="text-lg text-slate-500 line-through">${course.originalPrice}</span>
-                  <span className="text-sm text-emerald-400">USD</span>
+                  <span className="text-sm text-[#0194F6]">USD</span>
                 </div>
 
                 <Link
@@ -356,7 +356,7 @@ export default function CursosPage() {
                 <ul className="space-y-3">
                   {membership.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-slate-300">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
+                      <CheckCircle className="h-5 w-5 text-[#0194F6]" />
                       {feature}
                     </li>
                   ))}
