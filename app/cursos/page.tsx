@@ -334,25 +334,24 @@ export default function CursosPage() {
             ))}
           </div>
 
-          {/* VIP Title */}
-          <div className="mt-12 text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
-              🎁 <span className="gradient-text">¡GRANDES SORPRESAS TE ESPERAN EN NUESTROS PLANES VIP!</span> 💎
-            </h2>
-          </div>
-
           {/* VIP Main Container */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.45 }}
-            className="mt-8 bg-gradient-to-r from-purple-900/50 to-blue-900/40 rounded-3xl p-8 md:p-12 border border-purple-500/40 shadow-2xl"
+            className="mt-12 bg-gradient-to-r from-purple-900/50 to-blue-900/40 rounded-3xl p-8 md:p-12 border border-purple-500/40 shadow-2xl"
           >
+            {/* VIP Title Inside */}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-white">
+                🎁 <span className="gradient-text">¡GRANDES SORPRESAS TE ESPERAN EN NUESTROS PLANES VIP!</span> 💎
+              </h2>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-8 items-stretch">
               {/* Left Column - Membresía VIP */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-1">Membresía VIP</h3>
-                <p className="text-purple-300 mb-6 text-sm font-semibold">Todo Incluido</p>
+                <h3 className="text-2xl font-bold text-white mb-6 text-center">Membresía VIP</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
@@ -383,7 +382,7 @@ export default function CursosPage() {
 
               {/* Center Column - Planes VIP */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6">Planes VIP</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-center">Planes VIP</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
@@ -420,7 +419,7 @@ export default function CursosPage() {
                   <p className="text-lg text-blue-300 font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
-                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full btn-secondary inline-flex items-center justify-center gap-2 py-3 mt-4">
+                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="w-full inline-flex items-center justify-center gap-2 py-3 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all">
                   Quiero verlos <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
