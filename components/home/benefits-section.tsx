@@ -39,8 +39,8 @@ const benefits = [
     icon: Users,
     title: "Comunidad Activa",
     description: "Únete a una comunidad de traders que comparten estrategias y se apoyan",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
   },
   {
     icon: Clock,
@@ -66,9 +66,9 @@ const benefits = [
   {
     icon: Award,
     title: "Certificación",
-    description: "Puedes Obtener un certificado al completar cada módulo del programa",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    description: "Recibe tu certificado al completar cada módulo y respalda tu avance como trader ante el mundo.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
   },
 ];
 

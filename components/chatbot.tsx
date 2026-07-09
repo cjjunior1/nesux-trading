@@ -371,15 +371,29 @@ export function Chatbot() {
     return () => synth.removeEventListener?.("voiceschanged", warm);
   }, []);
 
+  // Abrir el chat desde botones de las landings (evento global) con saludo propio opcional.
+  const pendingGreetingRef = useRef<{ greeting?: string; message?: string } | null>(null);
+  useEffect(() => {
+    function onOpen(e: any) {
+      const d = (e && e.detail) || {};
+      if (d.greeting || d.message) pendingGreetingRef.current = { greeting: d.greeting, message: d.message };
+      setIsOpen(true);
+    }
+    window.addEventListener("nx-open-chat", onOpen as EventListener);
+    return () => window.removeEventListener("nx-open-chat", onOpen as EventListener);
+  }, []);
+
   // Cargar saludo inicial
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const dynamicGreeting = generateDynamicGreeting();
-      setMessages([{ 
-        id: "init", 
-        role: "assistant", 
-        content: dynamicGreeting.message,
-        greeting: dynamicGreeting.greeting,
+      const custom = pendingGreetingRef.current;
+      pendingGreetingRef.current = null;
+      setMessages([{
+        id: "init",
+        role: "assistant",
+        content: (custom && custom.message) || dynamicGreeting.message,
+        greeting: (custom && custom.greeting) || dynamicGreeting.greeting,
         greetingColor: dynamicGreeting.greetingColor,
         textColor: dynamicGreeting.textColor,
         emoji: dynamicGreeting.emoji

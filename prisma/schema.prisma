@@ -76,7 +76,9 @@ model Payment {
   user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscriptionId    String?
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  courseId          String?       // producto/curso comprado
+  courseId          String?       // curso que desbloquea (acceso / compatibilidad)
+  productId         String?       // producto del catálogo (course | bot | plan)
+  product           Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   amount            Float
   currency          String        @default("USD")
   method            String        // crypto | stripe | paypal | bank_transfer | manual
@@ -92,6 +94,32 @@ model Payment {
   @@index([status])
   @@index([paidAt])
   @@index([providerPaymentId])
+  @@index([productId])
+}
+
+// Catálogo unificado: cursos, bots y planes. Cada uno con su identidad y su precio.
+model Product {
+  id             String    @id @default(cuid())
+  kind           String    // "course" | "bot" | "plan"
+  slug           String    @unique
+  name           String
+  subtitle       String?
+  description    String    @default("")
+  imageUrl       String?
+  price          Float     @default(0)
+  originalPrice  Float?    // precio tachado / de referencia (opcional)
+  currency       String    @default("USD")
+  badge          String?   // ej. "Más vendido", "VIP"
+  features       Json?     // lista de beneficios (string[])
+  grantsCourseId String?   // curso que desbloquea al comprar (para kind=course|plan)
+  isPublished    Boolean   @default(true)
+  order          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  payments       Payment[]
+
+  @@index([kind])
+  @@index([isPublished])
 }
 
 // Notas internas del administrador sobre un usuario.

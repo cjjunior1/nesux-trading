@@ -3,9 +3,22 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, TrendingUp, Shield, Award } from "lucide-react";
+import { ArrowRight, TrendingUp, Shield, Zap, Headphones } from "lucide-react";
+
+// Mensajes variados: CJ se presenta como aliado, guía y amigo en el trading.
+const ALIADO_MSGS = [
+  "¡Hey! Soy CJ, tu aliado y amigo en el trading. No estás solo en esto — cuéntame por dónde quieres empezar y te acompaño paso a paso. 🚀",
+  "Bienvenido 👋 Soy CJ, tu guía en el mundo del trading. Aquí no vendemos humo: te acompaño con la verdad y con método. ¿Qué te gustaría saber?",
+  "Soy CJ. Piénsame como ese amigo que ya recorrió el camino del trading y quiere verte ganar. ¿Te muestro cómo empezar del lado correcto?",
+  "¡Qué bueno verte! Soy CJ, tu compañero de ruta. Mi misión es que pases del 95% que pierde al 5% que aprende a ganar. ¿Arrancamos juntos?",
+  "Soy CJ, tu mentor y aliado. El trading se ve difícil solo cuando lo enfrentas sin guía — para eso estoy yo. Pregúntame lo que quieras. 💪",
+];
 
 export function HeroSection() {
+  const openAliado = () => {
+    const m = ALIADO_MSGS[Math.floor(Math.random() * ALIADO_MSGS.length)];
+    window.dispatchEvent(new CustomEvent("nx-open-chat", { detail: { greeting: "Tu aliado en el trading 🤝", message: m } }));
+  };
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background Image */}
@@ -33,10 +46,22 @@ export function HeroSection() {
             <span className="text-sm text-emerald-400">Método Probado para Traders Exitosos</span>
           </div>
 
-          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Transforma tu Vida con el{" "}
-            <span className="gradient-text">Trading Inteligente</span>
+          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-tight">
+            Transforma tu Vida con el
+            <span className="block gradient-text mt-2">Trading Inteligente</span>
           </h1>
+
+          {/* Botón publicitario: activa a CJ como tu aliado / guía / amigo */}
+          <div className="mb-12 flex justify-center">
+            <button
+              type="button"
+              onClick={openAliado}
+              className="relative inline-flex items-center gap-2 rounded-full px-8 py-4 text-base md:text-lg font-extrabold text-white bg-gradient-to-r from-fuchsia-500 via-violet-500 to-cyan-400 shadow-xl shadow-fuchsia-500/50 hover:shadow-fuchsia-500/70 hover:scale-[1.04] transition-all"
+            >
+              <span className="absolute inset-0 rounded-full ring-2 ring-fuchsia-300/60 animate-ping opacity-50" />
+              🚀 Activa tu Aliado de Trading 📈
+            </button>
+          </div>
 
           {/* Las 3 Verdades del Trading */}
           <div className="max-w-3xl mx-auto mb-8">
@@ -45,19 +70,19 @@ export function HeroSection() {
             </h2>
             <div className="grid gap-4 text-left">
               <div className="bg-slate-900/50 border border-emerald-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-300 font-bold flex items-center justify-center">1</span>
+                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-emerald-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-emerald-500/40 ring-2 ring-emerald-300/50">1</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   En los mercados financieros, <strong className="text-white">la mayoría pierde</strong>. No es mala suerte — es no tener el método correcto.
                 </p>
               </div>
-              <div className="bg-slate-900/50 border border-amber-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center">2</span>
+              <div className="bg-slate-900/50 border border-sky-500/30 rounded-2xl p-5 flex gap-4 items-start">
+                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-sky-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-sky-500/40 ring-2 ring-sky-300/50">2</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   Hay una verdad incómoda en el trading: <strong className="text-white">los mercados no perdonan la improvisación</strong>. La mayoría paga un precio muy caro por aprenderlo tarde.
                 </p>
               </div>
               <div className="bg-slate-900/50 border border-blue-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-9 h-9 rounded-full bg-blue-500/20 text-blue-300 font-bold flex items-center justify-center">3</span>
+                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-blue-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-blue-500/40 ring-2 ring-blue-300/50">3</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   El dinero que pierde la mayoría de los traders no desaparece — <strong className="text-white">alguien más se lo lleva</strong>. La pregunta es: ¿de qué lado quieres estar?
                 </p>
@@ -65,27 +90,34 @@ export function HeroSection() {
             </div>
           </div>
 
-          <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto">
-            Aprende el método que te llevará del <strong className="text-red-500">95%</strong> que pierde al{" "}
-            <strong className="text-sky-400">5%</strong> <strong className="text-emerald-400">que GANA</strong> consistentemente en los mercados financieros.
+          <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-3xl mx-auto text-justify leading-relaxed">
+            El <strong className="text-red-500">95%</strong> de los traders pierde dinero por falta de conocimiento, disciplina y estrategia. Nuestro método está diseñado para ayudarte a formar parte del <strong className="text-emerald-400">5%</strong> que opera con criterio, controla el riesgo y busca resultados consistentes.
           </p>
 
-          <p className="text-lg text-slate-200 mb-6 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-slate-200 mb-6 max-w-3xl mx-auto leading-relaxed text-justify">
             El trading es una habilidad real que puede generar ingresos consistentes cuando se aprende correctamente. Nuestra formación está diseñada para que avances paso a paso, con acompañamiento práctico en cada etapa y un enfoque claro en resultados tangibles. No se trata solo de teoría, sino de desarrollar las habilidades necesarias para operar con confianza y consistencia en los mercados.
           </p>
 
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
+            <span className="text-emerald-400">Trading Binario</span>
+            <span className="text-slate-500"> vs </span>
+            <span className="text-blue-400">Trading de Forex</span>
+          </h3>
           <div className="bg-gradient-to-r from-emerald-900/40 to-blue-900/40 border border-emerald-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
-            <p className="text-base text-white leading-relaxed mb-3">
-              <strong className="text-emerald-300 text-lg">Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong className="text-yellow-300">mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
+            <p className="text-base text-white leading-relaxed mb-3 text-justify">
+              <strong className="text-emerald-300 text-lg">Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong className="text-emerald-300">mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
             </p>
-            <p className="text-base text-slate-200 leading-relaxed">
-              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong className="text-emerald-300">No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la libertad financiera.
+            <p className="text-base text-slate-200 leading-relaxed text-justify">
+              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong className="text-emerald-300">No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la <strong className="text-emerald-400">libertad financiera</strong>.
             </p>
           </div>
 
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
+            <span className="text-sky-400">CJ Bot</span> <span className="text-emerald-400">100% eficiente y rentable</span>
+          </h3>
           <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
             <p className="text-base text-white leading-relaxed mb-3">
-              <strong className="text-blue-300 text-lg">🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong className="text-yellow-300">diversos bots de trading automático</strong> que operan en:
+              <strong className="text-blue-300 text-lg">🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong className="text-sky-300">diversos bots de trading automático</strong> que operan en:
             </p>
             <div className="grid md:grid-cols-3 gap-3 mb-3">
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
@@ -108,7 +140,7 @@ export function HeroSection() {
             </p>
           </div>
 
-          <p className="text-lg text-yellow-300 mb-8 max-w-2xl mx-auto italic">
+          <p className="text-xl md:text-2xl font-extrabold mb-8 max-w-3xl mx-auto bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">
             Aquí no tenemos límites, lleguemos más allá de la meta porque no hay fronteras que nos detenga
           </p>
 
@@ -129,31 +161,35 @@ export function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/registro"
-              className="btn-primary text-lg flex items-center justify-center gap-2"
+              className="w-full sm:w-[300px] rounded-full py-4 text-base md:text-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
             >
-              Comienza Tu Transformación
+              Sí a mi libertad Financiera
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
               href="/metodo"
-              className="bg-slate-800/50 border border-slate-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-700/50 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-[300px] rounded-full py-4 text-base md:text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
             >
-              Conoce el Método
+              Quiero conocer el método
             </Link>
           </div>
 
           {/* Trust Badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
-              <Shield className="h-5 w-5 text-emerald-500" />
-              Garantía Total
+            <div className="flex items-center gap-2 text-slate-300 text-sm">
+              <Shield className="h-5 w-5 text-emerald-400" />
+              Comprometidos contigo
             </div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
-              <Award className="h-5 w-5 text-emerald-500" />
-              Certificación Incluida
+            <div className="flex items-center gap-2 text-slate-300 text-sm">
+              <Zap className="h-5 w-5 text-sky-400" />
+              Acceso inmediato
+            </div>
+            <div className="flex items-center gap-2 text-slate-300 text-sm">
+              <Headphones className="h-5 w-5 text-emerald-400" />
+              Soporte real
             </div>
           </div>
         </motion.div>

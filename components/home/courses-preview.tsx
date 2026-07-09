@@ -32,7 +32,7 @@ const courses = [
     title: "Curso Profesional",
     subtitle: "Trading Institucional",
     price: "$499.99",
-    image: "https://cdn.abacus.ai/images/b7869995-98fb-4702-94e9-a39eb45ab302.png",
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=450&fit=crop",
     features: ["Análisis institucional", "Automatización, Bot para Forex", "Mentoría avanzada"],
     students: "230+",
     duration: "Sin límite de tiempo",
@@ -71,7 +71,7 @@ export function CoursesPreview() {
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: idx * 0.15 }}
-              className={`card relative overflow-hidden ${
+              className={`card relative overflow-hidden h-full flex flex-col ${
                 course.popular ? "border-emerald-500/50" : ""
               }`}
             >
@@ -94,7 +94,7 @@ export function CoursesPreview() {
               <h3 className="text-xl font-bold text-white mb-1">{course.title}</h3>
               <p className="text-emerald-400 text-sm mb-4">{course.subtitle}</p>
 
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2 mb-6 flex-grow">
                 {course.features.map((feature) => (
                   <li key={feature} className="text-sm text-slate-400 flex items-center gap-2">
                     <span className="text-emerald-400">✓</span> {feature}
@@ -109,20 +109,17 @@ export function CoursesPreview() {
                 <span className="flex items-center gap-1">
                   <Clock className="h-4 w-4" /> {course.duration}
                 </span>
-                <span className="flex items-center gap-1 text-amber-400">
+                <span className="flex items-center gap-1 text-emerald-400">
                   <Star className="h-4 w-4 fill-current" /> {course.rating}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-white">{course.price} <span className="text-sm text-slate-400">USD</span></span>
-                <Link
-                  href="/cursos"
-                  className="btn-primary text-sm py-2 px-4"
-                >
-                  Ver Más
-                </Link>
-              </div>
+              <Link
+                href="/cursos"
+                className="btn-primary w-full text-sm py-2.5 flex items-center justify-center gap-2 mt-auto"
+              >
+                Ver Más <ArrowRight className="h-4 w-4" />
+              </Link>
             </motion.div>
           ))}
         </div>

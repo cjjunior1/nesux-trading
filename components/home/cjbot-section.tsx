@@ -13,13 +13,13 @@ export function CJBotSection() {
       </div>
       <div className="max-w-2xl mx-auto">
         <button
-          className="w-full flex items-center justify-between bg-slate-900 border border-emerald-700 rounded-xl p-6 text-left shadow hover:bg-slate-800/70 transition-all duration-200 focus:outline-none"
+          className="w-full flex items-center justify-center gap-3 bg-slate-900 border border-emerald-700 rounded-xl p-6 text-center shadow hover:bg-slate-800/70 transition-all duration-200 focus:outline-none"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="cj-bot-panel"
         >
-          <span className="font-semibold text-lg text-emerald-300">¿Por qué elegir CJ Bot a Otro Nivel?</span>
-          <ChevronDown className={`ml-2 h-6 w-6 text-emerald-400 transition-transform ${open ? "rotate-180" : ""}`} />
+          <span className="font-extrabold text-xl md:text-3xl bg-gradient-to-r from-emerald-400 via-sky-400 to-blue-500 bg-clip-text text-transparent">¿Por qué elegir CJ Bot a Otro Nivel?</span>
+          <ChevronDown className={`h-7 w-7 text-sky-400 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
         {open && (
           <div
