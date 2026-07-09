@@ -16,7 +16,7 @@ jobs:
         username: ${{ secrets.CONTABO_USER }}
         password: ${{ secrets.CONTABO_PASSWORD }}
         script: |
-          cd /var/www/nesux-trading
+          cd /var/www/trading
           git pull origin main
           npm install
           npm run build
