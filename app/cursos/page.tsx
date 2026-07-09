@@ -133,7 +133,7 @@ export default function CursosPage() {
             </h1>
 
             <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-              Programas estructurados para llevarte de principiante a un trader <span className="font-bold text-emerald-400">RENTABLE</span> con nuestro método probado.
+              Programas estructurados para llevarte de principiante a un trader <span className="font-bold gradient-text">RENTABLE</span> con nuestro método probado.
             </p>
 
             <div className="max-w-4xl mx-auto mb-8">
@@ -141,7 +141,7 @@ export default function CursosPage() {
                 <h3 className="text-2xl font-bold text-emerald-300 mb-4 text-center">Nuestra Estrategia: Trading Binario Como Base</h3>
                 
                 <p className="text-base text-slate-200 leading-relaxed mb-4">
-                  El trading en Forex es poderoso, pero requiere tiempo, capital y experiencia para dominarlo. <strong className="text-white">Por eso revolucionamos la forma de enseñar trading</strong>: comenzamos con <strong className="text-emerald-300">Trading Binario</strong>, la puerta de entrada perfecta que te permite <strong className="text-yellow-300">generar resultados desde las primeras semanas</strong> mientras construyes las bases sólidas que necesitas.
+                  El trading en Forex es poderoso, pero requiere mucho tiempo, capital y experiencia para dominarlo. <strong className="text-white">Por eso revolucionamos la forma de enseñar trading</strong>: comenzamos con <strong className="text-emerald-300">Trading Binario</strong>, la puerta de entrada perfecta que te permite <strong className="text-yellow-300">generar resultados desde las primeras semanas</strong> mientras construyes las bases sólidas que necesitas.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-4 my-6">
