@@ -48,16 +48,12 @@ export default function CjBotLanding() {
       {/* SECCIÓN 3: SOLUCIÓN */}
       <section className="max-w-3xl w-full mx-auto py-8 md:py-16 px-4 text-center">
         <div className="relative w-full max-w-2xl mx-auto mb-6 aspect-video rounded-2xl overflow-hidden shadow-lg bg-slate-900">
-          <video
-            className="w-full h-full object-cover"
-            controls
-            autoPlay
-            loop
-            muted
-          >
-            <source src="/cj-bot-video.mp4" type="video/mp4" />
-            Tu navegador no soporta el elemento video.
-          </video>
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/78fpT_7cvmo?autoplay=1&mute=1"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </div>
         <h2 className="section-title mb-1">Presentamos CJ Bot a Otro Nivel</h2>
         <div className="mb-3 text-xl text-emerald-400 font-bold">Tu Estratega Personal de Mercados</div>
