@@ -17,52 +17,60 @@ import {
   Headphones,
 } from "lucide-react";
 
+// Estilos para animaciones de degradados dinámicos (ya no se usa)
+
 const bots = [
   {
-    name: "Bot Starter",
+    name: " CJ Bot Lite",
     description: "Perfecto para comenzar con trading automatizado. Operaciones simples y seguras.",
-    price: 49,
+    accounts: "Para Dos cuentas Real y cuatro cuentas demos",
+    price: 99.99,
     period: "mes",
     features: [
-      "1 par de trading",
+      "Pares ilimitados",
       "Estrategia conservadora",
       "Operaciones 24/7",
       "Panel de control básico",
-      "Soporte por email",
+      "Soporte 24/7 por WhatsApp",
     ],
     color: "emerald",
+    colorHex: "#03A7A5",
+    buttonText: "claro que si",
   },
   {
-    name: "Bot Pro",
+    name: "CJ Bot Standard",
     description: "Múltiples estrategias y pares para traders intermedios que buscan diversificar.",
-    price: 149,
+    accounts: "Para Tres cuentas Real y seis cuentas demos",
+    price: 169.99,
     period: "mes",
     popular: true,
     features: [
-      "Hasta 5 pares de trading",
+      "Pares ilimitados",
       "3 estrategias diferentes",
-      "Análisis en tiempo real",
-      "Alertas por WhatsApp",
+      "Análisis en tiempo real",  
       "Panel avanzado con métricas",
-      "Soporte prioritario",
+      "Soporte 24/7 por WhatsApp"
     ],
-    color: "purple",
+    color: "blue",
+    colorHex: "#3B82F6",
+    buttonText: "My Standard",
   },
   {
-    name: "Bot Enterprise",
+    name: "CJ Bot Premium",
     description: "Solución institucional con las mejores herramientas y soporte dedicado.",
-    price: 399,
+    accounts: "Para Seis cuentas Real y ocho cuentas demos",
+    price: 209.99,
     period: "mes",
     features: [
       "Pares ilimitados",
       "Todas las estrategias",
       "API personalizada",
-      "Servidor dedicado",
       "Configuración personalizada",
       "Soporte 24/7 por WhatsApp",
-      "Sesiones de optimización mensuales",
     ],
     color: "amber",
+    colorHex: "#CE6674",
+    buttonText: "Soy Premium",
   },
 ];
 
@@ -208,25 +216,14 @@ export default function BotsPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView2 ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: idx * 0.15 }}
-                className={`card relative ${
-                  bot.popular ? "border-purple-500/50 ring-2 ring-purple-500/20" : ""
-                }`}
+                className="card relative"
               >
-                {bot.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
-                    RECOMENDADO
-                  </div>
-                )}
-
                 <div className="text-center mb-6">
-                  <div className={`inline-flex p-3 rounded-xl mb-4 ${
-                    bot.color === "emerald" ? "bg-emerald-500/20" :
-                    bot.color === "purple" ? "bg-purple-500/20" : "bg-amber-500/20"
-                  }`}>
-                    <Bot className={`h-8 w-8 ${
-                      bot.color === "emerald" ? "text-emerald-400" :
-                      bot.color === "purple" ? "text-purple-400" : "text-amber-400"
-                    }`} />
+                  <div 
+                    className="inline-flex p-3 rounded-xl mb-4"
+                    style={{ backgroundColor: `${bot.colorHex}20` }}
+                  >
+                    <Bot className="h-8 w-8" style={{ color: bot.colorHex }} />
                   </div>
                   <h3 className="text-2xl font-bold text-white">{bot.name}</h3>
                   <p className="text-slate-400 text-sm mt-2">{bot.description}</p>
@@ -237,13 +234,21 @@ export default function BotsPage() {
                   <span className="text-slate-400">/{bot.period}</span>
                 </div>
 
+                <div 
+                  className="text-center mb-6 p-3 rounded-full border"
+                  style={{ 
+                    backgroundColor: `${bot.colorHex}15`,
+                    borderColor: `${bot.colorHex}50`,
+                    color: bot.colorHex
+                  }}
+                >
+                  <p className="text-sm font-semibold">{bot.accounts}</p>
+                </div>
+
                 <ul className="space-y-3 mb-8">
                   {bot.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-slate-300 text-sm">
-                      <CheckCircle className={`h-5 w-5 flex-shrink-0 ${
-                        bot.color === "emerald" ? "text-emerald-400" :
-                        bot.color === "purple" ? "text-purple-400" : "text-amber-400"
-                      }`} />
+                      <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: bot.colorHex }} />
                       {feature}
                     </li>
                   ))}
@@ -251,21 +256,18 @@ export default function BotsPage() {
 
                 <Link
                   href="/registro"
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                    bot.popular ? "btn-secondary" : "bg-slate-700 hover:bg-slate-600 text-white"
-                  }`}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white"
+                  style={{ 
+                    backgroundColor: bot.colorHex,
+                    opacity: 1
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.85'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                 >
-                  Comenzar <ArrowRight className="h-4 w-4" />
+                  {bot.buttonText} <ArrowRight className="h-4 w-4" />
                 </Link>
               </motion.div>
             ))}
-          </div>
-
-          {/* Disclaimer */}
-          <div className="mt-12 p-6 bg-slate-800/30 rounded-xl border border-slate-700">
-            <p className="text-xs text-slate-500 text-center">
-              <strong>Aviso:</strong> Los bots de trading operan basados en algoritmos y estrategias predefinidas. Los resultados pasados no garantizan resultados futuros. El trading conlleva riesgos y podrías perder parte o la totalidad de tu capital. Opera solo con dinero que puedas permitirte perder.
-            </p>
           </div>
         </div>
       </section>
@@ -279,20 +281,20 @@ export default function BotsPage() {
 
           <div className="space-y-8">
             {[
-              { step: "1", title: "Elige tu plan", desc: "Selecciona el bot que mejor se adapte a tus necesidades y nivel de experiencia." },
-              { step: "2", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura. Tus fondos siempre están en tu broker." },
-              { step: "3", title: "Configura el bot", desc: "Personaliza los parámetros según tu tolerancia al riesgo y objetivos financieros." },
-              { step: "4", title: "Opera automáticamente", desc: "El bot ejecuta operaciones 24/7 mientras tú te enfocas en otras actividades." },
+              { emoji: "📋", title: "Elige tu plan", desc: "Selecciona el bot que mejor se adapte a tus necesidades y nivel de experiencia." },
+              { emoji: "🔗", title: "Conecta tu broker", desc: "Vincula tu cuenta de trading mediante API segura. Tus fondos siempre están en tu broker." },
+              { emoji: "⚙️", title: "Configura el bot", desc: "Personaliza los parámetros según tu tolerancia al riesgo y objetivos financieros." },
+              { emoji: "🤖", title: "Opera automáticamente", desc: "El bot ejecuta operaciones 24/7 mientras tú te enfocas en otras actividades." },
             ].map((item, idx) => (
               <motion.div
-                key={item.step}
+                key={item.emoji}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.15 }}
                 className="flex gap-6 items-start"
               >
-                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">{item.step}</span>
+                <div className="flex-shrink-0 text-4xl mt-1">
+                  {item.emoji}
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
@@ -315,10 +317,27 @@ export default function BotsPage() {
           </p>
           <Link
             href="/registro"
-            className="btn-primary inline-flex items-center gap-2 text-lg"
+            className="text-slate-900 font-bold px-8 py-4 rounded-full inline-flex items-center gap-3 text-lg transition-all hover:opacity-90"
+            style={{
+              backgroundColor: "#02A5EB"
+            }}
           >
-            Comenzar Ahora <ArrowRight className="h-5 w-5" />
+            🚀 Comenzar Ahora ⚡
           </Link>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="py-12 bg-slate-950">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="p-8 bg-red-500/15 rounded-2xl border-2 border-red-500/50">
+            <div className="flex items-start gap-4">
+              <span className="text-4xl flex-shrink-0">⚠️</span>
+              <p className="text-lg md:text-xl text-white font-semibold leading-tight">
+                <strong className="text-red-500 text-xl">AVISO IMPORTANTE:</strong> Los bots de trading conllevan riesgos y podrías perder tu capital. Opera solo con dinero que puedas permitirte perder.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
