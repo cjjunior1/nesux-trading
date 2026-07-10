@@ -2,6 +2,7 @@
 	"use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,9 +35,16 @@ function sendNavAnalytics(eventName: string, itemId?: string) {
 }
 
 function DropdownLanding() {
+  const pathname = usePathname();
+  const isLandingActive = pathname.startsWith("/landing");
+
   return (
     <div className="relative group">
-      <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors rounded-md">
+      <button className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+        isLandingActive
+          ? "text-blue-400 font-bold drop-shadow-lg"
+          : "text-slate-300 hover:text-emerald-400"
+      }`}>
         Landing <span className="ml-1 text-xs"></span>
       </button>
       
@@ -57,11 +65,17 @@ function DropdownLanding() {
 
 function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isLandingActive = pathname.startsWith("/landing");
   return (
     <div className="">
       <button
-        className="flex items-center gap-1 w-full py-2 text-slate-300 hover:text-emerald-400 text-left"
-        onClick={e => {e.preventDefault(); setOpen(!open); if (!open) sendNavAnalytics('nav_landing_open');}}
+        className={`flex items-center gap-1 w-full py-2 text-left ${
+          isLandingActive
+            ? "text-blue-400 font-bold drop-shadow-lg"
+            : "text-slate-300 hover:text-emerald-400"
+        }`}
+        onClick={() => {setOpen(!open); if (!open) sendNavAnalytics('nav_landing_open');}}
         aria-expanded={open}
         aria-controls="mobile-landing-menu"
       >
@@ -98,6 +112,7 @@ function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
   const sessionData = useSession();
   const session = sessionData?.data;
   const status = sessionData?.status ?? "loading";
@@ -116,6 +131,11 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav
@@ -136,16 +156,23 @@ export function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-1 text-sm font-medium"
-              >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                    active
+                      ? "text-blue-400 font-bold drop-shadow-lg"
+                      : "text-slate-300 hover:text-emerald-400"
+                  }`}
+                >
+                  <link.icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              );
+            })}
             <DropdownLanding />
             {mounted && status === "authenticated" ? (
               <div className="flex items-center gap-3">
@@ -165,11 +192,22 @@ export function Navbar() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/login"
-                  className="text-slate-300 hover:text-white transition-colors"
+                  className={`transition-colors text-sm font-medium ${
+                    pathname === "/login"
+                      ? "text-blue-400 font-bold drop-shadow-lg"
+                      : "text-slate-300 hover:text-white"
+                  }`}
                 >
                   Iniciar Sesión
                 </Link>
-                <Link href="/registro" className="btn-primary text-sm py-2 px-4">
+                <Link
+                  href="/registro"
+                  className={`text-sm font-medium py-2 px-4 rounded-lg transition-all ${
+                    pathname === "/registro"
+                      ? "text-blue-400 font-bold drop-shadow-lg border border-blue-400/50 bg-blue-400/10 hover:bg-blue-400/20"
+                      : "btn-primary hover:shadow-lg"
+                  }`}
+                >
                   Registrarse
                 </Link>
               </div>
@@ -200,17 +238,24 @@ export function Navbar() {
             className="md:hidden bg-slate-900/95 backdrop-blur-md"
           >
             <div className="px-4 py-4 space-y-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 text-slate-300 hover:text-emerald-400 py-2"
-                >
-                  <link.icon className="h-5 w-5" />
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-2 py-2 ${
+                      active
+                        ? "text-blue-400 font-bold drop-shadow-lg"
+                        : "text-slate-300 hover:text-emerald-400"
+                    }`}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                );
+              })}
               <MobileDropdownLanding closeMenu={() => setIsOpen(false)} />
               <div className="pt-4 border-t border-slate-700">
                 {mounted && status === "authenticated" ? (
@@ -226,14 +271,22 @@ export function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setIsOpen(false)}
-                      className="block w-full text-center py-2 text-slate-300"
+                      className={`block w-full text-center py-2 text-sm font-medium ${
+                        pathname === "/login"
+                          ? "text-blue-400 font-bold drop-shadow-lg"
+                          : "text-slate-300"
+                      }`}
                     >
                       Iniciar Sesión
                     </Link>
                     <Link
                       href="/registro"
                       onClick={() => setIsOpen(false)}
-                      className="block w-full btn-primary text-center"
+                      className={`block w-full text-center py-2 text-sm font-medium rounded-lg transition-all ${
+                        pathname === "/registro"
+                          ? "text-blue-400 font-bold drop-shadow-lg border border-blue-400/50 bg-blue-400/10"
+                          : "btn-primary"
+                      }`}
                     >
                       Registrarse Gratis
                     </Link>

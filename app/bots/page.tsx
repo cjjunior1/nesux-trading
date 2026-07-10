@@ -135,11 +135,12 @@ export default function BotsPage() {
               className="relative aspect-video rounded-2xl overflow-hidden"
             >
               <Image
-                src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop"
+                src="/robot-trading.png"
                 alt="Bot de trading automatizado"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
+                priority
               />
             </motion.div>
           </div>
