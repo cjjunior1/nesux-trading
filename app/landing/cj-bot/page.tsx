@@ -12,13 +12,14 @@ export default function CjBotLanding() {
         <p className="section-subtitle max-w-2xl mx-auto">
           Cansado de la montaña rusa emocional del trading? <b>CJ Bot a Otro Nivel</b> es tu copiloto analítico, una máquina de precisión diseñada para ejecutar estrategias ganadoras, proteger tu capital y operar por ti 24/7 sin dudar.
         </p>
-        <a href="https://youtube.com/shorts/ZqO9s1L8cbs?si=jDVr0E7nQlT31pEi" target="_blank" rel="noopener noreferrer">
-  <img
-    src="https://img.youtube.com/vi/ZqO9s1L8cbs/maxresdefault.jpg"
-    alt="Video CJ Bot - Trading automatizado"
-    className="w-full max-w-lg object-contain bg-slate-900/80 rounded-xl mx-auto animate-float animate-pulse-glow mb-6 mt-5 shadow-xl border-2 border-blue-900"
-  />
-</a>
+        <div className="w-full max-w-lg mx-auto mb-6 mt-5 rounded-xl overflow-hidden shadow-xl border-2 border-blue-900 aspect-video">
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/78fpT_7cvmo?autoplay=1&mute=1"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
         <a href="https://wa.me/" // Tu CTA real aquí
                   target="_blank"
                   rel="noopener noreferrer"
