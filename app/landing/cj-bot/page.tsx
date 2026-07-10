@@ -10,7 +10,7 @@ export default function CjBotLanding() {
           El Trading Automático Acaba de Evolucionar
         </h1>
         <p className="section-subtitle max-w-2xl mx-auto">
-          Cansado de la montaña rusa emocional del trading? <b>CJ Bot v2.30</b> es tu copiloto analítico, una máquina de precisión diseñada para ejecutar estrategias ganadoras, proteger tu capital y operar por ti 24/7 sin dudar.
+          Cansado de la montaña rusa emocional del trading? <b>CJ Bot a Otro Nivel</b> es tu copiloto analítico, una máquina de precisión diseñada para ejecutar estrategias ganadoras, proteger tu capital y operar por ti 24/7 sin dudar.
         </p>
         <a href="https://youtube.com/shorts/ZqO9s1L8cbs?si=jDVr0E7nQlT31pEi" target="_blank" rel="noopener noreferrer">
   <img
@@ -48,19 +48,21 @@ export default function CjBotLanding() {
       {/* SECCIÓN 3: SOLUCIÓN */}
       <section className="max-w-3xl w-full mx-auto py-8 md:py-16 px-4 text-center">
         <div className="relative w-full max-w-2xl mx-auto mb-6 aspect-video rounded-2xl overflow-hidden shadow-lg bg-slate-900">
-          <iframe
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[132%]"
-            src="https://www.youtube-nocookie.com/embed/6JZ_hLo0BTU?modestbranding=1&rel=0&controls=0&playsinline=1"
-            title="Presentamos CJ Bot v2.30"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
+          <video
+            className="w-full h-full object-cover"
+            controls
+            autoPlay
+            loop
+            muted
+          >
+            <source src="/cj-bot-video.mp4" type="video/mp4" />
+            Tu navegador no soporta el elemento video.
+          </video>
         </div>
-        <h2 className="section-title mb-1">Presentamos CJ Bot v2.30</h2>
+        <h2 className="section-title mb-1">Presentamos CJ Bot a Otro Nivel</h2>
         <div className="mb-3 text-xl text-emerald-400 font-bold">Tu Estratega Personal de Mercados</div>
         <p className="text-slate-300 mb-2">
-          Imagina un sistema que no solo sigue reglas, sino que piensa, se adapta y protege. <b>CJ Bot v2.30</b> no es otro bot “milagroso”. Es el resultado de una programación quirúrgica, enfocado en tres pilares fundamentales: <span className="font-bold text-emerald-300">Inteligencia, Control y Seguridad</span>.
+          Imagina un sistema que no solo sigue reglas, sino que piensa, se adapta y protege. <b>CJ Bot a Otro Nivel</b> no es otro bot “milagroso”. Es el resultado de una programación quirúrgica, enfocado en tres pilares fundamentales: <span className="font-bold text-emerald-300">Inteligencia, Control y Seguridad</span>.
         </p>
       </section>
 
@@ -192,10 +194,10 @@ export default function CjBotLanding() {
         </div>
         <div className="card bg-emerald-700/80 border-emerald-400/20 mb-4">
           <h3 className="text-2xl font-bold mb-2 gradient-text">Deja de Operar con Emociones</h3>
-          <p className="mb-5 text-slate-200">Elige la estrategia, define tu riesgo y deja que CJ Bot v2.30 haga el trabajo pesado. Recupera tu tiempo y tu paz mental.</p>
+          <p className="mb-5 text-slate-200">Elige la estrategia, define tu riesgo y deja que CJ Bot a Otro Nivel haga el trabajo pesado. Recupera tu tiempo y tu paz mental.</p>
           <div className="bg-slate-900 rounded-lg px-5 py-3 mb-4">
             <ul className="text-emerald-200 text-base text-left max-w-xs mx-auto space-y-1">
-              <li>✔️ Archivo completo CJ Bot v2.30 (Expert Advisor)</li>
+              <li>✔️ Archivo completo CJ Bot a Otro Nivel (Expert Advisor)</li>
               <li>✔️ Acceso a todas las nuevas versiones</li>
               <li>✔️ Guía de configuración & soporte</li>
               <li>✔️ Activación instantánea y soporte personalizado</li>
@@ -210,7 +212,7 @@ export default function CjBotLanding() {
       <section className="max-w-4xl w-full mx-auto py-14 px-4 text-center bg-gradient-to-tr from-emerald-900/60 via-slate-900 to-slate-800 rounded-2xl shadow-2xl mb-16 border border-emerald-600/30">
         <div className="inline-flex items-center gap-2 mb-4">
           <span className="text-3xl">🤖</span>
-          <span className="text-xl font-black uppercase tracking-wider text-emerald-300">CJ Bot v2.30</span>
+          <span className="text-xl font-black uppercase tracking-wider text-emerald-300">CJ Bot a Otro Nivel</span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-2 gradient-text">Cualidades Completas,<br className="hidden md:inline"/> Ventaja Definitiva</h2>
         <div className="max-w-3xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
@@ -283,7 +285,7 @@ export default function CjBotLanding() {
           rel="noopener noreferrer"
           className="btn-primary text-xl px-10 py-4 mt-10 shadow-lg font-bold inline-block"
         >
-          Quiero la potencia de CJ Bot v2.30
+          Quiero la potencia de CJ Bot a Otro Nivel
         </a>
         <p className="text-slate-400 text-sm mt-3">Únete a la élite del trading algorítmico. Deja atrás los bots simples y transforma tu operativa en una estrategia profesional y automática.</p>
       </section>
