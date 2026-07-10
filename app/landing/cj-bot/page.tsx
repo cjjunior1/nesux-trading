@@ -23,9 +23,9 @@ export default function CjBotLanding() {
         <a href="https://wa.me/" // Tu CTA real aquí
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-primary text-xl px-10 py-4 mt-2 shadow-lg font-bold"
+                  className="inline-block rounded-full bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 mt-8 shadow-lg font-bold transition-all hover:shadow-xl"
                 >
-                  ¡QUIERO MI LICENCIA AHORA!
+                  🚀 Si lo quiero ya 💰
                 </a>
                 
       </section>
