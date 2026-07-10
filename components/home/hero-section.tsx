@@ -69,20 +69,20 @@ export function HeroSection() {
               Las 3 Verdades del Trading que Debes Saber
             </h2>
             <div className="grid gap-4 text-left">
-              <div className="bg-slate-900/50 border border-emerald-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-emerald-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-emerald-500/40 ring-2 ring-emerald-300/50">1</span>
+              <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#4040BF' + '4D' }}>
+                <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#4040BF', boxShadow: '#4040BF 0 0 16px 0.4', borderColor: '#4040BF' + '80', ringColor: '#4040BF' + '80' }}>1</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   En los mercados financieros, <strong className="text-white">la mayoría pierde</strong>. No es mala suerte — es no tener el método correcto.
                 </p>
               </div>
-              <div className="bg-slate-900/50 border border-sky-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-sky-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-sky-500/40 ring-2 ring-sky-300/50">2</span>
+              <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#005288' + '4D' }}>
+                <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#005288', boxShadow: '#005288 0 0 16px 0.4', borderColor: '#005288' + '80', ringColor: '#005288' + '80' }}>2</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   Hay una verdad incómoda en el trading: <strong className="text-white">los mercados no perdonan la improvisación</strong>. La mayoría paga un precio muy caro por aprenderlo tarde.
                 </p>
               </div>
-              <div className="bg-slate-900/50 border border-blue-500/30 rounded-2xl p-5 flex gap-4 items-start">
-                <span className="flex-shrink-0 w-11 h-11 rounded-full bg-blue-500 text-white text-lg font-extrabold flex items-center justify-center shadow-lg shadow-blue-500/40 ring-2 ring-blue-300/50">3</span>
+              <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#8080FF' + '4D' }}>
+                <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#8080FF', boxShadow: '#8080FF 0 0 16px 0.4', borderColor: '#8080FF' + '80', ringColor: '#8080FF' + '80' }}>3</span>
                 <p className="text-base md:text-lg text-slate-200 leading-relaxed">
                   El dinero que pierde la mayoría de los traders no desaparece — <strong className="text-white">alguien más se lo lleva</strong>. La pregunta es: ¿de qué lado quieres estar?
                 </p>
