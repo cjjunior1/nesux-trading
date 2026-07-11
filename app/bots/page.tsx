@@ -463,6 +463,21 @@ export default function BotsPage() {
                 <Link href="#planes-vip-libertad" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
                   💎 Quiero verlos ✨
                 </Link>
+
+                {/* Preview Images */}
+                <div className="grid grid-cols-3 gap-3 w-full mt-6">
+                  {courses.map((course) => (
+                    <div key={course.id} className="relative aspect-video rounded-lg overflow-hidden border border-slate-600">
+                      <Image
+                        src={course.image}
+                        alt={course.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>
