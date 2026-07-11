@@ -322,7 +322,7 @@ export default function BotsPage() {
                 </ul>
 
                 <Link
-                  href="#vip-section"
+                  href={`/checkout?product=${bot.name}&amount=${bot.price}`}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white"
                   style={{
                     backgroundColor: bot.colorHex,
@@ -382,72 +382,78 @@ export default function BotsPage() {
             transition={{ delay: 0.45 }}
             className="bg-gradient-to-r from-purple-900/50 to-blue-900/40 rounded-3xl p-8 md:p-12 border border-purple-500/40 shadow-2xl"
           >
-            {/* VIP Title Inside */}
+            {/* VIP Title Inside - Styled Box */}
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-bold text-white whitespace-nowrap overflow-hidden text-ellipsis">
-                🎁 <span className="gradient-text">¡GRANDES SORPRESAS TE ESPERAN EN NUESTROS PLANES VIP!</span> 💎
-              </h2>
+              <div className="bg-gradient-to-r from-blue-600/40 via-emerald-500/40 to-cyan-600/40 border-2 border-emerald-400/60 rounded-full px-12 md:px-20 py-6 shadow-2xl backdrop-blur-sm w-full max-w-6xl mx-auto">
+                <div className="flex items-center gap-8 justify-center">
+                  <span className="text-5xl animate-pulse flex-shrink-0" style={{textShadow: '0 0 20px rgba(16, 185, 129, 0.8)'}}>💎</span>
+                  <h2 className="text-xl md:text-2xl font-bold text-white leading-snug flex-grow text-center">
+                    Los Planes VIP no son un <span className="gradient-text">gasto</span>,<br />sino una <span className="gradient-text">inversión</span> que <span className="gradient-text">multiplica</span> beneficios.
+                  </h2>
+                  <span className="text-5xl animate-pulse flex-shrink-0" style={{textShadow: '0 0 20px rgba(34, 197, 94, 0.8)'}}>💚</span>
+                </div>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 items-stretch">
-              {/* Left Column - Membresía VIP */}
+              {/* Left Column - Membresía VIP – Derechos */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6 text-left">Membresía VIP</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-left">Membresía VIP – Derechos</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Acceso a TODOS los cursos actuales</span>
+                    <span>Acceso exclusivo a la academia</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Trading en vivo programado</span>
+                    <span>Derechos exclusivos como VIP</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Comunidad VIP exclusiva</span>
+                    <span>Beneficios exclusivos incluidos</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Mentoría grupal semanal</span>
+                    <span>Protección exclusiva de inversión</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Bot Pro incluido</span>
+                    <span>Plaza exclusiva garantizada</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Soporte prioritario 24/7</span>
+                    <span>Atención exclusiva y prioritaria</span>
                   </li>
                 </ul>
               </div>
 
-              {/* Center Column - Planes VIP */}
+              {/* Center Column - Planes VIP Beneficio */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6 text-left">Planes VIP</h3>
+                <h3 className="text-2xl font-bold text-white mb-6 text-left">Planes VIP Beneficio</h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Garantía de recuperación de inversión</span>
+                    <span>Recupera y multiplica tu inversión</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Acceso a nuestros Bots</span>
+                    <span>Obtén ingresos por tus promociones</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Crear tu Bot con tus estrategias</span>
+                    <span>Comercializa nuestros cursos y Bots</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Te creamos un bot para ti</span>
+                    <span>Crea tu negocio con nuestra orientación</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Contenido premium y cursos ilimitados</span>
+                    <span>Desarrolla tu propio Bot y estrategias</span>
                   </li>
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                    <span>Soporte prioritario y dedicado</span>
+                    <span>Construye una comunidad productiva</span>
                   </li>
                 </ul>
               </div>
@@ -460,7 +466,7 @@ export default function BotsPage() {
                   <p className="text-2xl text-[#0194F6] font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
-                <Link href="#planes-vip-libertad" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
+                <Link href="/bots#vip-section" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
                   💎 Quiero verlos ✨
                 </Link>
               </div>
