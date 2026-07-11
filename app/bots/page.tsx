@@ -374,7 +374,7 @@ export default function BotsPage() {
       </section>
 
       {/* VIP Plans Section */}
-      <section className="py-16 bg-slate-900">
+      <section id="vip-section" className="py-16 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -463,21 +463,6 @@ export default function BotsPage() {
                 <Link href="#planes-vip-libertad" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
                   💎 Quiero verlos ✨
                 </Link>
-
-                {/* Preview Images */}
-                <div className="grid grid-cols-3 gap-3 w-full mt-6">
-                  {courses.map((course) => (
-                    <div key={course.id} className="relative aspect-video rounded-lg overflow-hidden border border-slate-600">
-                      <Image
-                        src={course.image}
-                        alt={course.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </motion.div>
@@ -566,7 +551,7 @@ export default function BotsPage() {
                 </div>
 
                 <Link
-                  href={`/checkout?product=${course.id}&amount=${course.price}&name=${encodeURIComponent(course.title)}`}
+                  href="#vip-section"
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white ${
                     course.id === "basico"
                       ? "bg-[#0194F6] hover:bg-[#0178d4]"
