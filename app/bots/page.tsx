@@ -460,7 +460,7 @@ export default function BotsPage() {
                   <p className="text-2xl text-[#0194F6] font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
-                <Link href="/checkout?product=vip&amount=999.99&name=Planes%20VIP" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
+                <Link href="#planes-vip-libertad" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
                   💎 Quiero verlos ✨
                 </Link>
               </div>
@@ -470,7 +470,7 @@ export default function BotsPage() {
       </section>
 
       {/* Planes VIP - Libertad Financiera */}
-      <section className="py-16 bg-gradient-to-b from-slate-950 to-slate-900">
+      <section id="planes-vip-libertad" className="py-16 bg-gradient-to-b from-slate-950 to-slate-900">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <motion.h2
