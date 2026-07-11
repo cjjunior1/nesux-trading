@@ -322,9 +322,9 @@ export default function BotsPage() {
                 </ul>
 
                 <Link
-                  href="/registro"
+                  href="#vip-section"
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white"
-                  style={{ 
+                  style={{
                     backgroundColor: bot.colorHex,
                     opacity: 1
                   }}
