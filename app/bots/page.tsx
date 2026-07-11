@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // Estilos para animaciones de degradados dinámicos (ya no se usa)
-// v1.1 - Actualización de imágenes de cursos
+// v1.2 - Imágenes finales de cursos: 2, 3 y 5+ usuarios
 
 const bots = [
   {
