@@ -29,7 +29,8 @@ async function createAdmin() {
         data: {
           email,
           password: hashedPassword,
-          name: 'Admin Nesux',
+          firstName: 'Admin',
+          lastName: 'Nesux',
           role: 'admin',
           emailVerified: new Date(),
         },
