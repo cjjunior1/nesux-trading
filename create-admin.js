@@ -31,6 +31,7 @@ async function createAdmin() {
           password: hashedPassword,
           firstName: 'Admin',
           lastName: 'Nesux',
+          whatsappNumber: '+1234567890',
           role: 'admin',
           emailVerified: new Date(),
         },
