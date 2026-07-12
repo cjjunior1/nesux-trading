@@ -46,7 +46,7 @@ export function HeroSection() {
             <span className="text-sm" style={{ color: '#00D9FF' }}>Método Probado para Traders Exitosos</span>
           </div>
 
-          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-relaxed">
+          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6" style={{ lineHeight: '1.5' }}>
             Transforma tu Vida con el
             <span className="block gradient-text mt-1">Trading Inteligente</span>
           </h1>
