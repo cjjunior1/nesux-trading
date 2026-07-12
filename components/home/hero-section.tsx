@@ -43,7 +43,7 @@ export function HeroSection() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6" style={{ backgroundColor: 'rgba(75, 123, 167, 0.1)', border: '1px solid rgba(75, 123, 167, 0.3)' }}>
             <TrendingUp style={{ color: '#4B7BA7' }} className="h-4 w-4" />
-            <span className="text-sm" style={{ color: '#4B7BA7' }}>Método Probado para Traders Exitosos</span>
+            <span className="text-sm" style={{ color: '#081022' }}>Método Probado para Traders Exitosos</span>
           </div>
 
           <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6" style={{ lineHeight: '1.5' }}>
