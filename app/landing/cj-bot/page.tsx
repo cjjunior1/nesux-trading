@@ -105,28 +105,76 @@ export default function CjBotLanding() {
       </section>
 
       {/* SECCIÓN 5: VENTAJA COMPETITIVA */}
-      <section className="max-w-4xl mx-auto py-10 px-4">
-        <h2 className="section-title text-center mb-3">Gestión de Riesgo Integral y Martingala Inteligente</h2>
-        <div className="grid md:grid-cols-2 gap-7">
-          <div className="bg-slate-800/50 rounded-lg p-6 shadow text-left">
-            <div className="font-bold mb-2 text-emerald-400">Gestión de Riesgo Profesional</div>
-            <ul className="text-slate-200 space-y-1 ml-4 text-base">
-              <li><b>Stop Loss dinámico:</b> Se calcula automáticamente en puntos configurables.</li>
-              <li><b>Take Profit dinámico:</b> Se ajusta según el precio promedio de la cesta.</li>
-              <li><b>Trailing Stop Loss:</b> Se activa al alcanzar un % de ganancia definido y sigue el precio.</li>
-              <li><b>Trailing Take Profit:</b> Mueve el TP hacia arriba/abajo para maximizar ganancias.</li>
-              <li><b>Protección de equidad en USD:</b> Cierra todo si alcanzas tu límite de pérdida o ganancia del día.</li>
+      <section className="max-w-5xl mx-auto py-14 px-4">
+        <div className="text-center mb-10">
+          <span className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4" style={{ backgroundColor: 'rgba(75,123,167,0.15)', color: '#6BA3D4', border: '1px solid rgba(75,123,167,0.3)' }}>
+            🛡️ Blindaje de Capital
+          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">
+            Gestión de Riesgo <span style={{ color: '#4B7BA7' }}>Integral</span> y Martingala <span style={{ color: '#C9A961' }}>Inteligente</span>
+          </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">Cada operación protegida por múltiples capas de seguridad y una lógica de recuperación diseñada para preservar tu capital.</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Columna 1: Gestión de Riesgo */}
+          <div className="rounded-2xl p-7 border" style={{ backgroundColor: '#111C2B', borderColor: 'rgba(75,123,167,0.35)' }}>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-2xl w-11 h-11 flex items-center justify-center rounded-xl" style={{ backgroundColor: 'rgba(75,123,167,0.2)' }}>🎯</span>
+              <h3 className="text-lg font-bold" style={{ color: '#6BA3D4' }}>Gestión de Riesgo Profesional</h3>
+            </div>
+            <ul className="space-y-4">
+              <li>
+                <p className="font-bold" style={{ color: '#7FB0DB' }}>📉 Stop Loss dinámico</p>
+                <p className="text-sm text-slate-300">Se calcula automáticamente en puntos configurables según tu estrategia.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#7FB0DB' }}>📈 Take Profit dinámico</p>
+                <p className="text-sm text-slate-300">Se ajusta según el precio promedio de la cesta para asegurar ganancias.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#7FB0DB' }}>🔒 Trailing Stop Loss</p>
+                <p className="text-sm text-slate-300">Se activa al alcanzar un % de ganancia y persigue el precio para blindar beneficios.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#7FB0DB' }}>🚀 Trailing Take Profit</p>
+                <p className="text-sm text-slate-300">Mueve el TP hacia arriba/abajo para exprimir cada tendencia al máximo.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#7FB0DB' }}>💵 Protección de equidad en USD</p>
+                <p className="text-sm text-slate-300">Cierra todo automáticamente al tocar tu límite de pérdida o ganancia del día.</p>
+              </li>
             </ul>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-6 shadow text-left">
-            <div className="font-bold mb-2 text-emerald-400">Sistema Martingala Inteligente (3 Modos)</div>
-            <ul className="text-slate-200 space-y-1 ml-4 text-base">
-              <li><b>Desactivada:</b> Opera lote fijo siempre.</li>
-              <li><b>Martingala:</b> Abre respaldos con lote multiplicado si el precio va en contra.</li>
-              <li><b>Recuperación:</b> Aumenta el lote progresivamente tras cada pérdida para recuperar.</li>
-              <li><b>Máximo 7 martingalas configurables.</b></li>
-              <li><b>Distancia entre respaldos con incremento porcentual ajustable.</b></li>
-              <li><b>Delay en segundos entre respaldos para evitar aperturas impulsivas.</b></li>
+
+          {/* Columna 2: Martingala */}
+          <div className="rounded-2xl p-7 border" style={{ backgroundColor: '#1C1A12', borderColor: 'rgba(201,169,97,0.35)' }}>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-2xl w-11 h-11 flex items-center justify-center rounded-xl" style={{ backgroundColor: 'rgba(201,169,97,0.2)' }}>♟️</span>
+              <h3 className="text-lg font-bold" style={{ color: '#D4B872' }}>Martingala Inteligente <span className="text-xs align-middle px-2 py-0.5 rounded-full ml-1" style={{ backgroundColor: 'rgba(201,169,97,0.2)', color: '#D4B872' }}>3 Modos</span></h3>
+            </div>
+            <ul className="space-y-4">
+              <li>
+                <p className="font-bold" style={{ color: '#E0C888' }}>⚪ Desactivada</p>
+                <p className="text-sm text-slate-300">Opera con lote fijo en todo momento. Máxima previsibilidad.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#E0C888' }}>🔵 Martingala</p>
+                <p className="text-sm text-slate-300">Abre respaldos con lote multiplicado cuando el precio va en contra.</p>
+              </li>
+              <li>
+                <p className="font-bold" style={{ color: '#E0C888' }}>🟢 Recuperación</p>
+                <p className="text-sm text-slate-300">Aumenta el lote progresivamente tras cada pérdida para recuperar el terreno.</p>
+              </li>
+              <li className="pt-2 border-t" style={{ borderColor: 'rgba(201,169,97,0.2)' }}>
+                <p className="text-sm text-slate-300"><b style={{ color: '#E0C888' }}>Hasta 7 martingalas</b> configurables por operación.</p>
+              </li>
+              <li>
+                <p className="text-sm text-slate-300"><b style={{ color: '#E0C888' }}>Distancia entre respaldos</b> con incremento porcentual ajustable.</p>
+              </li>
+              <li>
+                <p className="text-sm text-slate-300"><b style={{ color: '#E0C888' }}>Delay en segundos</b> entre respaldos para evitar aperturas impulsivas.</p>
+              </li>
             </ul>
           </div>
         </div>
