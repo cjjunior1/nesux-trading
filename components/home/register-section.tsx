@@ -9,11 +9,11 @@ export function RegisterSection() {
       <Link
         href="/registro"
         className="inline-block text-white font-bold py-3 px-8 rounded-full mt-6 shadow-lg transition-all duration-300 hover:scale-105"
-        style={{ backgroundColor: '#2563EB' }}
-        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1D4ED8')}
-        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2563EB')}
+        style={{ backgroundColor: '#B64183' }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#9E3570')}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#B64183')}
       >
-        Registrarme Gratis
+        Regístrate
       </Link>
     </section>
   );
