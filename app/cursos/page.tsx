@@ -294,9 +294,11 @@ export default function CursosPage() {
 
                 {/* Modules */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-white mb-3">Contenido:</h4>
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Contenido: <span className="font-bold" style={{ color: '#F39C12' }}>{course.modules[0]}</span>
+                  </h4>
                   <ul className="space-y-2">
-                    {course.modules.slice(0, 4).map((module) => (
+                    {course.modules.slice(1, 4).map((module) => (
                       <li key={module} className="text-sm text-slate-400 flex items-start gap-2">
                         <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
                         {module}
