@@ -40,15 +40,15 @@ export function TruthSection() {
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <Target className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>E</span><span className="text-white">l trading no es MAGIA</span></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#394FA1' }}>E</span><span className="text-white">l trading no es MAGIA</span></p>
               </div>
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <Brain className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>T</span><span className="text-white">ampoco es SUERTE</span></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#394FA1' }}>T</span><span className="text-white">ampoco es SUERTE</span></p>
               </div>
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>E</span><span className="text-white">s LÓGICA y MATEMÁTICAS</span></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#394FA1' }}>E</span><span className="text-white">s LÓGICA y MATEMÁTICAS</span></p>
               </div>
             </div>
 
