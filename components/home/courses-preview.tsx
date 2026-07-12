@@ -75,11 +75,6 @@ export function CoursesPreview() {
                 course.popular ? "border-emerald-500/50" : ""
               }`}
             >
-              {course.popular && (
-                <div className="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
-                  Más Popular
-                </div>
-              )}
 
               <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
                 <Image
