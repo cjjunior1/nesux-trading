@@ -559,7 +559,7 @@ export default function BotsPage() {
                 </div>
 
                 <Link
-                  href="#vip-section"
+                  href={`/checkout?product=${course.id}&amount=${course.price}&name=${encodeURIComponent(course.title)}`}
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white ${
                     course.id === "basico"
                       ? "bg-[#0194F6] hover:bg-[#0178d4]"
