@@ -41,9 +41,9 @@ export function HeroSection() {
           transition={{ duration: 0.6 }}
         >
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6" style={{ backgroundColor: 'rgba(0, 217, 255, 0.1)', border: '1px solid rgba(0, 217, 255, 0.3)' }}>
-            <TrendingUp style={{ color: '#00D9FF' }} className="h-4 w-4" />
-            <span className="text-sm" style={{ color: '#00D9FF' }}>Método Probado para Traders Exitosos</span>
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6" style={{ backgroundColor: 'rgba(75, 123, 167, 0.1)', border: '1px solid rgba(75, 123, 167, 0.3)' }}>
+            <TrendingUp style={{ color: '#4B7BA7' }} className="h-4 w-4" />
+            <span className="text-sm" style={{ color: '#4B7BA7' }}>Método Probado para Traders Exitosos</span>
           </div>
 
           <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6" style={{ lineHeight: '1.5' }}>
@@ -91,7 +91,7 @@ export function HeroSection() {
           </div>
 
           <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-3xl mx-auto text-justify leading-relaxed">
-            El <strong className="text-red-500">95%</strong> de los traders pierde dinero por falta de conocimiento, disciplina y estrategia. Nuestro método está diseñado para ayudarte a formar parte del <strong style={{ color: '#00D9FF' }}>5%</strong> que opera con criterio, controla el riesgo y busca resultados consistentes.
+            El <strong className="text-red-500">95%</strong> de los traders pierde dinero por falta de conocimiento, disciplina y estrategia. Nuestro método está diseñado para ayudarte a formar parte del <strong style={{ color: '#A78BFA' }}>5%</strong> que opera con criterio, controla el riesgo y busca resultados consistentes.
           </p>
 
           <p className="text-lg text-slate-200 mb-6 max-w-3xl mx-auto leading-relaxed text-justify">
@@ -99,25 +99,25 @@ export function HeroSection() {
           </p>
 
           <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
-            <span style={{ color: '#FFD700' }}>Trading Binario</span>
+            <span style={{ color: '#C9A961' }}>Trading Binario</span>
             <span className="text-slate-500"> vs </span>
-            <span className="text-blue-400">Trading de Forex</span>
+            <span style={{ color: '#4B7BA7' }}>Trading de Forex</span>
           </h3>
           <div className="border rounded-2xl p-6 mb-6 max-w-3xl mx-auto" style={{ background: 'linear-gradient(to right, rgba(255, 215, 0, 0.1), rgba(0, 82, 136, 0.1))', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
             <p className="text-base text-white leading-relaxed mb-3 text-justify">
-              <strong className="text-lg" style={{ color: '#FFD700' }}>Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong style={{ color: '#FFD700' }}>mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
+              <strong className="text-lg" style={{ color: '#C9A961' }}>Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong style={{ color: '#C9A961' }}>mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
             </p>
             <p className="text-base text-slate-200 leading-relaxed text-justify">
-              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong style={{ color: '#FFD700' }}>No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la <strong style={{ color: '#00FF88' }}>libertad financiera</strong>.
+              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong style={{ color: '#C9A961' }}>No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la <strong style={{ color: '#A78BFA' }}>libertad financiera</strong>.
             </p>
           </div>
 
           <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
-            <span className="text-sky-400">CJ Bot</span> <span style={{ color: '#00FF88' }}>100% eficiente y rentable</span>
+            <span style={{ color: '#4B7BA7' }}>CJ Bot</span> <span style={{ color: '#C9A961' }}>100% eficiente y rentable</span>
           </h3>
           <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
             <p className="text-base text-white leading-relaxed mb-3">
-              <strong className="text-lg" style={{ color: '#00D9FF' }}>🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong style={{ color: '#FF5733' }}>diversos bots de trading automático</strong> que operan en:
+              <strong className="text-lg" style={{ color: '#4B7BA7' }}>🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong style={{ color: '#C86432' }}>diversos bots de trading automático</strong> que operan en:
             </p>
             <div className="grid md:grid-cols-3 gap-3 mb-3">
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
@@ -136,26 +136,26 @@ export function HeroSection() {
               </div>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Los bots en <strong style={{ color: '#FF5733' }}>criptomonedas e índices sintéticos operan 24/7</strong>, aprovechando oportunidades en todo momento. <strong className="text-slate-200">Nota importante:</strong> Hasta el momento no contamos con bots para trading binario, ya que nuestro enfoque en automatización está en los mercados de Forex, cripto e índices.
+              Los bots en <strong style={{ color: '#C86432' }}>criptomonedas e índices sintéticos operan 24/7</strong>, aprovechando oportunidades en todo momento. <strong className="text-slate-200">Nota importante:</strong> Hasta el momento no contamos con bots para trading binario, ya que nuestro enfoque en automatización está en los mercados de Forex, cripto e índices.
             </p>
           </div>
 
-          <p className="text-xl md:text-2xl font-extrabold mb-8 max-w-3xl mx-auto bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #FFD700, #00D9FF, #FF5733)' }}>
+          <p className="text-xl md:text-2xl font-extrabold mb-8 max-w-3xl mx-auto bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #C9A961, #4B7BA7, #C86432)' }}>
             Aquí no tenemos límites, lleguemos más allá de la meta porque no hay fronteras que nos detenga
           </p>
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 mb-10">
             <div className="text-center">
-              <div className="text-3xl font-bold" style={{ color: '#00FF88' }}>+2,500</div>
+              <div className="text-3xl font-bold" style={{ color: '#A78BFA' }}>+2,500</div>
               <div className="text-sm text-slate-400">Estudiantes</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold" style={{ color: '#FFD700' }}>95%</div>
+              <div className="text-3xl font-bold" style={{ color: '#C9A961' }}>95%</div>
               <div className="text-sm text-slate-400">Satisfacción</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold" style={{ color: '#00D9FF' }}>7 Años</div>
+              <div className="text-3xl font-bold" style={{ color: '#4B7BA7' }}>7 Años</div>
               <div className="text-sm text-slate-400">Experiencia</div>
             </div>
           </div>
@@ -165,9 +165,9 @@ export function HeroSection() {
             <Link
               href="/registro"
               className="w-full sm:w-[300px] rounded-full py-4 text-base md:text-lg font-bold text-white transition-all flex items-center justify-center gap-2"
-              style={{ backgroundColor: '#00D9FF', boxShadow: '0 0 20px rgba(0, 217, 255, 0.4)' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#00BFFF'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00D9FF'}
+              style={{ backgroundColor: '#4B7BA7', boxShadow: '0 0 20px rgba(75, 123, 167, 0.4)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3A5A7F'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4B7BA7'}
             >
               Sí a mi libertad Financiera
               <ArrowRight className="h-5 w-5" />
@@ -183,15 +183,15 @@ export function HeroSection() {
           {/* Trust Badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Shield style={{ color: '#00FF88' }} className="h-5 w-5" />
+              <Shield style={{ color: '#A78BFA' }} className="h-5 w-5" />
               Comprometidos contigo
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Zap style={{ color: '#FFD700' }} className="h-5 w-5" />
+              <Zap style={{ color: '#C9A961' }} className="h-5 w-5" />
               Acceso inmediato
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Headphones style={{ color: '#00D9FF' }} className="h-5 w-5" />
+              <Headphones style={{ color: '#4B7BA7' }} className="h-5 w-5" />
               Soporte real
             </div>
           </div>
