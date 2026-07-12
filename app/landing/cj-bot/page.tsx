@@ -126,23 +126,23 @@ export default function CjBotLanding() {
             <ul className="space-y-4">
               <li>
                 <p className="font-bold" style={{ color: '#7FB0DB' }}>📉 Stop Loss dinámico</p>
-                <p className="text-sm text-slate-300">Se calcula automáticamente en puntos configurables según tu estrategia.</p>
+                <p className="text-sm text-slate-300">Define tu riesgo una sola vez y el bot lo respeta en cada operación. Nunca más una pérdida se te va de las manos.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#7FB0DB' }}>📈 Take Profit dinámico</p>
-                <p className="text-sm text-slate-300">Se ajusta según el precio promedio de la cesta para asegurar ganancias.</p>
+                <p className="text-sm text-slate-300">Se ajusta al precio promedio de la cesta para cerrar en verde en el momento justo, sin que la codicia decida por ti.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#7FB0DB' }}>🔒 Trailing Stop Loss</p>
-                <p className="text-sm text-slate-300">Se activa al alcanzar un % de ganancia y persigue el precio para blindar beneficios.</p>
+                <p className="text-sm text-slate-300">Al alcanzar tu % de ganancia, persigue el precio y asegura beneficios ya conseguidos. Proteges lo ganado, pase lo que pase.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#7FB0DB' }}>🚀 Trailing Take Profit</p>
-                <p className="text-sm text-slate-300">Mueve el TP hacia arriba/abajo para exprimir cada tendencia al máximo.</p>
+                <p className="text-sm text-slate-300">Deja correr las ganancias cuando la tendencia acompaña. Exprime cada movimiento fuerte sin salir antes de tiempo.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#7FB0DB' }}>💵 Protección de equidad en USD</p>
-                <p className="text-sm text-slate-300">Cierra todo automáticamente al tocar tu límite de pérdida o ganancia del día.</p>
+                <p className="text-sm text-slate-300">Fija tu tope diario de pérdida y de ganancia. Al tocarlo, el bot cierra todo solo. Tu cuenta nunca opera "descontrolada".</p>
               </li>
             </ul>
           </div>
@@ -156,15 +156,15 @@ export default function CjBotLanding() {
             <ul className="space-y-4">
               <li>
                 <p className="font-bold" style={{ color: '#E0C888' }}>⚪ Desactivada</p>
-                <p className="text-sm text-slate-300">Opera con lote fijo en todo momento. Máxima previsibilidad.</p>
+                <p className="text-sm text-slate-300">Lote fijo siempre. El modo más conservador: ideal para cuentas pequeñas o para operar con calma total.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#E0C888' }}>🔵 Martingala</p>
-                <p className="text-sm text-slate-300">Abre respaldos con lote multiplicado cuando el precio va en contra.</p>
+                <p className="text-sm text-slate-300">Abre respaldos con lote multiplicado cuando el precio va en contra, buscando promediar y salir en positivo antes.</p>
               </li>
               <li>
                 <p className="font-bold" style={{ color: '#E0C888' }}>🟢 Recuperación</p>
-                <p className="text-sm text-slate-300">Aumenta el lote progresivamente tras cada pérdida para recuperar el terreno.</p>
+                <p className="text-sm text-slate-300">Aumenta el lote de forma progresiva tras cada pérdida para recuperar el terreno con control, no a ciegas.</p>
               </li>
               <li className="pt-2 border-t" style={{ borderColor: 'rgba(201,169,97,0.2)' }}>
                 <p className="text-sm text-slate-300"><b style={{ color: '#E0C888' }}>Hasta 7 martingalas</b> configurables por operación.</p>
