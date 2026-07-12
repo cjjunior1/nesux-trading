@@ -14,7 +14,7 @@ const courses = [
     image: "https://cdn.abacus.ai/images/9077f6c6-7652-4e22-a797-efccad168a7c.png",
     features: ["Análisis técnico básico", "Gestión de riesgo", "Acceso a Una Plataforma de trading Binario"],
     students: "850+",
-    duration: "Sin límite de tiempo",
+    duration: "Compromiso de un año",
     rating: 4.8,
   },
   {
@@ -24,7 +24,7 @@ const courses = [
     image: "https://cdn.abacus.ai/images/2a4bf941-3927-4c8e-91eb-b6158caac34a.png",
     features: ["Patrones de velas", "Indicadores técnicos", "Psicología del trader", "Acceso a Tres Plataformas de trading Binario"],
     students: "520+",
-    duration: "Sin límite de tiempo",
+    duration: "Compromiso de un año",
     rating: 4.9,
     popular: true,
   },
@@ -35,7 +35,7 @@ const courses = [
     image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=450&fit=crop",
     features: ["Análisis institucional", "Automatización, Bot para Forex", "Mentoría avanzada"],
     students: "230+",
-    duration: "Sin límite de tiempo",
+    duration: "Compromiso de un año",
     rating: 5.0,
   },
 ];
