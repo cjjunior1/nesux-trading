@@ -31,7 +31,7 @@ const courses = [
     students: "850+",
     rating: 4.8,
     modules: [
-      "Unipersonal",
+      "Para una persona",
       "Análisis técnico básico",
       "Gestión de Riesgo Básico",
       "Acceso a Una Plataforma de trading Binario",
@@ -53,7 +53,7 @@ const courses = [
     rating: 4.9,
     popular: true,
     modules: [
-      "Bi-personal",
+      "Para dos personas",
       "Todo lo del Básico",
       "Acceso a Una Plataforma de trading Binario",
       "Estrategias Avanzadas",
@@ -79,7 +79,7 @@ const courses = [
     students: "230+",
     rating: 5.0,
     modules: [
-      "Tri-personal",
+      "Para tres personas",
       "Todo lo del Curso Básico y del Intermedio",
       "Mentoría y Análisis Avanzado",
       "Herramientas de Trading Avanzado",
@@ -294,14 +294,12 @@ export default function CursosPage() {
 
                 {/* Modules */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-white mb-3">
-                    Contenido: <span className="font-bold" style={{ color: '#F39C12' }}>{course.modules[0]}</span>
-                  </h4>
+                  <h4 className="text-sm font-semibold text-white mb-3">Contenido:</h4>
                   <ul className="space-y-2">
-                    {course.modules.slice(1, 4).map((module) => (
-                      <li key={module} className="text-sm text-slate-400 flex items-start gap-2">
+                    {course.modules.slice(0, 4).map((module, mIdx) => (
+                      <li key={module} className="text-sm flex items-start gap-2" style={{ color: mIdx === 0 ? '#F39C12' : undefined }}>
                         <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
-                        {module}
+                        <span className={mIdx === 0 ? 'font-bold' : 'text-slate-400'}>{module}</span>
                       </li>
                     ))}
                     {course.modules.length > 4 && (
