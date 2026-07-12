@@ -116,7 +116,7 @@ export function TestimonialsPreview() {
         >
           <Link
             href="/testimonios"
-            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium"
+            className="inline-flex items-center gap-2 font-medium text-white"
           >
             Ver más testimonios <ArrowRight className="h-4 w-4" />
           </Link>
