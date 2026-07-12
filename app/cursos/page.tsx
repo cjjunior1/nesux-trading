@@ -67,10 +67,10 @@ const courses = [
   },
   {
     id: "profesional",
-    title: "Curso Profesional",
-    subtitle: "Trading Institucional",
+    title: "Trading a Otro Nivel",
+    subtitle: "Estrategias Avanzadas",
     description:
-      "Todo lo del Curso Básico y del Intermedio más Trading Institucional. Incluye mentoría personalizada y acceso a bots automáticos.",
+      "Domina el trading avanzado con estrategias profesionales, análisis técnico profundo y acceso a bots automáticos. Formación completa para traders institucionales.",
     price: 379.99,
     originalPrice: 645,
     image: "/curso-profesional.png",
@@ -420,7 +420,7 @@ export default function CursosPage() {
                   <p className="text-2xl text-blue-400 font-semibold mb-4">a 4,999.99</p>
                   <p className="text-xs text-slate-400 mb-6">Ahorra desde $491 a $2437<br />vs comprar por separado</p>
                 </div>
-                <Link href={`/checkout?product=vip&amount=${membership.price}&name=${encodeURIComponent(membership.title)}`} className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
+                <Link href="/bots#vip-section" className="inline-flex items-center justify-center gap-2 py-3 px-8 mt-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-full transition-all text-base">
                   💎 Quiero verlos ✨
                 </Link>
               </div>

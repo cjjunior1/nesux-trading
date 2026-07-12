@@ -56,9 +56,9 @@ export function TruthSection() {
               Aquí tendrás las herramientas para saber abrir operaciones y aunque la tendencia sea contraria, <strong className="text-white">aprenderás a abrir operaciones de respaldo de contra tendencia.</strong>
             </p>
 
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 mt-6">
-              <p className="text-emerald-300">
-                <strong>💡 Recuerda:</strong> Sabiendo que la perfección no existe, debes tener muy bien claro que esto es una relación de dos: <strong>1)</strong> el manual de instrucciones y <strong>2)</strong> que tú hagas tu parte, aplicándolo de la manera correcta.
+            <div className="rounded-xl p-6 mt-6" style={{ backgroundColor: '#8D5D8B20', borderColor: '#8D5D8B80', borderWidth: '1px' }}>
+              <p>
+                <strong style={{ color: '#8D5D8B' }}>💡 Recuerda:</strong> <span style={{ color: '#5E7CBA' }}>Sabiendo que la perfección no existe, debes tener muy bien claro que esto es una relación de dos: <strong>1)</strong> el manual de instrucciones y <strong>2)</strong> que tú hagas tu parte, aplicándolo de la manera correcta.</span>
               </p>
             </div>
           </div>

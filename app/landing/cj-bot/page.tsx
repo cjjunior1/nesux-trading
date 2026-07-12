@@ -12,12 +12,13 @@ export default function CjBotLanding() {
         <p className="section-subtitle max-w-2xl mx-auto">
           Cansado de la montaña rusa emocional del trading? <b>CJ Bot a Otro Nivel</b> es tu copiloto analítico, una máquina de precisión diseñada para ejecutar estrategias ganadoras, proteger tu capital y operar por ti 24/7 sin dudar.
         </p>
-        <div className="w-full max-w-lg mx-auto mb-6 mt-5 rounded-xl overflow-hidden shadow-xl border-2 border-blue-900 aspect-video">
+        <div className="w-full max-w-lg mx-auto mb-6 mt-5 rounded-xl overflow-hidden shadow-xl border-2 border-blue-900 aspect-video relative">
           <iframe
-            className="w-full h-full"
-            src="https://www.youtube.com/embed/78fpT_7cvmo?autoplay=1&mute=1"
+            className="absolute inset-0 w-full h-full"
+            src="https://www.youtube.com/embed/78fpT_7cvmo?autoplay=1"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            frameBorder="0"
           ></iframe>
         </div>
         <a href="https://wa.me/" // Tu CTA real aquí
@@ -35,13 +36,14 @@ export default function CjBotLanding() {
         <div className="flex flex-col items-center gap-5">
           
           <h2 className="section-title">¿Te Suena Familiar?</h2>
-          <ul className="space-y-2 text-[1.07rem] text-slate-300 list-none max-w-xl mx-auto text-left">
-            <li><b>• Decisiones Emocionales:</b> El miedo te hace cerrar antes de tiempo y la codicia te hace entrar tarde, saboteando tus ganancias.</li>
-            <li><b>• Falta de Tiempo:</b> No puedes estar pegado a la pantalla todo el día esperando la señal perfecta. La vida real te llama.</li>
-            <li><b>• El Miedo a "Quemar la Cuenta":</b> Has probado otros bots o estrategias que prometían el oro y el moro, solo para ver tu capital desaparecer en un abrir y cerrar de ojos.</li>
+          <ul className="space-y-2 text-[1.07rem] text-slate-300 list-none max-w-xl mx-auto text-justify">
+            <li><b className="text-blue-400">• Decisiones Emocionales:</b> El miedo te hace cerrar antes de tiempo y la codicia te hace entrar tarde, saboteando tus ganancias.</li>
+            <li><b className="text-blue-400">• Falta de Tiempo:</b> No puedes estar pegado a la pantalla todo el día esperando la señal perfecta. La vida real te llama.</li>
+            <li><b className="text-blue-400">• El Miedo a "Quemar la Cuenta":</b> Has probado otros bots o estrategias que prometían el oro y el moro, solo para ver tu capital desaparecer en un abrir y cerrar de ojos.</li>
           </ul>
-          <div className="text-emerald-300 font-bold mt-4">
-            El trading no tiene por qué ser una fuente de estrés. Tiene que ser una herramienta de libertad.
+          <div className="font-bold mt-4 max-w-2xl mx-auto text-lg leading-relaxed" style={{ color: '#357B3B' }}>
+            El trading no tiene por qué ser una fuente de estrés.<br />
+            Tiene que ser una herramienta de libertad.
           </div>
         </div>
       </section>
@@ -157,39 +159,83 @@ export default function CjBotLanding() {
         </ul>
       </section>
 
-      {/* SECCIÓN 8: RESUMEN TÉCNICO Y CTA FINAL */}
-      <section className="max-w-2xl w-full mx-auto mb-20 px-4 text-center">
-        <div className="bg-emerald-800/60 rounded-xl p-5 mb-6 border border-emerald-500/30">
-          <h2 className="text-xl font-bold text-emerald-300 mb-4 flex items-center gap-2">🔎 Resumen técnico y características exclusivas</h2>
-          <table className="w-full text-xs bg-slate-900/80 rounded-md border border-emerald-700 overflow-hidden">
-            <tbody>
-              <tr className="border-b border-emerald-800">
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Licenciamiento por cuenta</td>
-                <td>Único por número de cuenta y contraseña maestra. Control total de acceso.</td>
-              </tr>
-              <tr className="border-b border-emerald-800">
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Estrategias programables</td>
-                <td>EMA+RSI, solo RSI, cruce de EMA, por tiempo y modo seguidor. Flexibilidad total.</td>
-              </tr>
-              <tr className="border-b border-emerald-800">
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Trailing doble independiente</td>
-                <td>TP y SL con lógica y configuración separadas. Gestión avanzada del riesgo y beneficio.</td>
-              </tr>
-              <tr className="border-b border-emerald-800">
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Martingala inteligente & modo recuperación</td>
-                <td>Cruza lotes, gestiona operaciones, y limita riesgos acumulativos. Control en todo momento.</td>
-              </tr>
-              <tr className="border-b border-emerald-800">
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Seguridad multicapa</td>
-                <td>Comprende validación por cuenta, licenciamiento temporal, whitelist y control de balance mínimo/máximo. <b>Tu dinero siempre bajo control.</b></td>
-              </tr>
-              <tr>
-                <td className="py-2 px-2 text-emerald-300 font-semibold">Interfaz y monitoreo</td>
-                <td>Comentarios y avisos en pantalla de actividad, logs y personalización de parámetros.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div className="text-xs text-slate-400 italic mt-5">* Todas las estrategias y sistemas de control han sido desarrollados con lógica profesional para MetaTrader 5.<br/>* CJ Bot es compatible con cuentas reales y demo, configurable para distintos perfiles de usuario y reglas de riesgo.</div>
+      {/* SECCIÓN 8: MANUAL Y CARACTERÍSTICAS */}
+      <section className="max-w-4xl w-full mx-auto mb-20 px-4">
+        <div className="rounded-2xl p-8 mb-6 border-2 border-teal-500/50" style={{ backgroundColor: '#0F3D3A' }}>
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">📘 Manual Técnico del CJ Bot</h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Característica 1 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#1a2a3a', borderColor: '#00D9FF' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">1️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Licenciamiento por Cuenta</h3>
+                  <p className="text-slate-300 text-sm">Único por número de cuenta y contraseña maestra. Control total de acceso y seguridad garantizada.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Característica 2 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#3a1a1a', borderColor: '#FF4444' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">2️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Estrategias Programables</h3>
+                  <p className="text-slate-300 text-sm">EMA+RSI, solo RSI, cruce de EMA, por tiempo y modo seguidor. Flexibilidad total para adaptarse a tu mercado.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Característica 3 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#3a2a1a', borderColor: '#FFAA00' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">3️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Trailing Doble Independiente</h3>
+                  <p className="text-slate-300 text-sm">TP y SL con lógica y configuración separadas. Gestión avanzada del riesgo y máxima protección del beneficio.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Característica 4 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#1a3a1a', borderColor: '#00FF88' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">4️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Martingala Inteligente</h3>
+                  <p className="text-slate-300 text-sm">Cruza lotes, gestiona operaciones y limita riesgos acumulativos. Control absoluto en todo momento.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Característica 5 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#3a1a3a', borderColor: '#FF00FF' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">5️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Seguridad Multicapa</h3>
+                  <p className="text-slate-300 text-sm">Validación por cuenta, licenciamiento temporal, lista blanca de acceso y control de balance. Tu dinero siempre bajo control.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Característica 6 */}
+            <div className="rounded-xl p-5 border-l-4" style={{ backgroundColor: '#3a3a1a', borderColor: '#FFD700' }}>
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">6️⃣</span>
+                <div>
+                  <h3 className="font-bold text-white mb-2">Interfaz y Monitoreo</h3>
+                  <p className="text-slate-300 text-sm">Comentarios en pantalla, logs detallados y personalización total de parámetros. Todo visible y controlable.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-400 italic mt-6 text-center border-t border-slate-700 pt-6">
+            * Todas las estrategias y sistemas de control han sido desarrollados con lógica profesional para MetaTrader 5.<br/>
+            * CJ Bot es compatible con cuentas reales y demo, configurable para distintos perfiles de usuario y reglas de riesgo.
+          </div>
         </div>
         <div className="card bg-emerald-700/80 border-emerald-400/20 mb-4">
           <h3 className="text-2xl font-bold mb-2 gradient-text">Deja de Operar con Emociones</h3>
@@ -197,17 +243,106 @@ export default function CjBotLanding() {
           <div className="bg-slate-900 rounded-lg px-5 py-3 mb-4">
             <ul className="text-emerald-200 text-base text-left max-w-xs mx-auto space-y-1">
               <li>✔️ Archivo completo CJ Bot a Otro Nivel (Expert Advisor)</li>
-              <li>✔️ Acceso a todas las nuevas versiones</li>
+              <li>✔️ Actualizaciones continuas y soporte permanente</li>
               <li>✔️ Guía de configuración & soporte</li>
               <li>✔️ Activación instantánea y soporte personalizado</li>
             </ul>
           </div>
-          <a target="_blank" rel="noopener noreferrer" href="https://wa.me/" className="btn-primary text-lg px-8 py-3 font-bold">¡OBTÉN MI CJ BOT v2.30 AHORA!</a>
+          <a target="_blank" rel="noopener noreferrer" href="https://wa.me/" className="btn-primary text-lg px-8 py-3 font-bold">¡OBTÉN CJ BOT AHORA!</a>
         </div>
         <small className="block text-slate-400 mt-2">El trading implica riesgos importantes. El rendimiento pasado no garantiza resultados futuros.</small>
       </section>
 
-      {/* SECCIÓN 9: INNOVACIÓN CJ BOT V2.30 */}
+      {/* SECCIÓN 8B: GUÍA DE PARÁMETROS */}
+      <section className="max-w-5xl w-full mx-auto mb-20 px-4">
+        <div className="rounded-2xl p-8 border-2 border-slate-700" style={{ backgroundColor: '#0F1720' }}>
+          <h2 className="text-3xl font-bold text-white mb-10 text-center">⚙️ Guía de Parámetros del Bot</h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Sección 1 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#FF5733' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>📊</span> Estrategia de Entrada
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Estrategia de Entrada:</strong> Define cómo el bot identifica señales (EMA+RSI, Solo RSI, Cruce EMA, Por Tiempo, Modo Seguidor)</li>
+                <li><strong>Dirección:</strong> Especifica si opera en compra, venta o ambas direcciones</li>
+                <li><strong>Temporalidad:</strong> Marco de tiempo para analizar las señales (M1, M5, M15, H1, etc.)</li>
+              </ul>
+            </div>
+
+            {/* Sección 2 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#2ECC71' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>💰</span> Gestión de Capital
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Lote Inicial:</strong> Tamaño del lote para la primera operación</li>
+                <li><strong>Take Profit (TP):</strong> Ganancia objetivo en puntos para cerrar automáticamente</li>
+                <li><strong>Stop Loss (SL):</strong> Pérdida máxima permitida en puntos para salir de la operación</li>
+              </ul>
+            </div>
+
+            {/* Sección 3 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#F39C12' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>📈</span> Trailing Stop (Persegidor)
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Trailing TP:</strong> Mueve el Take Profit automáticamente hacia arriba conforme sube el precio</li>
+                <li><strong>Trailing SL:</strong> Protege tus ganancias moviendo el Stop Loss hacia arriba</li>
+                <li><strong>% de Ganancia:</strong> Porcentaje de ganancia necesario para activar el trailing</li>
+              </ul>
+            </div>
+
+            {/* Sección 4 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#9B59B6' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>🔄</span> Martingala Inteligente
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Modo Martingala:</strong> Desactivado, Martingala o Recuperación (abre respaldos si el precio va en contra)</li>
+                <li><strong>Multiplicador de Lote:</strong> Aumenta el tamaño del lote en cada respaldo (2.0 = el doble)</li>
+                <li><strong>Cantidad de Martingalas:</strong> Máximo número de respaldos permitidos (hasta 7)</li>
+                <li><strong>Puntos entre Respaldos:</strong> Distancia en puntos para abrir el siguiente respaldo</li>
+              </ul>
+            </div>
+
+            {/* Sección 5 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#1ABC9C' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>🛡️</span> Protección y Seguridad
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Pérdida Máxima en USD:</strong> Si las pérdidas alcanzan este monto, el bot cierra todas las operaciones</li>
+                <li><strong>Ganancia Máxima en USD:</strong> Si las ganancias alcanzan este monto, el bot cierra todas las operaciones</li>
+                <li><strong>Frecuencia de Vigilancia:</strong> Cada cuántos milisegundos verifica el bot las condiciones</li>
+              </ul>
+            </div>
+
+            {/* Sección 6 */}
+            <div className="rounded-lg p-5 border-l-4" style={{ backgroundColor: '#1a2332', borderColor: '#E74C3C' }}>
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>🔐</span> Licencia y Control
+              </h3>
+              <ul className="text-slate-300 text-sm space-y-2">
+                <li><strong>Número de Cuenta:</strong> Tu número de cuenta único en el broker</li>
+                <li><strong>Contraseña Maestra:</strong> Contraseña de seguridad para activar el bot</li>
+                <li><strong>ID Mágico del Bot:</strong> Identificador único para distinguir operaciones del bot</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700">
+            <h3 className="text-xl font-bold text-emerald-300 mb-4">💡 Consejo Profesional</h3>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Comienza con <strong>valores conservadores</strong>: lote pequeño, SL cercano, sin martingala activa. Una vez que compruebes que el bot funciona con tu estrategia, incrementa gradualmente los parámetros. <strong>Nunca ignores los límites de pérdida</strong> — son tu red de seguridad más importante. El objetivo no es ganar mucho en poco tiempo, sino ganar consistentemente con control del riesgo.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN 9: INNOVACIÓN CJ BOT */}
       <section className="max-w-4xl w-full mx-auto py-14 px-4 text-center bg-gradient-to-tr from-emerald-900/60 via-slate-900 to-slate-800 rounded-2xl shadow-2xl mb-16 border border-emerald-600/30">
         <div className="inline-flex items-center gap-2 mb-4">
           <span className="text-3xl">🤖</span>
@@ -290,16 +425,10 @@ export default function CjBotLanding() {
       </section>
 
       {/* DISCLAIMER */}
-      <section className="max-w-3xl mx-auto py-10 px-4 text-center">
-        <div className="bg-red-900/80 border-2 border-red-700 text-red-200 rounded-xl p-6 text-md font-semibold shadow-lg tracking-wide leading-relaxed flex flex-col items-center justify-center">
-          <span className="text-2xl mb-2">⚠️</span>
-          <span>
-            <b>Aviso de Riesgo:</b> El trading en los mercados financieros conlleva un alto nivel de riesgo y puede no ser adecuado para todos los inversores.<br/>
-            Antes de decidirse a invertir, considere cuidadosamente sus objetivos, experiencia y apetito por el riesgo.<br/>
-            El rendimiento pasado no es indicativo de resultados futuros.<br/>
-            <span className="block mt-2"><b>CJ Bot</b> es una herramienta: la responsabilidad es del usuario final.</span>
-          </span>
-        </div>
+      <section className="max-w-4xl mx-auto px-4 text-center mb-8">
+        <p className="text-xs text-slate-500 leading-relaxed">
+          <span className="text-slate-600">⚠️ Aviso:</span> El trading conlleva riesgo. CJ Bot es una herramienta: la responsabilidad es del usuario. El rendimiento pasado no garantiza resultados futuros.
+        </p>
       </section>
     </main>
   );

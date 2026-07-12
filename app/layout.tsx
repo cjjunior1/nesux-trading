@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import LayoutShell from '@/components/layout-shell';
 import PageTracker from '@/components/page-tracker';
+import { InstallAppBanner } from '@/components/install-app-banner';
 import Script from 'next/script';
 import './globals.css';
 
@@ -41,11 +42,25 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+      </head>
       <body className={inter.className}>
         <Providers>
           <PageTracker />
+          <InstallAppBanner />
           <LayoutShell>{children}</LayoutShell>
         </Providers>
+        <Script
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

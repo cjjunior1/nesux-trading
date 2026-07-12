@@ -427,9 +427,11 @@ export default function BotsPage() {
                 </ul>
               </div>
 
-              {/* Center Column - Planes VIP Beneficio */}
+              {/* Center Column - Planes VIP - Beneficios */}
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-6 text-left">Planes VIP Beneficio</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 text-left">
+                  Planes VIP<span className="hidden md:inline"> - </span><br className="md:hidden" />Beneficios
+                </h3>
                 <ul className="space-y-3 flex-grow">
                   <li className="flex items-start gap-2 text-slate-300 text-sm">
                     <CheckCircle className="h-4 w-4 text-[#0194F6] flex-shrink-0 mt-0.5" />
