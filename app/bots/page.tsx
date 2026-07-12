@@ -43,7 +43,7 @@ const bots = [
   {
     name: "CJ Bot Standard",
     description: "Múltiples estrategias y pares para traders intermedios que buscan diversificar.",
-    accounts: "Para dos cuentas Reales y cuatro cuentas demos",
+    accounts: "Para dos cuentas Reales y cuatro demos",
     price: 169.99,
     period: "mes",
     popular: true,
@@ -61,7 +61,7 @@ const bots = [
   {
     name: "CJ Bot Premium",
     description: "Solución institucional con las mejores herramientas y soporte dedicado.",
-    accounts: "Para tres cuentas Reales y ocho cuentas demos",
+    accounts: "Para tres cuentas Reales y seis demos",
     price: 209.99,
     period: "mes",
     features: [
