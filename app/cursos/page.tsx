@@ -70,7 +70,7 @@ const courses = [
     title: "Trading a Otro Nivel",
     subtitle: "Estrategias Avanzadas",
     description:
-      "Domina el trading avanzado con estrategias profesionales, análisis técnico profundo y acceso a bots automáticos. Formación completa para traders institucionales.",
+      "Domina el trading avanzado con estrategias profesionales, análisis técnico profundo y acceso a bots automáticos para traders institucionales.",
     price: 379.99,
     originalPrice: 645,
     image: "/curso-profesional.png",
