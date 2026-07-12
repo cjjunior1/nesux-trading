@@ -46,9 +46,9 @@ export function HeroSection() {
             <span className="text-sm" style={{ color: '#00D9FF' }}>Método Probado para Traders Exitosos</span>
           </div>
 
-          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-tight">
+          <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-relaxed">
             Transforma tu Vida con el
-            <span className="block gradient-text mt-2">Trading Inteligente</span>
+            <span className="block gradient-text mt-1">Trading Inteligente</span>
           </h1>
 
           {/* Botón publicitario: activa a CJ como tu aliado / guía / amigo */}
