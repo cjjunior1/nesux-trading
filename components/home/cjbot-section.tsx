@@ -8,7 +8,7 @@ export function CJBotSection() {
   return (
     <section className="py-20 px-4 bg-gradient-to-b from-slate-950 to-slate-900">
       <div className="max-w-3xl mx-auto text-center mb-8">
-        <h2 className="section-title gradient-text">Landing / CJ Bot a Otro Nivel</h2>
+        <h2 className="section-title bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #FF3CAC, #FF8C42, #FFD93D)' }}>Landing / CJ Bot a Otro Nivel</h2>
         <p className="section-subtitle mb-6">Descubre el bot más avanzado, seguro y rentable de Trading Academy A Otro Nivel.</p>
       </div>
       <div className="max-w-2xl mx-auto">
@@ -18,7 +18,7 @@ export function CJBotSection() {
           aria-expanded={open}
           aria-controls="cj-bot-panel"
         >
-          <span className="font-extrabold text-xl md:text-3xl bg-gradient-to-r from-emerald-400 via-sky-400 to-blue-500 bg-clip-text text-transparent">¿Por qué elegir CJ Bot a Otro Nivel?</span>
+          <span className="font-extrabold text-xl md:text-3xl bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #00F5A0, #00D9F5, #7C4DFF)' }}>¿Por qué elegir CJ Bot a Otro Nivel?</span>
           <ChevronDown className={`h-7 w-7 text-sky-400 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
         {open && (
@@ -26,19 +26,18 @@ export function CJBotSection() {
             id="cj-bot-panel"
             className="transition-all duration-300 bg-slate-900 border border-emerald-800 mt-2 rounded-xl p-6"
           >
-            <ul className="mb-4 space-y-3 text-left text-slate-200">
-              <li><b>Automatización 24/7:</b> Opera en forex y criptos sin intervención manual.</li>
-              <li><b>100% Seguro:</b> Tu dinero siempre bajo tu control. El bot nunca puede hacer retiros.</li>
-              <li><b>Resultados auditables:</b> Win rate sostenible y reportes semanales de rendimiento.</li>
-              <li><b>Fácil para todos:</b> Solo conecta tu cuenta y activa. Soporte y tutoriales en español.</li>
-              <li><b>Demo gratuita:</b> Solicita acceso de prueba sin compromiso por WhatsApp o en la plataforma.</li>
+            <ul className="space-y-3 text-left">
+              <li><b style={{ color: '#4B7BA7' }}>Automatización 24/7:</b> <span style={{ color: '#B8C4D9' }}>Opera en forex y criptos sin intervención manual.</span></li>
+              <li><b style={{ color: '#C9A961' }}>100% Seguro:</b> <span style={{ color: '#D9CFB8' }}>Tu dinero siempre bajo tu control. El bot nunca puede hacer retiros.</span></li>
+              <li><b style={{ color: '#A78BFA' }}>Resultados auditables:</b> <span style={{ color: '#CFC4E8' }}>Win rate sostenible y reportes semanales de rendimiento.</span></li>
+              <li><b style={{ color: '#C86432' }}>Fácil para todos:</b> <span style={{ color: '#E0C0AC' }}>Solo conecta tu cuenta y activa. Soporte y tutoriales en español.</span></li>
+              <li><b style={{ color: '#B64183' }}>Demo gratuita:</b> <span style={{ color: '#E0B8D0' }}>Solicita acceso de prueba sin compromiso en la plataforma.</span></li>
+              <li><b style={{ color: '#5E9EA0' }}>Multi-estrategia:</b> <span style={{ color: '#B8D4D5' }}>EMA+RSI, cruce de EMA, por tiempo y modo seguidor en un solo bot.</span></li>
+              <li><b style={{ color: '#8B7EC8' }}>Gestión de riesgo:</b> <span style={{ color: '#CAC3E5' }}>Stop Loss y Take Profit dinámicos con trailing inteligente.</span></li>
+              <li><b style={{ color: '#D4915D' }}>Martingala inteligente:</b> <span style={{ color: '#E8CBB0' }}>Recuperación progresiva con límite de respaldos configurable.</span></li>
+              <li><b style={{ color: '#6BA3C4' }}>Protección de capital:</b> <span style={{ color: '#BDD4E2' }}>Límites de pérdida y ganancia en USD con cierre automático.</span></li>
+              <li><b style={{ color: '#C4728F' }}>Soporte permanente:</b> <span style={{ color: '#E2C0CD' }}>Actualizaciones de por vida y comunidad privada de traders.</span></li>
             </ul>
-            <a
-              href="https://wa.me/" // Pon el número real aquí
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >Solicitar Demo por WhatsApp</a>
           </div>
         )}
       </div>
