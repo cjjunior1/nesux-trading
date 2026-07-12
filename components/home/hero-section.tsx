@@ -52,7 +52,7 @@ export function HeroSection() {
           </h1>
 
           {/* Botón publicitario: activa a CJ como tu aliado / guía / amigo */}
-          <div className="mb-20 mt-20 flex justify-center">
+          <div className="mb-10 mt-10 flex justify-center">
             <button
               type="button"
               onClick={openAliado}
@@ -123,16 +123,17 @@ export function HeroSection() {
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
                 <div className="text-2xl mb-1">💱</div>
                 <div className="text-white font-semibold text-sm">Forex</div>
+                <div className="text-xs font-bold" style={{ color: '#A78BFA' }}>24/5</div>
               </div>
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
                 <div className="text-2xl mb-1">₿</div>
                 <div className="text-white font-semibold text-sm">Criptomonedas</div>
-                <div className="text-xs font-bold" style={{ color: '#FFD700' }}>24/7</div>
+                <div className="text-xs font-bold" style={{ color: '#A78BFA' }}>24/7</div>
               </div>
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
                 <div className="text-2xl mb-1">📊</div>
                 <div className="text-white font-semibold text-sm">Índices Sintéticos</div>
-                <div className="text-xs font-bold" style={{ color: '#FFD700' }}>24/7</div>
+                <div className="text-xs font-bold" style={{ color: '#A78BFA' }}>24/7</div>
               </div>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
