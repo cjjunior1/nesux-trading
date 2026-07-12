@@ -41,9 +41,9 @@ export function HeroSection() {
           transition={{ duration: 0.6 }}
         >
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-2 mb-6">
-            <TrendingUp className="h-4 w-4 text-emerald-400" />
-            <span className="text-sm text-emerald-400">Método Probado para Traders Exitosos</span>
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6" style={{ backgroundColor: 'rgba(0, 217, 255, 0.1)', border: '1px solid rgba(0, 217, 255, 0.3)' }}>
+            <TrendingUp style={{ color: '#00D9FF' }} className="h-4 w-4" />
+            <span className="text-sm" style={{ color: '#00D9FF' }}>Método Probado para Traders Exitosos</span>
           </div>
 
           <h1 className="title-anim text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-tight">
@@ -52,7 +52,7 @@ export function HeroSection() {
           </h1>
 
           {/* Botón publicitario: activa a CJ como tu aliado / guía / amigo */}
-          <div className="mb-12 flex justify-center">
+          <div className="mb-20 flex justify-center">
             <button
               type="button"
               onClick={openAliado}
@@ -65,7 +65,7 @@ export function HeroSection() {
 
           {/* Las 3 Verdades del Trading */}
           <div className="max-w-3xl mx-auto mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-5">
+            <h2 className="text-2xl md:text-3xl font-bold mb-5" style={{ color: '#B64183' }}>
               Las 3 Verdades del Trading que Debes Saber
             </h2>
             <div className="grid gap-4 text-left">
@@ -91,7 +91,7 @@ export function HeroSection() {
           </div>
 
           <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-3xl mx-auto text-justify leading-relaxed">
-            El <strong className="text-red-500">95%</strong> de los traders pierde dinero por falta de conocimiento, disciplina y estrategia. Nuestro método está diseñado para ayudarte a formar parte del <strong className="text-emerald-400">5%</strong> que opera con criterio, controla el riesgo y busca resultados consistentes.
+            El <strong className="text-red-500">95%</strong> de los traders pierde dinero por falta de conocimiento, disciplina y estrategia. Nuestro método está diseñado para ayudarte a formar parte del <strong style={{ color: '#00D9FF' }}>5%</strong> que opera con criterio, controla el riesgo y busca resultados consistentes.
           </p>
 
           <p className="text-lg text-slate-200 mb-6 max-w-3xl mx-auto leading-relaxed text-justify">
@@ -99,25 +99,25 @@ export function HeroSection() {
           </p>
 
           <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
-            <span className="text-emerald-400">Trading Binario</span>
+            <span style={{ color: '#FFD700' }}>Trading Binario</span>
             <span className="text-slate-500"> vs </span>
             <span className="text-blue-400">Trading de Forex</span>
           </h3>
-          <div className="bg-gradient-to-r from-emerald-900/40 to-blue-900/40 border border-emerald-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
+          <div className="border rounded-2xl p-6 mb-6 max-w-3xl mx-auto" style={{ background: 'linear-gradient(to right, rgba(255, 215, 0, 0.1), rgba(0, 82, 136, 0.1))', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
             <p className="text-base text-white leading-relaxed mb-3 text-justify">
-              <strong className="text-emerald-300 text-lg">Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong className="text-emerald-300">mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
+              <strong className="text-lg" style={{ color: '#FFD700' }}>Comenzamos con Trading Binario</strong> porque es la forma más efectiva de que empieces a generar resultados reales <strong style={{ color: '#FFD700' }}>mientras aprendes</strong>. Imagina poder aplicar lo que estudias hoy y ver los resultados en horas, no en meses. El trading binario te permite exactamente eso: operaciones rápidas, claras y simples que aceleran tu curva de aprendizaje sin las complejidades del Forex tradicional.
             </p>
             <p className="text-base text-slate-200 leading-relaxed text-justify">
-              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong className="text-emerald-300">No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la <strong className="text-emerald-400">libertad financiera</strong>.
+              Una vez domines los fundamentos y desarrolles la disciplina necesaria, darás el salto natural al trading en Forex con una base sólida. <strong style={{ color: '#FFD700' }}>No invertirás años estudiando teoría</strong> — estarás operando desde el inicio, generando experiencia real y viendo oportunidades de ingresos mientras construyes tu camino hacia la <strong style={{ color: '#00FF88' }}>libertad financiera</strong>.
             </p>
           </div>
 
           <h3 className="text-2xl md:text-3xl font-bold mb-4 max-w-3xl mx-auto">
-            <span className="text-sky-400">CJ Bot</span> <span className="text-emerald-400">100% eficiente y rentable</span>
+            <span className="text-sky-400">CJ Bot</span> <span style={{ color: '#00FF88' }}>100% eficiente y rentable</span>
           </h3>
           <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-500/40 rounded-2xl p-6 mb-6 max-w-3xl mx-auto">
             <p className="text-base text-white leading-relaxed mb-3">
-              <strong className="text-blue-300 text-lg">🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong className="text-sky-300">diversos bots de trading automático</strong> que operan en:
+              <strong className="text-lg" style={{ color: '#00D9FF' }}>🤖 Nuestros Bots de Trading Automático</strong> — En la actualidad, contamos con <strong style={{ color: '#FF5733' }}>diversos bots de trading automático</strong> que operan en:
             </p>
             <div className="grid md:grid-cols-3 gap-3 mb-3">
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
@@ -127,35 +127,35 @@ export function HeroSection() {
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
                 <div className="text-2xl mb-1">₿</div>
                 <div className="text-white font-semibold text-sm">Criptomonedas</div>
-                <div className="text-emerald-400 text-xs font-bold">24/7</div>
+                <div className="text-xs font-bold" style={{ color: '#FFD700' }}>24/7</div>
               </div>
               <div className="bg-slate-900/60 rounded-lg p-3 border border-blue-500/30 text-center">
                 <div className="text-2xl mb-1">📊</div>
                 <div className="text-white font-semibold text-sm">Índices Sintéticos</div>
-                <div className="text-emerald-400 text-xs font-bold">24/7</div>
+                <div className="text-xs font-bold" style={{ color: '#FFD700' }}>24/7</div>
               </div>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Los bots en <strong className="text-blue-300">criptomonedas e índices sintéticos operan 24/7</strong>, aprovechando oportunidades en todo momento. <strong className="text-slate-200">Nota importante:</strong> Hasta el momento no contamos con bots para trading binario, ya que nuestro enfoque en automatización está en los mercados de Forex, cripto e índices.
+              Los bots en <strong style={{ color: '#FF5733' }}>criptomonedas e índices sintéticos operan 24/7</strong>, aprovechando oportunidades en todo momento. <strong className="text-slate-200">Nota importante:</strong> Hasta el momento no contamos con bots para trading binario, ya que nuestro enfoque en automatización está en los mercados de Forex, cripto e índices.
             </p>
           </div>
 
-          <p className="text-xl md:text-2xl font-extrabold mb-8 max-w-3xl mx-auto bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">
+          <p className="text-xl md:text-2xl font-extrabold mb-8 max-w-3xl mx-auto bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #FFD700, #00D9FF, #FF5733)' }}>
             Aquí no tenemos límites, lleguemos más allá de la meta porque no hay fronteras que nos detenga
           </p>
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 mb-10">
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-400">+2,500</div>
+              <div className="text-3xl font-bold" style={{ color: '#00FF88' }}>+2,500</div>
               <div className="text-sm text-slate-400">Estudiantes</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-400">95%</div>
+              <div className="text-3xl font-bold" style={{ color: '#FFD700' }}>95%</div>
               <div className="text-sm text-slate-400">Satisfacción</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-400">7 Años</div>
+              <div className="text-3xl font-bold" style={{ color: '#00D9FF' }}>7 Años</div>
               <div className="text-sm text-slate-400">Experiencia</div>
             </div>
           </div>
@@ -164,7 +164,10 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/registro"
-              className="w-full sm:w-[300px] rounded-full py-4 text-base md:text-lg font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-[300px] rounded-full py-4 text-base md:text-lg font-bold text-white transition-all flex items-center justify-center gap-2"
+              style={{ backgroundColor: '#00D9FF', boxShadow: '0 0 20px rgba(0, 217, 255, 0.4)' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#00BFFF'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00D9FF'}
             >
               Sí a mi libertad Financiera
               <ArrowRight className="h-5 w-5" />
@@ -180,15 +183,15 @@ export function HeroSection() {
           {/* Trust Badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Shield className="h-5 w-5 text-emerald-400" />
+              <Shield style={{ color: '#00FF88' }} className="h-5 w-5" />
               Comprometidos contigo
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Zap className="h-5 w-5 text-sky-400" />
+              <Zap style={{ color: '#FFD700' }} className="h-5 w-5" />
               Acceso inmediato
             </div>
             <div className="flex items-center gap-2 text-slate-300 text-sm">
-              <Headphones className="h-5 w-5 text-emerald-400" />
+              <Headphones style={{ color: '#00D9FF' }} className="h-5 w-5" />
               Soporte real
             </div>
           </div>
