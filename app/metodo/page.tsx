@@ -227,12 +227,17 @@ export default function MetodoPage() {
               </div>
 
               <div className="mt-8 flex gap-4">
-                <Link href="/cursos" className="btn-primary flex items-center gap-2">
+                <Link
+                  href="/cursos"
+                  className="flex items-center gap-2 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+                  style={{ backgroundColor: '#2563EB' }}
+                >
                   Ver Cursos <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/registro"
-                  className="btn-secondary flex items-center gap-2"
+                  className="flex items-center gap-2 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+                  style={{ backgroundColor: '#B64183' }}
                 >
                   <Zap className="h-4 w-4" /> Comenzar Ahora
                 </Link>
