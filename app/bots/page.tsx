@@ -26,7 +26,7 @@ const bots = [
   {
     name: " CJ Bot Lite",
     description: "Perfecto para comenzar con trading automatizado. Operaciones simples y seguras.",
-    accounts: "Para dos cuentas Real y cuatro cuentas demos",
+    accounts: "Para una cuenta Real y dos demos",
     price: 99.99,
     period: "mes",
     features: [
@@ -43,7 +43,7 @@ const bots = [
   {
     name: "CJ Bot Standard",
     description: "Múltiples estrategias y pares para traders intermedios que buscan diversificar.",
-    accounts: "Para tres cuentas Real y seis cuentas demos",
+    accounts: "Para dos cuentas Reales y cuatro cuentas demos",
     price: 169.99,
     period: "mes",
     popular: true,
@@ -61,7 +61,7 @@ const bots = [
   {
     name: "CJ Bot Premium",
     description: "Solución institucional con las mejores herramientas y soporte dedicado.",
-    accounts: "Para seis cuentas Real y ocho cuentas demos",
+    accounts: "Para tres cuentas Reales y ocho cuentas demos",
     price: 209.99,
     period: "mes",
     features: [
