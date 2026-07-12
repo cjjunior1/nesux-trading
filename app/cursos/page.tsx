@@ -322,7 +322,7 @@ export default function CursosPage() {
                       ? "bg-[#0194F6] hover:bg-[#0178d4]"
                       : course.id === "intermedio"
                       ? "bg-[#9D4EDD] hover:bg-[#8b3fc8]"
-                      : "bg-orange-500 hover:bg-orange-600"
+                      : "bg-[#C4703A] hover:bg-[#A85D30]"
                   }`}
                 >
                   {course.id === "basico"
