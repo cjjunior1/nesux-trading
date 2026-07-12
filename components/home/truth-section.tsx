@@ -34,21 +34,21 @@ export function TruthSection() {
             </p>
 
             <p>
-              ¿Recuerdas que te pedí que no te asustaras? Ya que <strong className="text-emerald-400">he desarrollado un método</strong> para que personas que no saben trading o con conocimientos, pero que no tienen la disciplina y el dominio, <strong className="text-emerald-400">siempre estén del lado del 5% que aprenderán a ser ganadores</strong> en este mundo del TRADING.
+              ¿Recuerdas que te pedí que no te asustaras? Ya que <strong style={{ color: '#A78BFA' }}>he desarrollado un método</strong> para que personas que no saben trading o con conocimientos, pero que no tienen la disciplina y el dominio, <strong style={{ color: '#A78BFA' }}>siempre estén del lado del 5% que aprenderán a ser ganadores</strong> en este mundo del TRADING.
             </p>
 
             <div className="grid md:grid-cols-3 gap-4 my-8">
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <Target className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                <p className="text-sm">El trading no es <strong className="text-white">MAGIA</strong></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>E</span><span className="text-white">l trading no es MAGIA</span></p>
               </div>
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <Brain className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                <p className="text-sm">Tampoco es <strong className="text-white">SUERTE</strong></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>T</span><span className="text-white">ampoco es SUERTE</span></p>
               </div>
               <div className="bg-slate-800/50 p-4 rounded-xl text-center">
                 <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                <p className="text-sm">Es <strong className="text-emerald-400">LÓGICA y MATEMÁTICAS</strong></p>
+                <p className="text-sm font-semibold"><span style={{ color: '#4B7BA7' }}>E</span><span className="text-white">s LÓGICA y MATEMÁTICAS</span></p>
               </div>
             </div>
 
