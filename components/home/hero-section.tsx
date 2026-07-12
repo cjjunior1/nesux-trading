@@ -170,7 +170,7 @@ export function HeroSection() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3A5A7F'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4B7BA7'}
             >
-              Sí a mi libertad Financiera
+              Sí, a mi libertad Financiera
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
