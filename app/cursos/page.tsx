@@ -26,6 +26,7 @@ const courses = [
     price: 149.99,
     originalPrice: 255,
     image: "/curso-basico.png",
+    tier: "Unipersonal",
     duration: "Compromiso de un año",
     lessons: 24,
     students: "850+",
@@ -47,6 +48,7 @@ const courses = [
     price: 239.99,
     originalPrice: 407,
     image: "/curso-intermedio.png",
+    tier: "Bi-personal",
     duration: "Compromiso de un año",
     lessons: 42,
     students: "520+",
@@ -74,6 +76,7 @@ const courses = [
     price: 379.99,
     originalPrice: 645,
     image: "/curso-profesional.png",
+    tier: "Tri-personal",
     duration: "Compromiso de un año",
     lessons: 78,
     students: "230+",
@@ -295,7 +298,7 @@ export default function CursosPage() {
                 {/* Modules */}
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold text-white mb-3">
-                    Contenido: <span className="font-bold" style={{ color: '#F39C12' }}>{course.modules[0]}</span>
+                    Contenido: <span className="font-bold" style={{ color: '#F39C12' }}>{course.tier}</span>
                   </h4>
                   <ul className="space-y-2">
                     {course.modules.slice(0, 4).map((module) => (
