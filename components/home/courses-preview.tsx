@@ -132,8 +132,7 @@ export function CoursesPreview() {
         >
           <Link
             href="/cursos"
-            className="inline-flex items-center gap-2 font-medium"
-            style={{ color: '#0002D1' }}
+            className="inline-flex items-center gap-2 font-medium text-white"
           >
             Ver todos los cursos <ArrowRight className="h-4 w-4" />
           </Link>
