@@ -523,7 +523,7 @@ export default function BotsPage() {
 
                 <h3 className="text-2xl font-bold text-white mb-1">{course.title}</h3>
                 <p className={`font-medium mb-3 ${course.id === "intermedio" ? "text-[#008874]" : course.id === "basico" ? "text-[#0194F6]" : "text-[#B54181]"}`}>{course.subtitle}</p>
-                <p className="text-slate-400 text-sm mb-4">{course.description}</p>
+                <p className="text-slate-400 text-sm mb-4 text-justify line-clamp-3 min-h-[3.75rem]">{course.description}</p>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 mb-4 text-sm text-slate-400">
