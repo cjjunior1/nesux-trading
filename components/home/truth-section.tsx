@@ -24,7 +24,7 @@ export function TruthSection() {
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 La Verdad que Nadie Te Dice
               </h2>
-              <p className="text-slate-300 font-semibold">No tengas miedo, ni te asustes con lo que vas a leer ahora mismo...</p>
+              <p className="font-semibold" style={{ color: '#8B285E' }}>No tengas miedo, ni te asustes con lo que vas a leer ahora mismo...</p>
             </div>
           </div>
 
