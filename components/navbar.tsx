@@ -202,11 +202,10 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/registro"
-                  className={`text-sm font-medium py-2 px-4 rounded-lg transition-all ${
-                    pathname === "/registro"
-                      ? "text-blue-400 font-bold drop-shadow-lg border border-blue-400/50 bg-blue-400/10 hover:bg-blue-400/20"
-                      : "btn-primary hover:shadow-lg"
-                  }`}
+                  className="text-sm font-bold text-white py-2 px-6 rounded-full transition-all hover:shadow-lg hover:scale-105"
+                  style={{ backgroundColor: '#B64183' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#9E3570')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#B64183')}
                 >
                   Registrarse
                 </Link>
