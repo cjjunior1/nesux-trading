@@ -277,7 +277,7 @@ export default function CursosPage() {
 
                 <h3 className="text-2xl font-bold text-white mb-1">{course.title}</h3>
                 <p className="text-[#0194F6] font-medium mb-3">{course.subtitle}</p>
-                <p className="text-slate-400 text-sm mb-4">{course.description}</p>
+                <p className="text-slate-400 text-sm mb-4 text-justify line-clamp-3 min-h-[3.75rem]">{course.description}</p>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 mb-4 text-sm text-slate-400">
