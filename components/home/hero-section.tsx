@@ -52,7 +52,7 @@ export function HeroSection() {
           </h1>
 
           {/* Botón publicitario: activa a CJ como tu aliado / guía / amigo */}
-          <div className="mb-32 mt-20 flex justify-center">
+          <div className="mb-20 mt-20 flex justify-center">
             <button
               type="button"
               onClick={openAliado}
