@@ -431,6 +431,16 @@ export function Chatbot() {
     return () => synth.removeEventListener?.("voiceschanged", warm);
   }, []);
 
+  // App instalada (PWA): si la URL trae ?chat=1 (o #chat), abre el chat al entrar,
+  // para que la app arranque directo en el asistente conversacional.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const u = new URL(window.location.href);
+      if (u.searchParams.get("chat") === "1" || u.hash === "#chat") setIsOpen(true);
+    } catch {}
+  }, []);
+
   // Abrir el chat desde botones de las landings (evento global) con saludo propio opcional.
   const pendingGreetingRef = useRef<{ greeting?: string; message?: string } | null>(null);
   useEffect(() => {

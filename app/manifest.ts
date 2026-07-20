@@ -4,10 +4,10 @@ import type { MetadataRoute } from 'next';
 // En modo standalone el sitio se abre a pantalla completa, como una app.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Trading a Otro Nivel',
-    short_name: 'Trading',
-    description: 'Aprende y automatiza tu trading con Trading a Otro Nivel.',
-    start_url: '/',
+    name: 'Asistente Trading Academy',
+    short_name: 'Asistente',
+    description: 'Tu asistente de trading con IA: conversa por voz o texto, aprende y automatiza.',
+    start_url: '/?chat=1',
     display: 'standalone',
     background_color: '#020617',
     theme_color: '#059669',
