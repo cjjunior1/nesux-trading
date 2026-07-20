@@ -6,6 +6,8 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/api/chatbot': ['./knowledge/**/*'],
     },
+    // Librerías de lectura de archivos: no empaquetar (usan APIs de Node).
+    serverComponentsExternalPackages: ['pdf-parse', 'mammoth', 'xlsx'],
   },
   images: {
     remotePatterns: [

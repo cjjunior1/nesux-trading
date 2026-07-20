@@ -55,9 +55,18 @@ function cleanMarkdown(text: string): string {
 // va en un color distinto (cicla por una paleta). Las palabras se envuelven en
 // <span class="cj-word wi-N"> para resaltar (cj-active) la que se está leyendo.
 const LINE_COLORS = [
-  "#E2E8F0", "#7DD3FC", "#86EFAC", "#FCD34D", "#F0ABFC",
-  "#FDA4AF", "#A5B4FC", "#5EEAD4", "#FDBA74",
+  "#7DD3FC", "#86EFAC", "#FCD34D", "#F0ABFC", "#FDA4AF",
+  "#A5B4FC", "#5EEAD4", "#FDBA74", "#C4B5FD", "#6EE7B7",
+  "#FCA5A5", "#93C5FD", "#F9A8D4", "#FDE68A", "#67E8F9",
 ];
+
+// Semilla por mensaje: cada mensaje ARRANCA en un color distinto de la paleta,
+// para que no todos empiecen por el mismo tono (más diversidad entre mensajes).
+function colorSeed(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h % LINE_COLORS.length;
+}
 
 // Plugin (rehype): parte cada texto en palabras envueltas en <span class="cj-word wi-N">,
 // en ORDEN del documento. A la palabra activa (activeIndex) le añade "cj-active".
@@ -102,7 +111,8 @@ const Markdown = memo(function Markdown({ text, msgId, wordsRef, activeIndex }: 
   const words: string[] = [];
   wordsRef.current[msgId] = words;
   const wordSplitter = makeWordSplitter(words, activeIndex);
-  let lineIdx = 0;
+  // Arranca en un color distinto por mensaje; líneas consecutivas nunca repiten color.
+  let lineIdx = colorSeed(msgId);
   const nextColor = () => LINE_COLORS[lineIdx++ % LINE_COLORS.length];
 
   const components: Record<string, any> = {
@@ -160,6 +170,25 @@ const Markdown = memo(function Markdown({ text, msgId, wordsRef, activeIndex }: 
   a.text === b.text && a.msgId === b.msgId && a.wordsRef === b.wordsRef && a.activeIndex === b.activeIndex
 );
 
+// Prompt de VENTAS/ATRACCIÓN para desconocidos (botón "Activa tu Aliado").
+// No es tutor: indaga, conecta y vende la plataforma con mensajes CORTOS.
+const ALIADO_SYSTEM_PROMPT = "Eres CJ en MODO ALIADO (ventas y atracción), hablando con un VISITANTE NUEVO que aún no te conoce. Objetivo: conocerlo e interesarlo para que se una a Trading Academy. REGLAS: 1. Mensajes MUY CORTOS (1-3 frases). 2. Haz SIEMPRE una pregunta para conocerlo (nivel, meta, capacidad, qué lo frena, interés). 3. Nunca repitas el mismo encabezado, palabra de apertura ni idea; varía el tono en cada respuesta. 4. Conecta como un amigo cercano, cálido y directo — nada de párrafos ni clases largas. 5. Ve sembrando el valor de la plataforma (método, guía, comunidad) sin sonar a spam. 6. Cuando muestre interés real, invítalo suavemente a dejar sus datos o dar el siguiente paso. NO des clases técnicas largas aquí; eso es del modo tutor.";
+
+// Contexto de la página donde está el bot: se enfoca en ella sin perder lo global.
+function getPageContext(): string {
+  if (typeof window === "undefined") return "";
+  const p = (window.location?.pathname || "/").toLowerCase();
+  const title = (typeof document !== "undefined" ? document.title : "") || "";
+  let area = "la página principal (inicio)";
+  if (p.includes("curso")) area = "la sección de CURSOS";
+  else if (p.includes("bot")) area = "la sección de BOTS de trading";
+  else if (p.includes("metodo") || p.includes("método")) area = "la sección del MÉTODO";
+  else if (p.includes("testimonio")) area = "la sección de TESTIMONIOS";
+  else if (p.includes("precio") || p.includes("plan")) area = "la sección de PRECIOS/PLANES";
+  else if (p.includes("contacto")) area = "la sección de CONTACTO";
+  return `CONTEXTO DE PÁGINA: el visitante está viendo ${area} (ruta ${p}, título "${title}"). Enfócate en ESE tema; si te preguntan por otro asunto, atiéndelo sin problema, pero sin perder el conocimiento global de Trading Academy.`;
+}
+
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -197,6 +226,37 @@ export function Chatbot() {
   const recognitionRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const dragControls = useDragControls();
+
+  // --- Persistencia de la conversación POR PERSONA (localStorage) ---
+  // Evita que se reinicie: guarda y restaura la charla en cada dispositivo/persona.
+  const sessionIdRef = useRef<string>("");
+  const persistLoadedRef = useRef(false);
+  // Modo "aliado" (ventas/atracción para desconocidos): lo activa el botón del Hero.
+  const aliadoModeRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      let sid = localStorage.getItem("nx_chat_sid");
+      if (!sid) {
+        sid = "web-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        localStorage.setItem("nx_chat_sid", sid);
+      }
+      sessionIdRef.current = sid;
+      const saved = localStorage.getItem("nx_chat_msgs_" + sid);
+      if (saved) {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr) && arr.length) setMessages(arr);
+      }
+    } catch {}
+    persistLoadedRef.current = true;
+  }, []);
+  // Guarda la conversación cada vez que cambia (últimos 60 mensajes).
+  useEffect(() => {
+    if (typeof window === "undefined" || !persistLoadedRef.current || !sessionIdRef.current) return;
+    try {
+      localStorage.setItem("nx_chat_msgs_" + sessionIdRef.current, JSON.stringify(messages.slice(-60)));
+    } catch {}
+  }, [messages]);
 
   // Modo conversación continuo por voz (manos libres)
   const conversationModeRef = useRef(false);   // true mientras la conversación por voz esté activa
@@ -376,6 +436,24 @@ export function Chatbot() {
   useEffect(() => {
     function onOpen(e: any) {
       const d = (e && e.detail) || {};
+      if (d.mode === "aliado") {
+        // Cada clic AÑADE un mensaje corto de atracción (distinto + color distinto),
+        // SIN borrar la conversación existente: solo sube otro mensaje.
+        aliadoModeRef.current = true;
+        const color = d.color || "#8B5CF6";
+        setMessages(prev => [...prev, {
+          id: "aliado-" + Date.now(),
+          role: "assistant",
+          content: d.message || "¿Qué te trajo al trading hoy? 👀",
+          greeting: d.greeting || "Tu aliado en el trading 🤝",
+          greetingColor: color,
+          textColor: color,
+          emoji: "🤝",
+        }]);
+        setIsOpen(true);
+        return;
+      }
+      aliadoModeRef.current = false;
       if (d.greeting || d.message) pendingGreetingRef.current = { greeting: d.greeting, message: d.message };
       setIsOpen(true);
     }
@@ -385,7 +463,7 @@ export function Chatbot() {
 
   // Cargar saludo inicial
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isOpen && messages.length === 0 && persistLoadedRef.current) {
       const dynamicGreeting = generateDynamicGreeting();
       const custom = pendingGreetingRef.current;
       pendingGreetingRef.current = null;
@@ -675,7 +753,7 @@ export function Chatbot() {
       const response = await fetch("/api/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userMessage: msg, messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })) }),
+        body: JSON.stringify({ sessionId: sessionIdRef.current, userMessage: msg, messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })), pageContext: getPageContext(), ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}) }),
       });
       if (!response.ok) throw new Error("Error");
       const data = await response.json();
@@ -715,8 +793,11 @@ export function Chatbot() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sessionId: sessionIdRef.current,
           userMessage: text,
           messages: truncated.slice(0, -1).slice(-10).map(m => ({ role: m.role, content: m.content })),
+          pageContext: getPageContext(),
+          ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}),
         }),
       });
       if (!response.ok) throw new Error("Error");
@@ -787,10 +868,13 @@ export function Chatbot() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userMessage: `Analiza este archivo: ${fileName} (${fileUrl})`,
+          sessionId: sessionIdRef.current,
+          userMessage: `Analiza este archivo: ${fileName}`,
           messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
           fileUrl: fileUrl,
-          fileName: fileName
+          fileName: fileName,
+          pageContext: getPageContext(),
+          ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}),
         }),
       });
       if (!response.ok) throw new Error("Error en la respuesta");
@@ -828,7 +912,16 @@ export function Chatbot() {
             ? "bg-red-600 hover:bg-red-700 ring-4 ring-red-400/50 animate-pulse"
             : "bg-emerald-600 hover:bg-emerald-700"
         }`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen) {
+            // Botón redondo = MODO TUTOR. Vuelve al asistente normal SIN borrar la
+            // conversación: solo desactiva el prompt de ventas del modo aliado.
+            aliadoModeRef.current = false;
+            setIsOpen(true);
+          } else {
+            setIsOpen(false);
+          }
+        }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         title={isRecording && !isOpen ? "Conversación por voz activa — toca para abrir" : (isOpen ? "Cerrar" : "Abrir chat")}

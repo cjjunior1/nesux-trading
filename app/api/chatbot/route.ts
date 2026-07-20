@@ -76,7 +76,56 @@ function initWatcher() {
   console.log('👁️ File Watcher activo para:', knowledgeDir);
 }
 
-const SYSTEM_PROMPT = 'Eres CJ, tutor experto de Trading Academy. Tu misión principal es EDUCAR y FORMAR alumnos desde cero. Sigue estrictamente estas reglas: 1. PEDAGOGÍA COMO PRIORIDAD ABSOLUTA - Adaptación de nivel: Identifica si el usuario es PRINCIPIANTE, INTERMEDIO o AVANZADO. 2. NUNCA SALUDES — ABRE DIRECTO AL CONTENIDO - Entra al tema como si la conversación ya estuviera en marcha. 3. CONTENIDO EDUCATIVO PURO - Explicaciones claras y construcción progresiva. 4. FORMATO Y PRESENTACIÓN - USA MARKDOWN PROFESIONAL con párrafos cortos. Tu meta: transformar usuarios en traders EDUCADOS, no solo en operadores automáticos.';
+const SYSTEM_PROMPT = 'Eres CJ, tutor experto de Trading Academy. Tu misión principal es EDUCAR y FORMAR alumnos desde cero. Sigue estrictamente estas reglas: 1. PEDAGOGÍA COMO PRIORIDAD ABSOLUTA - Adaptación de nivel: Identifica si el usuario es PRINCIPIANTE, INTERMEDIO o AVANZADO. 2. NUNCA SALUDES — ABRE DIRECTO AL CONTENIDO - Entra al tema como si la conversación ya estuviera en marcha. 3. CONTENIDO EDUCATIVO PURO - Explicaciones claras y construcción progresiva. 4. FORMATO Y PRESENTACIÓN - USA MARKDOWN PROFESIONAL con párrafos cortos. Tu meta: transformar usuarios en traders EDUCADOS, no solo en operadores automáticos. CAPACIDADES: SÍ puedes analizar ARCHIVOS (PDF, Word, Excel, TXT) e IMÁGENES que el usuario adjunte — cuando recibas su contenido, interprétalo con detalle. NUNCA digas que no puedes ver imágenes ni analizar archivos.';
+
+// --- Lectura de ARCHIVOS ADJUNTOS: extrae texto (PDF/Word/Excel/TXT) o prepara imagen (visión) ---
+async function extractFile(fileUrl: string, fileName: string): Promise<{ text?: string; imageDataUrl?: string }> {
+  try {
+    const rel = fileUrl.replace(/^\//, ''); // /uploads/... -> uploads/...
+    const filePath = path.join(process.cwd(), 'public', rel);
+    const buffer = await readFile(filePath);
+    const name = (fileName || rel).toLowerCase();
+
+    // Imágenes -> data URL para visión
+    if (/\.(jpe?g|png|gif|webp)$/.test(name)) {
+      const ext = name.split('.').pop();
+      const mime = ext === 'jpg' ? 'jpeg' : ext;
+      return { imageDataUrl: `data:image/${mime};base64,${buffer.toString('base64')}` };
+    }
+    // PDF
+    if (name.endsWith('.pdf')) {
+      const mod: any = await import('pdf-parse');
+      const fn: any = mod?.default ?? mod;
+      if (typeof fn === 'function') {
+        const data: any = await fn(buffer);
+        return { text: (data?.text || '').trim().slice(0, 12000) };
+      }
+      return {};
+    }
+    // Word
+    if (name.endsWith('.docx') || name.endsWith('.doc')) {
+      const mammoth: any = await import('mammoth');
+      const res = await mammoth.extractRawText({ buffer });
+      return { text: (res?.value || '').trim().slice(0, 12000) };
+    }
+    // Excel
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      const XLSX: any = await import('xlsx');
+      const wb = XLSX.read(buffer, { type: 'buffer' });
+      const out: string[] = [];
+      for (const sheet of wb.SheetNames) out.push(`# Hoja: ${sheet}\n` + XLSX.utils.sheet_to_csv(wb.Sheets[sheet]));
+      return { text: out.join('\n\n').slice(0, 12000) };
+    }
+    // Texto plano
+    if (name.endsWith('.txt') || name.endsWith('.md') || name.endsWith('.csv')) {
+      return { text: buffer.toString('utf-8').slice(0, 12000) };
+    }
+    return {};
+  } catch (err) {
+    console.error('❌ extractFile error:', (err as Error).message);
+    return {};
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -85,7 +134,7 @@ export async function POST(request: Request) {
     initWatcher();
 
     const body = await request.json();
-    const { sessionId, messages, userMessage, isStudent, systemPrompt } = body;
+    const { sessionId, messages, userMessage, isStudent, systemPrompt, fileUrl, fileName, pageContext } = body;
 
     console.log('🔍 CHATBOT API DEBUG:', {
       userMessage,
@@ -111,7 +160,20 @@ export async function POST(request: Request) {
 
     // Construir contexto
     let model = 'gpt-4o-mini';
-    const userContent = userMessage;
+    let userContent: any = userMessage;
+    let imageDataUrl: string | undefined;
+
+    // Si hay archivo adjunto, léelo: imagen -> visión; documento -> texto en el contexto.
+    if (fileUrl) {
+      const ext = await extractFile(fileUrl, fileName || '');
+      if (ext.imageDataUrl) {
+        imageDataUrl = ext.imageDataUrl;
+      } else if (ext.text) {
+        userContent = `${userMessage}\n\n--- CONTENIDO DEL ARCHIVO "${fileName}" ---\n${ext.text}\n--- FIN DEL ARCHIVO ---\nInterprétalo y responde/analiza con detalle.`;
+      } else {
+        userContent = `${userMessage}\n\n(No pude leer el contenido del archivo "${fileName}". Pídele al usuario que lo reenvíe o pegue el texto.)`;
+      }
+    }
 
     const hasHistory = Array.isArray(messages) && messages.length > 0;
     const turnInstruction = hasHistory
@@ -128,9 +190,18 @@ export async function POST(request: Request) {
     const apiMessages = [
       { role: 'system', content: finalSystemPrompt },
       ...(knowledgeMessage ? [{ role: 'system', content: knowledgeMessage }] : []),
+      ...(pageContext ? [{ role: 'system', content: pageContext }] : []),
       { role: 'system', content: turnInstruction },
       ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: userContent }
+      {
+        role: 'user',
+        content: imageDataUrl
+          ? [
+              { type: 'text', text: userMessage || 'Analiza esta imagen a fondo. Si es de trading (operaciones, historial, gráfico), interprétala con detalle educativo: ganancias/pérdidas por operación y por par, balance total, y enseña.' },
+              { type: 'image_url', image_url: { url: imageDataUrl } },
+            ]
+          : userContent,
+      }
     ];
 
     const abortController = new AbortController();

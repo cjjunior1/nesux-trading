@@ -5,19 +5,67 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, TrendingUp, Shield, Zap, Headphones } from "lucide-react";
 
-// Mensajes variados: CJ se presenta como aliado, guía y amigo en el trading.
+// Mensajes CORTOS de ATRACCIÓN para desconocidos: cada uno indaga algo distinto
+// (necesidad, nivel, capacidad, interés) para conocer al visitante y engancharlo.
 const ALIADO_MSGS = [
-  "¡Hey! Soy CJ, tu aliado y amigo en el trading. No estás solo en esto — cuéntame por dónde quieres empezar y te acompaño paso a paso. 🚀",
-  "Bienvenido 👋 Soy CJ, tu guía en el mundo del trading. Aquí no vendemos humo: te acompaño con la verdad y con método. ¿Qué te gustaría saber?",
-  "Soy CJ. Piénsame como ese amigo que ya recorrió el camino del trading y quiere verte ganar. ¿Te muestro cómo empezar del lado correcto?",
-  "¡Qué bueno verte! Soy CJ, tu compañero de ruta. Mi misión es que pases del 95% que pierde al 5% que aprende a ganar. ¿Arrancamos juntos?",
-  "Soy CJ, tu mentor y aliado. El trading se ve difícil solo cuando lo enfrentas sin guía — para eso estoy yo. Pregúntame lo que quieras. 💪",
+  "Antes de empezar… ¿qué te trajo al trading hoy? 👀",
+  "Rápido: ¿ya operas o estás empezando desde cero?",
+  "¿Buscas un ingreso extra o quieres vivir de esto? 💭",
+  "Cuéntame una cosa: ¿qué es lo que más te frena para arrancar?",
+  "¿Cuánto sabes de trading hoy — nada, poquito o bastante?",
+  "Si te enseñara a leer un gráfico en 5 min, ¿te interesaría? 📈",
+  "¿Qué prefieres: aprender solo o con alguien que ya lo logró?",
+  "Dime algo… ¿cuánto tiempo llevas queriendo entrar a esto? ⏳",
+  "¿Te ha pasado que pruebas trading y pierdes? Cuéntame.",
+  "Una pregunta clave: ¿qué querrías lograr en 6 meses? 🎯",
 ];
+
+// Encabezados variados: distinto en cada clic (nunca se repite el mismo saludo).
+const ALIADO_GREETINGS = [
+  "¿Tienes lo que se necesita? 🔥",
+  "Veamos de qué eres capaz 💪",
+  "¿Listo para dar el paso? 🚀",
+  "Este reto es para ti 🎯",
+  "Demuéstrate que puedes 📈",
+  "Tu cupo te está esperando ⏳",
+  "¿Entras o te quedas mirando? 👀",
+  "Es tu momento de empezar ⚡",
+];
+
+// Colores distintos por clic (encabezado del chat en modo aliado).
+const ALIADO_COLORS = ["#F43F5E", "#8B5CF6", "#06B6D4", "#F59E0B", "#10B981", "#EC4899", "#3B82F6"];
+
+// "Bolsa barajada": recorre TODA la lista antes de repetir ninguno; al rebarajar
+// evita que el primero del nuevo ciclo sea igual al último del ciclo anterior.
+function makeBag(list: string[]) {
+  let bag: string[] = [];
+  let last = "";
+  const shuffle = () => {
+    const a = [...list];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    if (a[0] === last && a.length > 1) [a[0], a[1]] = [a[1], a[0]];
+    bag = a;
+  };
+  return () => {
+    if (bag.length === 0) shuffle();
+    const v = bag.shift() as string;
+    last = v;
+    return v;
+  };
+}
+const nextColor = makeBag(ALIADO_COLORS);
+const nextGreeting = makeBag(ALIADO_GREETINGS);
+const nextMsg = makeBag(ALIADO_MSGS);
 
 export function HeroSection() {
   const openAliado = () => {
-    const m = ALIADO_MSGS[Math.floor(Math.random() * ALIADO_MSGS.length)];
-    window.dispatchEvent(new CustomEvent("nx-open-chat", { detail: { greeting: "Tu aliado en el trading 🤝", message: m } }));
+    const m = nextMsg();
+    const greeting = nextGreeting();
+    const color = nextColor();
+    window.dispatchEvent(new CustomEvent("nx-open-chat", { detail: { mode: "aliado", greeting, message: m, color } }));
   };
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
@@ -71,19 +119,19 @@ export function HeroSection() {
             <div className="grid gap-4 text-left">
               <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#4040BF4D' }}>
                 <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#4040BF', boxShadow: '0 0 16px rgba(64, 64, 191, 0.4)', borderColor: '#4040BF' }}>1</span>
-                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed text-justify">
                   En los mercados financieros, <strong className="text-white">la mayoría pierde</strong>. No es mala suerte — es no tener el método correcto.
                 </p>
               </div>
               <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#0052884D' }}>
                 <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#005288', boxShadow: '0 0 16px rgba(0, 82, 136, 0.4)', borderColor: '#005288' }}>2</span>
-                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed text-justify">
                   Hay una verdad incómoda en el trading: <strong className="text-white">los mercados no perdonan la improvisación</strong>. La mayoría paga un precio muy caro por aprenderlo tarde.
                 </p>
               </div>
               <div className="bg-slate-900/50 border rounded-2xl p-5 flex gap-4 items-start" style={{ borderColor: '#8080FF4D' }}>
                 <span className="flex-shrink-0 w-11 h-11 rounded-full text-white text-lg font-extrabold flex items-center justify-center ring-2" style={{ backgroundColor: '#8080FF', boxShadow: '0 0 16px rgba(128, 128, 255, 0.4)', borderColor: '#8080FF' }}>3</span>
-                <p className="text-base md:text-lg text-slate-200 leading-relaxed">
+                <p className="text-base md:text-lg text-slate-200 leading-relaxed text-justify">
                   El dinero que pierde la mayoría de los traders no desaparece — <strong className="text-white">alguien más se lo lleva</strong>. La pregunta es: ¿de qué lado quieres estar?
                 </p>
               </div>
