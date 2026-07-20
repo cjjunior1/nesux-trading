@@ -47,8 +47,8 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Contacto</h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-slate-400">
-                <Mail className="h-4 w-4 text-emerald-500" />
-                <a href="mailto:trading@nesuxglobalbusinessrd.com" className="hover:text-emerald-400 transition-colors break-all">
+                <Mail className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                <a href="mailto:trading@nesuxglobalbusinessrd.com" className="hover:text-emerald-400 transition-colors text-sm whitespace-nowrap">
                   trading@nesuxglobalbusinessrd.com
                 </a>
               </li>
