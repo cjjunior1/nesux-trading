@@ -175,6 +175,43 @@ export async function POST(request: Request) {
       }
     }
 
+    // === UNIFICACIÓN (Fase 2): intentar el CEREBRO CENTRAL compartido de Nexy ===
+    // Solo si NEXY_BRAIN_URL está configurado. Si falla o no responde, cae al
+    // cerebro LOCAL de abajo (nunca se pierde ninguna capacidad).
+    const BRAIN_URL = process.env.NEXY_BRAIN_URL;
+    if (BRAIN_URL) {
+      try {
+        const messageForBrain = typeof userContent === 'string' ? userContent : userMessage;
+        const r = await fetch(`${BRAIN_URL.replace(/\/$/, '')}/api/nexy/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: messageForBrain,
+            history: (Array.isArray(messages) ? messages : []).slice(-12).map((m: any) => ({ role: m.role, content: m.content })),
+            profile: 'trading-web',
+            channel: 'web',
+            identity: (body?.email || body?.userEmail) ? { email: body.email || body.userEmail, name: body?.userName } : undefined,
+            pageContext,
+            systemOverride: systemPrompt,
+            imageDataUrl,
+          }),
+          signal: AbortSignal.timeout(45000),
+        });
+        if (r.ok) {
+          const d = await r.json().catch(() => ({} as any));
+          if (d?.reply) {
+            if (sessionId && db) {
+              try { db.prepare('INSERT INTO chat_messages (sessionId, role, content) VALUES (?, ?, ?)').run(sessionId, 'assistant', d.reply); } catch {}
+            }
+            return NextResponse.json({ content: d.reply });
+          }
+        }
+        console.warn('[brain-central] sin reply, uso cerebro local');
+      } catch (e: any) {
+        console.warn('[brain-central] error, uso cerebro local:', e?.message || e);
+      }
+    }
+
     const hasHistory = Array.isArray(messages) && messages.length > 0;
     const turnInstruction = hasHistory
       ? 'NOTA: Conversación en curso. Sé consistente pero variad en tono.'
