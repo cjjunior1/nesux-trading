@@ -12,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 
 type ProfileForm = {
@@ -30,6 +31,15 @@ const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 export default function PerfilPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  // Esc vuelve al panel: sin esto la pantalla no tenía ninguna salida.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") router.push("/dashboard");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [router]);
 
   const [formData, setFormData] = useState<ProfileForm>({
     name: "",
@@ -284,11 +294,7 @@ export default function PerfilPage() {
                   />
                 </div>
               </div>
-            ) : (
-              <div className="rounded-lg border border-slate-700 bg-slate-800/40 px-4 py-3 text-xs text-slate-400">
-                El campo de usuario/username no está disponible en el esquema actual.
-              </div>
-            )}
+            ) : null}
 
             <div className="pt-2 border-t border-slate-800">
               <h2 className="text-white font-semibold mb-1">Cambiar contraseña</h2>
@@ -346,6 +352,14 @@ export default function PerfilPage() {
               </div>
             </div>
 
+            <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
+              className="w-full sm:w-auto px-6 py-3 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 transition flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" /> Cancelar
+            </button>
             <button
               type="submit"
               disabled={isSaving}
@@ -360,6 +374,7 @@ export default function PerfilPage() {
                 "Guardar cambios"
               )}
             </button>
+            </div>
           </form>
         </motion.div>
       </div>
