@@ -184,7 +184,11 @@ export const COUNTRIES: Country[] = [
   { c: "GB", n: "Reino Unido", d: "+44" },
   { c: "CF", n: "República Centroafricana", d: "+236" },
   { c: "CZ", n: "República Checa", d: "+420" },
-  { c: "DO", n: "República Dominicana", d: "+1" },
+  // RD tiene tres códigos de área y los tres están en uso. Con "+1" a secas el
+  // alumno tenía que acordarse de escribirlo; así lo elige y no se equivoca.
+  { c: "DO", n: "República Dominicana (809)", d: "+1809" },
+  { c: "DO", n: "República Dominicana (829)", d: "+1829" },
+  { c: "DO", n: "República Dominicana (849)", d: "+1849" },
   { c: "RE", n: "Reunión", d: "+262" },
   { c: "RW", n: "Ruanda", d: "+250" },
   { c: "RO", n: "Rumanía", d: "+40" },
@@ -235,3 +239,26 @@ export const COUNTRIES: Country[] = [
   { c: "ZM", n: "Zambia", d: "+260" },
   { c: "ZW", n: "Zimbabue", d: "+263" },
 ];
+
+
+/**
+ * Une el prefijo del país con lo que escribió la persona, en formato E.164.
+ *
+ * Existe porque mucha gente escribe su número completo con el código de área
+ * ("8091234567") aunque ya lo haya elegido en la lista. Concatenar a ciegas
+ * daba "+18098091234567", un número inválido que rompía el WhatsApp.
+ *
+ * - Si lo escrito ya empieza por el prefijo elegido, no se duplica.
+ * - En RD, si eligió 809 pero escribió un 829/849, manda lo que escribió:
+ *   el número real pesa más que la opción de la lista.
+ */
+export function buildPhoneE164(dial: string, raw: string): string {
+  const digits = (raw || "").replace(/\D/g, "");
+  const dialDigits = (dial || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith(dialDigits)) return `+${digits}`;
+  if (dialDigits.startsWith("1") && dialDigits.length === 4 && digits.length === 10) {
+    return `+1${digits}`;
+  }
+  return `+${dialDigits}${digits}`;
+}

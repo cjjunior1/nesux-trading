@@ -6,10 +6,11 @@ import Link from "next/link";
 import {
   User, Mail, Phone, ArrowRight, CheckCircle, Shield, Gift, AlertCircle, Loader2,
 } from "lucide-react";
-import { COUNTRIES, flagOf } from "@/lib/countries";
+import { COUNTRIES, flagOf, buildPhoneE164 } from "@/lib/countries";
 
 export default function RegistroPage() {
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", country: "DO", localNumber: "" });
+  const DEFAULT_COUNTRY = String(COUNTRIES.findIndex((x) => x.c === "DO"));
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", country: DEFAULT_COUNTRY, localNumber: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,8 +18,9 @@ export default function RegistroPage() {
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [apiError, setApiError] = useState("");
 
-  const dialOf = (c: string) => COUNTRIES.find((x) => x.c === c)?.d || "+1";
-  const fullWhatsapp = (data = formData) => dialOf(data.country) + data.localNumber.replace(/\D/g, "");
+  const countryOf = (idx: string) => COUNTRIES[Number(idx)];
+  const dialOf = (idx: string) => countryOf(idx)?.d || "+1";
+  const fullWhatsapp = (data = formData) => buildPhoneE164(dialOf(data.country), data.localNumber);
 
   const validate = (data = formData) => {
     const e: Record<string, string> = {};
@@ -195,8 +197,8 @@ export default function RegistroPage() {
                     className="input-field w-auto max-w-[42%]"
                     title="Selecciona tu país"
                   >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.c} value={c.c}>{c.n} {flagOf(c.c)} ({c.d})</option>
+                    {COUNTRIES.map((c, i) => (
+                      <option key={i} value={i}>{c.n} {flagOf(c.c)} ({c.d})</option>
                     ))}
                   </select>
                   <div className="relative flex-1">
@@ -206,13 +208,13 @@ export default function RegistroPage() {
                       value={formData.localNumber}
                       onChange={(e) => onChange("localNumber", e.target.value.replace(/\D/g, ""))}
                       className={`input-field pl-10 ${errors.localNumber ? "border-red-500" : ""}`}
-                      placeholder="Tu número (sin código de país)"
+                      placeholder="Ej: 8128214"
                     />
                   </div>
                 </div>
                 {errors.localNumber && <p className="text-red-400 text-xs mt-1">{errors.localNumber}</p>}
                 <p className="text-xs text-slate-500 mt-1">
-                  Tu WhatsApp completo: <span className="text-emerald-400 font-mono">{dialOf(formData.country)} {formData.localNumber || "…"}</span>. Aquí recibirás tu ID.
+                  Tu WhatsApp completo: <span className="text-emerald-400 font-mono">{fullWhatsapp() || dialOf(formData.country)}</span>. Aquí recibirás tu ID.
                 </p>
               </div>
 
