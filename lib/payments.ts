@@ -1,18 +1,11 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
 
-export const BANK_DISCOUNT = 0.1; // 10% en transferencia bancaria
 const APP_URL = () => process.env.APP_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 // ============================================================
 //  PURAS (testeables)
 // ============================================================
-
-/** Aplica el descuento del 10% de transferencia bancaria. */
-export function applyBankDiscount(amount: number): { amount: number; discount: number } {
-  const discount = Math.round(amount * BANK_DISCOUNT * 100) / 100;
-  return { amount: Math.round((amount - discount) * 100) / 100, discount };
-}
 
 /** Ordena recursivamente las claves de un objeto (NOWPayments firma el JSON ordenado). */
 function sortObject(obj: any): any {
@@ -52,9 +45,27 @@ export function verifyStripeSignature(rawBody: string, sigHeader: string | null,
 export type BankAccount = { bank_name: string; account_number: string; account_holder: string; type?: string; currency?: string };
 
 /**
+ * Tasa USD -> DOP con la que se le cobra al alumno por transferencia.
+ * Se configura a mano (BANK_USD_TO_DOP) para que el monto no cambie solo entre
+ * que el alumno abre el checkout y transfiere. Devuelve null si no está puesta.
+ */
+export function getUsdToDop(): number | null {
+  const rate = Number(process.env.BANK_USD_TO_DOP);
+  return Number.isFinite(rate) && rate > 0 ? rate : null;
+}
+
+/** Convierte el precio en USD al monto en pesos que debe transferir el alumno. */
+export function toDop(amountUsd: number, rate: number): number {
+  return Math.round(amountUsd * rate * 100) / 100;
+}
+
+/**
  * Devuelve la lista de cuentas bancarias para mostrar en el checkout.
  * Configurable con BANK_ACCOUNTS (JSON array) en .env; si no, usa la cuenta única
  * BANK_NAME / BANK_ACCOUNT_NUMBER / BANK_ACCOUNT_HOLDER.
+ *
+ * Devuelve [] si no hay nada configurado: es preferible desactivar el método a
+ * mostrarle al alumno una cuenta de ejemplo a la que podría transferir de verdad.
  */
 export function getBankAccounts(): BankAccount[] {
   const raw = process.env.BANK_ACCOUNTS;
@@ -62,13 +73,16 @@ export function getBankAccounts(): BankAccount[] {
     try {
       const arr = JSON.parse(raw);
       if (Array.isArray(arr) && arr.length) return arr;
-    } catch { /* JSON inválido -> fallback */ }
+    } catch { /* JSON inválido -> sin cuentas */ }
   }
-  return [{
-    bank_name: process.env.BANK_NAME || "Banco (configurar en .env)",
-    account_number: process.env.BANK_ACCOUNT_NUMBER || "—",
-    account_holder: process.env.BANK_ACCOUNT_HOLDER || "Trading a Otro Nivel",
-  }];
+  if (process.env.BANK_ACCOUNT_NUMBER && process.env.BANK_ACCOUNT_HOLDER) {
+    return [{
+      bank_name: process.env.BANK_NAME || "Banco",
+      account_number: process.env.BANK_ACCOUNT_NUMBER,
+      account_holder: process.env.BANK_ACCOUNT_HOLDER,
+    }];
+  }
+  return [];
 }
 
 // ============================================================
@@ -120,7 +134,14 @@ export async function createStripeSession(opts: { paymentId: string; userId: str
   return data; // { id, url, ... }
 }
 
-export async function createPaypalOrder(opts: { paymentId: string; amount: number; currency: string; }) {
+/**
+ * Crea una orden en PayPal.
+ *
+ * Con `cardFirst` se abre directamente el formulario de tarjeta (pago como
+ * invitado, sin cuenta PayPal): es como ofrecemos "Tarjeta de crédito/débito"
+ * sin contratar una pasarela aparte.
+ */
+export async function createPaypalOrder(opts: { paymentId: string; amount: number; currency: string; productName?: string; cardFirst?: boolean; }) {
   const id = process.env.PAYPAL_CLIENT_ID, secret = process.env.PAYPAL_CLIENT_SECRET;
   if (!id || !secret) throw new Error("PayPal no está configurado");
   const base = process.env.PAYPAL_API_BASE || "https://api-m.paypal.com";
@@ -133,15 +154,71 @@ export async function createPaypalOrder(opts: { paymentId: string; amount: numbe
   if (!tokRes.ok) throw new Error("Error autenticando con PayPal");
   const res = await fetch(`${base}/v2/checkout/orders`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${tok.access_token}`, "Content-Type": "application/json" },
+    headers: {
+      Authorization: `Bearer ${tok.access_token}`,
+      "Content-Type": "application/json",
+      // Idempotencia: si reintentamos, PayPal devuelve la misma orden.
+      "PayPal-Request-Id": opts.paymentId,
+    },
     body: JSON.stringify({
       intent: "CAPTURE",
-      purchase_units: [{ custom_id: opts.paymentId, amount: { currency_code: opts.currency, value: opts.amount.toFixed(2) } }],
+      purchase_units: [{
+        custom_id: opts.paymentId,
+        description: opts.productName?.slice(0, 127),
+        amount: { currency_code: opts.currency, value: opts.amount.toFixed(2) },
+      }],
+      payment_source: {
+        paypal: {
+          experience_context: {
+            brand_name: process.env.PAYPAL_BRAND_NAME || "Trading a Otro Nivel",
+            locale: "es-DO",
+            user_action: "PAY_NOW",
+            // BILLING abre el formulario de tarjeta; LOGIN, la cuenta de PayPal.
+            landing_page: opts.cardFirst ? "BILLING" : "LOGIN",
+            return_url: `${APP_URL()}/api/payments/paypal/return?payment_id=${opts.paymentId}`,
+            cancel_url: `${APP_URL()}/checkout?canceled=1`,
+          },
+        },
+      },
     }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error("Error creando orden de PayPal");
   return data; // { id, links: [{ rel: 'approve', href }] }
+}
+
+/** Token OAuth de PayPal (client credentials). */
+async function paypalToken(): Promise<string> {
+  const id = process.env.PAYPAL_CLIENT_ID, secret = process.env.PAYPAL_CLIENT_SECRET;
+  if (!id || !secret) throw new Error("PayPal no está configurado");
+  const base = process.env.PAYPAL_API_BASE || "https://api-m.paypal.com";
+  const res = await fetch(`${base}/v1/oauth2/token`, {
+    method: "POST",
+    headers: { Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: "grant_type=client_credentials",
+  });
+  const tok = await res.json();
+  if (!res.ok) throw new Error("Error autenticando con PayPal");
+  return tok.access_token;
+}
+
+/** Cobra una orden ya aprobada por el comprador. Aprobar no mueve dinero; capturar sí. */
+export async function capturePaypalOrder(orderId: string) {
+  const base = process.env.PAYPAL_API_BASE || "https://api-m.paypal.com";
+  const res = await fetch(`${base}/v2/checkout/orders/${orderId}/capture`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${await paypalToken()}`,
+      "Content-Type": "application/json",
+      "PayPal-Request-Id": `capture-${orderId}`,
+    },
+  });
+  const data = await res.json();
+  // 422 ORDER_ALREADY_CAPTURED: el webhook se nos adelantó, no es un error.
+  if (!res.ok && data?.details?.[0]?.issue !== "ORDER_ALREADY_CAPTURED") {
+    throw new Error(data?.message || "Error capturando la orden de PayPal");
+  }
+  return data;
 }
 
 // ============================================================

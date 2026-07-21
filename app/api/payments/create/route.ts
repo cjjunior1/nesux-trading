@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
 import {
-  applyBankDiscount, getBankAccounts,
+  getBankAccounts, getUsdToDop, toDop,
   createNowPayment, createStripeSession, createPaypalOrder,
 } from "@/lib/payments";
+import { useDirectCrypto, getCryptoWallet, reserveUniqueAmount, CRYPTO_WINDOW_MIN } from "@/lib/crypto-direct";
 
 export const dynamic = "force-dynamic";
 
-const METHODS = ["crypto", "stripe", "paypal", "bank_transfer"];
+const METHODS = ["crypto", "card", "stripe", "paypal", "bank_transfer"];
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
@@ -60,18 +61,54 @@ export async function POST(req: Request) {
   try {
     switch (method) {
       case "bank_transfer": {
-        const { amount: discounted, discount } = applyBankDiscount(amount);
+        const accounts = getBankAccounts();
+        if (!accounts.length) throw new Error("La transferencia bancaria no está disponible por ahora. Elige otro método.");
         const reference = user.clientId || payment.id;
-        await prisma.payment.update({ where: { id: payment.id }, data: { amount: discounted, reference } });
+
+        // Las cuentas son en pesos: le mostramos al alumno el monto en DOP,
+        // pero el pago se sigue registrando en USD (moneda del catálogo).
+        const needsDop = accounts.some((a) => (a.currency || "").toUpperCase() === "DOP");
+        const rate = getUsdToDop();
+        if (needsDop && !rate) {
+          throw new Error("La transferencia bancaria no está disponible por ahora. Elige otro método.");
+        }
+
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { reference, providerMetadata: needsDop ? { display_currency: "DOP", rate } : undefined },
+        });
         return NextResponse.json({
           payment_id: payment.id,
-          bank_accounts: getBankAccounts(),
+          bank_accounts: accounts,
           reference,
-          amount: discounted,
-          discount_applied: discount,
+          amount,
+          ...(needsDop ? { amount_dop: toDop(amount, rate!), rate } : {}),
         });
       }
       case "crypto": {
+        // Modo directo: el alumno paga a nuestra wallet, sin procesador de por medio.
+        if (useDirectCrypto()) {
+          const address = getCryptoWallet()!;
+          const payAmount = await reserveUniqueAmount(amount);
+          const expiresAt = new Date(Date.now() + CRYPTO_WINDOW_MIN * 60_000);
+          await prisma.payment.update({
+            where: { id: payment.id },
+            data: {
+              amount: payAmount, // monto único: así identificamos el depósito
+              providerMetadata: { mode: "direct_trc20", address, network: "TRC20", expiresAt: expiresAt.toISOString() },
+            },
+          });
+          return NextResponse.json({
+            payment_id: payment.id,
+            pay_address: address,
+            pay_amount: payAmount,
+            pay_currency: "usdttrc20",
+            network: "TRON (TRC20)",
+            exact_amount: true,
+            expires_at: expiresAt.toISOString(),
+          });
+        }
+
         const np = await createNowPayment({ paymentId: payment.id, userId, amount, currency, payCurrency: body.pay_currency, description: productName });
         await prisma.payment.update({ where: { id: payment.id }, data: { providerPaymentId: String(np.payment_id), providerMetadata: np } });
         return NextResponse.json({
@@ -88,9 +125,17 @@ export async function POST(req: Request) {
         await prisma.payment.update({ where: { id: payment.id }, data: { providerPaymentId: s.id, providerMetadata: s } });
         return NextResponse.json({ payment_id: payment.id, checkout_url: s.url });
       }
+      // "card" también va por PayPal, pero abriendo el formulario de tarjeta
+      // (pago como invitado, sin cuenta PayPal).
+      case "card":
       case "paypal": {
-        const o = await createPaypalOrder({ paymentId: payment.id, amount, currency });
-        const approve = (o.links || []).find((l: any) => l.rel === "approve")?.href || null;
+        const o = await createPaypalOrder({
+          paymentId: payment.id, amount, currency, productName,
+          cardFirst: method === "card",
+        });
+        // Con payment_source el enlace viene como "payer-action" en vez de "approve".
+        const approve = (o.links || []).find((l: any) => l.rel === "payer-action" || l.rel === "approve")?.href || null;
+        if (!approve) throw new Error("PayPal no devolvió el enlace de pago");
         await prisma.payment.update({ where: { id: payment.id }, data: { providerPaymentId: o.id, providerMetadata: o } });
         return NextResponse.json({ payment_id: payment.id, checkout_url: approve });
       }

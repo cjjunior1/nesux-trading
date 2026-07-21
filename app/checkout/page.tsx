@@ -8,11 +8,11 @@ import {
   Bitcoin, CreditCard, Landmark, CheckCircle, Copy, Loader2, ArrowRight, ShieldCheck,
 } from "lucide-react";
 
-type Method = "crypto" | "stripe" | "paypal" | "bank_transfer";
+type Method = "crypto" | "card" | "paypal" | "bank_transfer";
 
 const METHODS: { id: Method; label: string; icon: any; note?: string }[] = [
-  { id: "bank_transfer", label: "Transferencia bancaria", icon: Landmark, note: "10% de descuento" },
-  { id: "stripe", label: "Tarjeta de crédito/débito", icon: CreditCard },
+  { id: "bank_transfer", label: "Transferencia bancaria", icon: Landmark },
+  { id: "card", label: "Tarjeta de crédito/débito", icon: CreditCard, note: "No necesitas cuenta PayPal" },
   { id: "crypto", label: "Criptomonedas (USDT, BTC…)", icon: Bitcoin },
   { id: "paypal", label: "PayPal", icon: () => <span className="font-bold text-sky-400">P</span> },
 ];
@@ -126,9 +126,30 @@ function CheckoutInner() {
         {result?.bank_accounts && (
           <div className="card">
             <h2 className="text-lg font-bold text-white mb-1">Datos para tu transferencia</h2>
-            <p className="text-sm text-slate-400 mb-4">
-              Transfiere <b className="text-emerald-400">${result.amount.toFixed(2)} USD</b> (ahorraste ${result.discount_applied.toFixed(2)}) a <b>cualquiera</b> de estas cuentas y coloca la referencia en el concepto.
-            </p>
+            {result.amount_dop ? (
+              <>
+                <p className="text-sm text-slate-400 mb-3">
+                  Transfiere este monto a <b>cualquiera</b> de estas cuentas y coloca la referencia en el concepto.
+                </p>
+                <div className="bg-slate-800 rounded-lg p-3 mb-4">
+                  <div className="text-xs text-slate-400">Monto a transferir</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-2xl font-bold text-emerald-400">
+                      RD$ {result.amount_dop.toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <button onClick={() => copy(String(result.amount_dop), "dop")} className="text-slate-500 hover:text-emerald-400"><Copy size={16} /></button>
+                  </div>
+                  {copied === "dop" && <span className="text-emerald-400 text-xs">✓ Copiado</span>}
+                  <p className="text-xs text-slate-500 mt-1">
+                    Equivale a ${result.amount.toFixed(2)} USD (tasa RD$ {result.rate} por dólar).
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-slate-400 mb-4">
+                Transfiere <b className="text-emerald-400">${result.amount.toFixed(2)} USD</b> a <b>cualquiera</b> de estas cuentas y coloca la referencia en el concepto.
+              </p>
+            )}
 
             {/* Referencia destacada (igual para todas las cuentas) */}
             <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 mb-4 flex items-center justify-between">
@@ -170,9 +191,24 @@ function CheckoutInner() {
             <h2 className="text-lg font-bold text-white mb-1">Paga con cripto</h2>
             <p className="text-sm text-slate-400 mb-4">Envía exactamente esta cantidad a la dirección. El acceso se activa al confirmarse en la red.</p>
             <div className="bg-slate-800 rounded-lg p-3 mb-3">
-              <div className="text-xs text-slate-400">Monto</div>
-              <div className="text-xl font-bold text-emerald-400">{result.pay_amount} {String(result.pay_currency).toUpperCase()}</div>
+              <div className="text-xs text-slate-400">Monto exacto</div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xl font-bold text-emerald-400">{result.pay_amount} {result.network ? "USDT" : String(result.pay_currency).toUpperCase()}</span>
+                <button onClick={() => copy(String(result.pay_amount), "amt")} className="text-slate-500 hover:text-emerald-400"><Copy size={16} /></button>
+              </div>
+              {copied === "amt" && <span className="text-emerald-400 text-xs">✓ Copiado</span>}
+              {result.exact_amount && (
+                <p className="text-xs text-amber-300 mt-2">
+                  Envía este monto <b>al céntimo</b>: así identificamos tu pago automáticamente. Si envías otra cantidad, la activación tardará.
+                </p>
+              )}
             </div>
+            {result.network && (
+              <div className="bg-slate-800 rounded-lg p-3 mb-3 flex justify-between items-center">
+                <span className="text-xs text-slate-400">Red</span>
+                <span className="text-sm font-medium text-white">{result.network}</span>
+              </div>
+            )}
             <div className="bg-slate-800 rounded-lg p-3 mb-3">
               <div className="text-xs text-slate-400 mb-1">Dirección</div>
               <div className="flex items-center justify-between gap-2">
@@ -181,6 +217,11 @@ function CheckoutInner() {
               </div>
               {copied === "addr" && <span className="text-emerald-400 text-xs">✓ Copiada</span>}
             </div>
+            {result.network && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-3 text-sm text-amber-200">
+                ⚠️ Envía únicamente <b>USDT por la red {result.network}</b>. Fondos enviados por otra red se pierden.
+              </div>
+            )}
             {result.pay_url && <a href={result.pay_url} target="_blank" rel="noreferrer" className="btn-secondary w-full inline-flex items-center justify-center gap-2 mb-3">Abrir página de pago <ArrowRight size={16} /></a>}
             <p className="text-xs text-slate-500 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> Esperando confirmación en la red…</p>
           </div>
