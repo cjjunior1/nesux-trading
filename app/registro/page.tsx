@@ -9,7 +9,7 @@ import {
 import { COUNTRIES, flagOf } from "@/lib/countries";
 
 export default function RegistroPage() {
-  const [formData, setFormData] = useState({ fullName: "", email: "", country: "DO", localNumber: "" });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", country: "DO", localNumber: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,10 +23,9 @@ export default function RegistroPage() {
   const validate = (data = formData) => {
     const e: Record<string, string> = {};
 
-    const words = data.fullName.trim().split(/\s+/).filter(Boolean);
-    if (words.length < 2) {
-      e.fullName = "Por favor, ingresa tu nombre y apellido completos. Necesitamos ambos para generar tu ID de usuario.";
-    }
+    // Hacen falta los dos: el ID se genera con la inicial de cada uno.
+    if (!data.firstName.trim()) e.firstName = "Ingresa tu nombre";
+    if (!data.lastName.trim()) e.lastName = "Ingresa tu apellido";
 
     if (!data.email.trim()) e.email = "El correo electrónico es obligatorio";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) e.email = "El formato del correo no es válido";
@@ -58,7 +57,8 @@ export default function RegistroPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName: formData.fullName.trim(),
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
           email: formData.email.trim(),
           whatsappNumber: fullWhatsapp(),
         }),
@@ -137,20 +137,36 @@ export default function RegistroPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-              {/* Nombre y Apellido */}
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Nombre y Apellido *</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => onChange("fullName", e.target.value)}
-                    className={`input-field pl-10 ${errors.fullName ? "border-red-500" : ""}`}
-                    placeholder="Ej: Juan Hernández"
-                  />
+              {/* Nombre y Apellido (separados: el ID usa la inicial de cada uno) */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Nombre *</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                    <input
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => onChange("firstName", e.target.value)}
+                      className={`input-field pl-10 ${errors.firstName ? "border-red-500" : ""}`}
+                      placeholder="Juan"
+                    />
+                  </div>
+                  {errors.firstName && <p className="text-red-400 text-xs mt-1">{errors.firstName}</p>}
                 </div>
-                {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Apellido *</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                    <input
+                      type="text"
+                      value={formData.lastName}
+                      onChange={(e) => onChange("lastName", e.target.value)}
+                      className={`input-field pl-10 ${errors.lastName ? "border-red-500" : ""}`}
+                      placeholder="Hernández"
+                    />
+                  </div>
+                  {errors.lastName && <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>}
+                </div>
               </div>
 
               {/* Correo */}

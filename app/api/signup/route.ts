@@ -9,20 +9,31 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    // Acepta el nuevo campo "fullName"; con compatibilidad si llegan firstName/lastName.
-    const fullName: string = body.fullName || [body.firstName, body.lastName].filter(Boolean).join(" ");
     const email: string = (body.email || "").trim();
     const whatsappNumber: string = (body.whatsappNumber || "").trim();
 
-    // --- Validaciones ---
-    const parsed = parseFullName(fullName);
-    if (!parsed) {
-      return NextResponse.json(
-        { error: "Por favor, ingresa tu nombre y apellido completos. Necesitamos ambos para generar tu ID de usuario." },
-        { status: 400 }
-      );
+    // --- Nombre y apellido ---
+    // El formulario los manda separados. Se respetan tal cual: recomponerlos y
+    // volver a partirlos rompía los nombres compuestos ("Juan Carlos" + "Pérez"
+    // daba apellido "Carlos Pérez"). Se mantiene fullName por compatibilidad
+    // con clientes viejos que aún lo envíen.
+    let firstName: string = (body.firstName || "").trim();
+    let lastName: string = (body.lastName || "").trim();
+
+    if (!firstName || !lastName) {
+      const parsed = parseFullName(body.fullName || "");
+      if (!parsed) {
+        return NextResponse.json(
+          { error: "Por favor, ingresa tu nombre y apellido completos. Necesitamos ambos para generar tu ID de usuario." },
+          { status: 400 }
+        );
+      }
+      firstName = parsed.firstName;
+      lastName = parsed.lastName;
     }
-    const { firstName, lastName, initials } = parsed;
+
+    // El ID se forma con la inicial del nombre y la del apellido (ej. Juan Hernández -> JH1001)
+    const initials = (firstName[0] + lastName[0]).toUpperCase();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "El formato del email no es válido" }, { status: 400 });
