@@ -58,13 +58,18 @@ type Trc20Transfer = {
   quant: string;
   block_ts: number;
   finalResult?: string;
+  confirmed?: boolean;
   contract_address?: string;
+  tokenInfo?: { tokenDecimal?: number };
 };
+
+/** Host de la API pública de TronScan (apis.tronscan.org quedó fuera de servicio). */
+const TRONSCAN_BASE = () => process.env.TRONSCAN_API_BASE || "https://apilist.tronscanapi.com";
 
 /** Últimas transferencias USDT-TRC20 recibidas en nuestra wallet. */
 async function fetchIncomingTransfers(address: string): Promise<Trc20Transfer[]> {
   const url =
-    `https://apis.tronscan.org/api/token_trc20/transfers` +
+    `${TRONSCAN_BASE()}/api/token_trc20/transfers` +
     `?limit=50&start=0&sort=-timestamp&count=true&filterTokenValue=0` +
     `&relatedAddress=${address}&contract_address=${USDT_TRC20_CONTRACT}`;
 
@@ -76,12 +81,15 @@ async function fetchIncomingTransfers(address: string): Promise<Trc20Transfer[]>
   const data = await res.json();
   const list: Trc20Transfer[] = data?.token_transfers || [];
   // Solo entradas confirmadas hacia nuestra dirección.
-  return list.filter((t) => t.to_address === address && (t.finalResult ?? "SUCCESS") === "SUCCESS");
+  return list.filter(
+    (t) => t.to_address === address && (t.finalResult ?? "SUCCESS") === "SUCCESS" && t.confirmed !== false
+  );
 }
 
-/** USDT usa 6 decimales; `quant` viene en unidades base. */
-function toUsdt(quant: string): number {
-  return Number(quant) / 1e6;
+/** `quant` viene en unidades base; USDT usa 6 decimales. */
+function toUsdt(t: Trc20Transfer): number {
+  const decimals = t.tokenInfo?.tokenDecimal ?? 6;
+  return Number(t.quant) / 10 ** decimals;
 }
 
 /**
@@ -104,7 +112,7 @@ export async function checkDirectCryptoPayment(paymentId: string): Promise<boole
 
   for (const t of transfers) {
     if (t.block_ts < notBefore) continue;
-    if (Math.abs(toUsdt(t.quant) - payment.amount) > AMOUNT_TOLERANCE) continue;
+    if (Math.abs(toUsdt(t) - payment.amount) > AMOUNT_TOLERANCE) continue;
 
     // Una transacción no puede pagar dos órdenes distintas.
     const alreadyUsed = await prisma.payment.findFirst({
