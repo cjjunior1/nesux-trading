@@ -14,7 +14,7 @@ export default function RegistroPage() {
   const [touched, setTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [creds, setCreds] = useState<{ clientId?: string; tempPassword?: string }>({});
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const [apiError, setApiError] = useState("");
 
   const dialOf = (c: string) => COUNTRIES.find((x) => x.c === c)?.d || "+1";
@@ -65,7 +65,7 @@ export default function RegistroPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al registrar");
-      setCreds({ clientId: data.clientId, tempPassword: data.tempPassword });
+      setRegisteredEmail(data.email || formData.email.trim());
       setSuccess(true);
     } catch (error: any) {
       setApiError(error.message || "Error al procesar el registro");
@@ -83,22 +83,9 @@ export default function RegistroPage() {
           </div>
           <h1 className="text-2xl font-bold text-white mb-4">¡Registro exitoso!</h1>
           <p className="text-slate-300 mb-4">
-            Revisa tu WhatsApp y tu correo electrónico. Te hemos enviado tu <strong className="text-emerald-400">ID de usuario</strong> y tu <strong className="text-amber-300">contraseña temporal</strong>.
+            Para poder iniciar sesión debes ir a tu <strong className="text-emerald-400">WhatsApp</strong> y a tu <strong className="text-emerald-400">correo</strong>:
+            enviamos tu <strong>ID de usuario por WhatsApp</strong> y tu <strong>contraseña al correo {registeredEmail}</strong>.
           </p>
-
-          {(creds.clientId || creds.tempPassword) && (
-            <div className="bg-slate-800/70 border border-slate-700 rounded-xl p-4 mb-4 text-left">
-              <p className="text-xs text-slate-400 mb-2 text-center">Guarda estos datos para iniciar sesión:</p>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400 text-sm">ID de usuario</span>
-                <span className="font-mono text-cyan-300 font-bold">{creds.clientId}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-t border-slate-700">
-                <span className="text-slate-400 text-sm">Contraseña temporal</span>
-                <span className="font-mono text-amber-300 font-bold">{creds.tempPassword}</span>
-              </div>
-            </div>
-          )}
 
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-6">
             <p className="text-sm text-amber-300">⚠️ Por seguridad, deberás cambiar tu contraseña la primera vez que inicies sesión.</p>
