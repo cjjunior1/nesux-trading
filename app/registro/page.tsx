@@ -10,7 +10,7 @@ import { COUNTRIES, flagOf, buildPhoneE164 } from "@/lib/countries";
 
 export default function RegistroPage() {
   const DEFAULT_COUNTRY = String(COUNTRIES.findIndex((x) => x.c === "DO"));
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", country: DEFAULT_COUNTRY, localNumber: "" });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", country: DEFAULT_COUNTRY, area: "809", localNumber: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,8 +19,14 @@ export default function RegistroPage() {
   const [apiError, setApiError] = useState("");
 
   const countryOf = (idx: string) => COUNTRIES[Number(idx)];
-  const dialOf = (idx: string) => countryOf(idx)?.d || "+1";
-  const fullWhatsapp = (data = formData) => buildPhoneE164(dialOf(data.country), data.localNumber);
+  const areasOf = (idx: string) => countryOf(idx)?.areas;
+  /** Prefijo real: el del país, más el código de área si ese país los tiene (RD). */
+  const dialOf = (data = formData) => {
+    const c = countryOf(data.country);
+    if (!c) return "+1";
+    return c.areas?.length ? `${c.d}${data.area}` : c.d;
+  };
+  const fullWhatsapp = (data = formData) => buildPhoneE164(dialOf(data), data.localNumber);
 
   const validate = (data = formData) => {
     const e: Record<string, string> = {};
@@ -41,6 +47,8 @@ export default function RegistroPage() {
 
   const onChange = (field: string, value: string) => {
     const next = { ...formData, [field]: value };
+    // Al cambiar de país, dejar seleccionado su primer código de área.
+    if (field === "country") next.area = areasOf(value)?.[0] || "";
     setFormData(next);
     if (touched) setErrors(validate(next));
   };
@@ -194,13 +202,26 @@ export default function RegistroPage() {
                   <select
                     value={formData.country}
                     onChange={(e) => onChange("country", e.target.value)}
-                    className="input-field w-auto max-w-[42%]"
+                    className="input-field w-auto max-w-[38%]"
                     title="Selecciona tu país"
                   >
                     {COUNTRIES.map((c, i) => (
                       <option key={i} value={i}>{c.n} {flagOf(c.c)} ({c.d})</option>
                     ))}
                   </select>
+                  {/* Código de área, solo en los países que tienen varios (RD) */}
+                  {areasOf(formData.country)?.length ? (
+                    <select
+                      value={formData.area}
+                      onChange={(e) => onChange("area", e.target.value)}
+                      className="input-field w-auto"
+                      title="Código de área"
+                    >
+                      {areasOf(formData.country)!.map((a) => (
+                        <option key={a} value={a}>{a}</option>
+                      ))}
+                    </select>
+                  ) : null}
                   <div className="relative flex-1">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <input
@@ -214,7 +235,7 @@ export default function RegistroPage() {
                 </div>
                 {errors.localNumber && <p className="text-red-400 text-xs mt-1">{errors.localNumber}</p>}
                 <p className="text-xs text-slate-500 mt-1">
-                  Tu WhatsApp completo: <span className="text-emerald-400 font-mono">{fullWhatsapp() || dialOf(formData.country)}</span>. Aquí recibirás tu ID.
+                  Tu WhatsApp completo: <span className="text-emerald-400 font-mono">{fullWhatsapp() || dialOf()}</span>. Aquí recibirás tu ID.
                 </p>
               </div>
 

@@ -1,7 +1,8 @@
 // Lista completa de países con su código de marcación (para el selector de WhatsApp).
 // La bandera se genera desde el código ISO-2 con flagOf() — así no hay que escribir 200 emojis.
 
-export type Country = { c: string; n: string; d: string }; // c = ISO-2, n = nombre, d = código (+xx)
+export type Country = { c: string; n: string; d: string; areas?: string[] };
+// c = ISO-2, n = nombre, d = código (+xx), areas = códigos de área a elegir aparte (ej. RD)
 
 /** Convierte un ISO-2 (ej. "DO") en su emoji de bandera. */
 export function flagOf(iso2: string): string {
@@ -184,11 +185,9 @@ export const COUNTRIES: Country[] = [
   { c: "GB", n: "Reino Unido", d: "+44" },
   { c: "CF", n: "República Centroafricana", d: "+236" },
   { c: "CZ", n: "República Checa", d: "+420" },
-  // RD tiene tres códigos de área y los tres están en uso. Con "+1" a secas el
-  // alumno tenía que acordarse de escribirlo; así lo elige y no se equivoca.
-  { c: "DO", n: "República Dominicana (809)", d: "+1809" },
-  { c: "DO", n: "República Dominicana (829)", d: "+1829" },
-  { c: "DO", n: "República Dominicana (849)", d: "+1849" },
+  // RD usa tres códigos de área. Se eligen en un desplegable aparte para no
+  // repetir el país tres veces en la lista.
+  { c: "DO", n: "República Dominicana", d: "+1", areas: ["809", "829", "849"] },
   { c: "RE", n: "Reunión", d: "+262" },
   { c: "RW", n: "Ruanda", d: "+250" },
   { c: "RO", n: "Rumanía", d: "+40" },
