@@ -18,7 +18,7 @@ import {
 
 const courses = [
   {
-    id: "basico",
+    id: "curso-basico",
     title: "Curso Básico",
     subtitle: "Fundamentos del Trading",
     description:
@@ -40,7 +40,7 @@ const courses = [
     bonuses: ["Compromiso de un año", "Acceso a comunidad básica", "Certificado de finalización"],
   },
   {
-    id: "intermedio",
+    id: "curso-intermedio",
     title: "Curso Intermedio",
     subtitle: "Estrategias Avanzadas",
     description:
@@ -68,7 +68,7 @@ const courses = [
     ],
   },
   {
-    id: "profesional",
+    id: "trading-otro-nivel",
     title: "Trading a Otro Nivel",
     subtitle: "Estrategias Avanzadas",
     description:

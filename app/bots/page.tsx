@@ -24,7 +24,8 @@ import {
 
 const bots = [
   {
-    name: " CJ Bot Lite",
+    slug: "cj-bot-lite",
+    name: "CJ Bot Lite",
     description: "Perfecto para comenzar con trading automatizado. Operaciones simples y seguras.",
     accounts: "Para una cuenta Real y dos demos",
     price: 99.99,
@@ -41,6 +42,7 @@ const bots = [
     buttonText: "claro que si",
   },
   {
+    slug: "cj-bot-standard",
     name: "CJ Bot Standard",
     description: "Múltiples estrategias y pares para traders intermedios que buscan diversificar.",
     accounts: "Para dos cuentas Reales y cuatro demos",
@@ -59,6 +61,7 @@ const bots = [
     buttonText: "My Standard",
   },
   {
+    slug: "cj-bot-premium",
     name: "CJ Bot Premium",
     description: "Solución institucional con las mejores herramientas y soporte dedicado.",
     accounts: "Para tres cuentas Reales y seis demos",
@@ -102,7 +105,7 @@ const features = [
 
 const courses = [
   {
-    id: "basico",
+    id: "academia-plus-2",
     title: "Academia Plus/Bots 2 Users",
     subtitle: "Beneficios del Plan",
     description:
@@ -122,7 +125,7 @@ const courses = [
     ],
   },
   {
-    id: "intermedio",
+    id: "academia-plus-3",
     title: "Academia Plus/Bots 3 Users",
     subtitle: "Estrategias Avanzadas",
     description:
@@ -143,7 +146,7 @@ const courses = [
     ],
   },
   {
-    id: "profesional",
+    id: "academia-plus-5",
     title: "Academia Plus/Bots 5 Users",
     subtitle: "Trading Institucional",
     description:
@@ -322,7 +325,7 @@ export default function BotsPage() {
                 </ul>
 
                 <Link
-                  href={`/checkout?product=${bot.name}&amount=${bot.price}`}
+                  href={`/checkout?product=${bot.slug}&amount=${bot.price}`}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all text-white"
                   style={{
                     backgroundColor: bot.colorHex,
