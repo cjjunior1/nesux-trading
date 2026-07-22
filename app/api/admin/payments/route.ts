@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { guardAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
+import { bizWhere } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,8 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status") || "";
   const method = searchParams.get("method") || "";
-  const where: any = {};
+  // Solo los pagos de este negocio: la base es compartida.
+  const where: any = { ...(await bizWhere()) };
   if (status) where.status = status;
   if (method) where.method = method;
 
@@ -21,7 +23,7 @@ export async function GET(req: Request) {
       where, orderBy: { createdAt: "desc" }, take: 100,
       include: { user: { select: { firstName: true, lastName: true, email: true, clientId: true } } },
     }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid" } }),
+    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", ...(await bizWhere()) } }),
   ]);
 
   return NextResponse.json({

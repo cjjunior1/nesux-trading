@@ -1,3 +1,17 @@
+// =============================================================================
+//  ESQUEMA ESPEJO — NO EDITAR AQUI
+//
+//  La fuente de verdad es "2- Nesux Landing/prisma/schema.prisma".
+//  Esta app comparte la MISMA base de datos que Nesux y el resto de negocios.
+//
+//  NUNCA ejecutes 'prisma db push' ni 'prisma migrate' desde este proyecto:
+//  este esquema podria quedar desfasado respecto al de Nesux y Prisma ofreceria
+//  BORRAR las tablas que aqui no aparezcan. Los cambios de esquema se hacen
+//  siempre en Nesux, y luego se copia el archivo aqui.
+//
+//  Copiado el 2026-07-21.
+// =============================================================================
+
 generator client {
     provider = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
@@ -8,9 +22,58 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// Cada negocio de Nesux (Trading Academy, IA, Litio, VS Code…).
+// Guarda su identidad y, opcionalmente, sus propias credenciales de cobro.
+// Si una credencial es null, se usa la global del .env (compatibilidad hacia atrás).
+model Business {
+  id        String   @id @default(cuid())
+  slug      String   @unique // "trading" | "ia" | "litio" | "vscode"
+  name      String
+  isActive  Boolean  @default(true)
+
+  // --- Config del BOT por negocio (Fase 4 multi-negocio) ---
+  tagline         String?  // frase corta de qué hace
+  personaStyle    String?  // tono/personalidad del bot para este negocio
+  botKnowledge    String?  // conocimiento base en texto (además del inventario)
+  contactEmail    String?
+  contactWhatsapp String?
+  website         String?
+  subscribed      Boolean  @default(true) // mensualidad al día (para cortar el bot si no paga)
+
+  // Datos/credenciales de cobro por negocio (opcionales)
+  bankAccounts         Json?   // array de cuentas bancarias para transferencia
+  stripeSecretKey      String?
+  stripeWebhookSecret  String?
+  paypalClientId       String?
+  paypalClientSecret   String?
+  nowpaymentsApiKey    String?
+  nowpaymentsIpnSecret String?
+
+  apiKey    String?  @unique // clave para que el negocio consuma la API (futuro)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  members       UserBusiness[]
+  payments      Payment[]
+  courses       Course[]
+  subscriptions Subscription[]
+  leads         Lead[]
+  products      Product[]
+  botProducts   BotProduct[]
+
+  @@index([slug])
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
+  // Negocio por el que se registró la PRIMERA vez (de dónde vino).
+  // Para saber a qué negocios pertenece HOY, mirar la relación `businesses`:
+  // una misma persona puede estar en Trading y en Litio a la vez.
+  businessId        String?
+  business          Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  businesses        UserBusiness[]
   password          String
   firstName         String
   lastName          String
@@ -46,6 +109,25 @@ model User {
   @@index([status])
   @@index([role])
   @@index([createdAt])
+  @@index([businessId])
+}
+
+// A qué negocios pertenece una persona.
+//
+// La cuenta es ÚNICA en todo Nesux: mismo correo, mismo WhatsApp, misma
+// contraseña y mismo ID de cliente. Si alguien que ya es alumno de Trading se
+// inscribe en Litio, NO se crea otro usuario: se le añade una fila aquí y pasa
+// a estar en los dos. Cada negocio lo ve en su panel como alumno suyo.
+model UserBusiness {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, businessId])
+  @@index([businessId])
 }
 
 // Suscripción de un usuario a un plan. currentPeriodEnd define el vencimiento:
@@ -54,6 +136,8 @@ model Subscription {
   id               String    @id @default(cuid())
   userId           String
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId       String?
+  business         Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
   plan             String    // basico | intermedio | profesional | vip
   status           String    @default("active") // active | past_due | canceled | expired
   amount           Float     @default(0)
@@ -65,6 +149,7 @@ model Subscription {
   payments         Payment[]
 
   @@index([userId])
+  @@index([businessId])
   @@index([status])
   @@index([currentPeriodEnd])
 }
@@ -74,10 +159,12 @@ model Payment {
   id                String        @id @default(cuid())
   userId            String
   user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId        String?
+  business          Business?     @relation(fields: [businessId], references: [id], onDelete: SetNull)
   subscriptionId    String?
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  courseId          String?       // curso que desbloquea (acceso / compatibilidad)
-  productId         String?       // producto del catálogo (course | bot | plan)
+  courseId          String?       // producto/curso comprado
+  productId         String?       // artículo del catálogo que se compró
   product           Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   amount            Float
   currency          String        @default("USD")
@@ -91,35 +178,11 @@ model Payment {
   updatedAt         DateTime      @default(now()) @updatedAt
 
   @@index([userId])
+  @@index([businessId])
+  @@index([productId])
   @@index([status])
   @@index([paidAt])
   @@index([providerPaymentId])
-  @@index([productId])
-}
-
-// Catálogo unificado: cursos, bots y planes. Cada uno con su identidad y su precio.
-model Product {
-  id             String    @id @default(cuid())
-  kind           String    // "course" | "bot" | "plan"
-  slug           String    @unique
-  name           String
-  subtitle       String?
-  description    String    @default("")
-  imageUrl       String?
-  price          Float     @default(0)
-  originalPrice  Float?    // precio tachado / de referencia (opcional)
-  currency       String    @default("USD")
-  badge          String?   // ej. "Más vendido", "VIP"
-  features       Json?     // lista de beneficios (string[])
-  grantsCourseId String?   // curso que desbloquea al comprar (para kind=course|plan)
-  isPublished    Boolean   @default(true)
-  order          Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  payments       Payment[]
-
-  @@index([kind])
-  @@index([isPublished])
 }
 
 // Notas internas del administrador sobre un usuario.
@@ -177,16 +240,25 @@ model AppSetting {
 }
 
 model Lead {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
+  businessId     String?
+  business       Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
   email          String
   firstName      String?
   lastName       String?
   whatsappNumber String?
-  source         String?  @default("website")
-  status         String   @default("new")
+  source         String?   @default("website")
+  status         String    @default("new")
+  ownerName      String?
+  followUpAt     DateTime?
+  lastContactAt  DateTime?
   notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([businessId])
+  @@index([status])
+  @@index([followUpAt])
 }
 
 model ContactSubmission {
@@ -234,6 +306,8 @@ model ChatTopic {
 
 model Course {
   id          String             @id @default(cuid())
+  businessId  String?
+  business    Business?          @relation(fields: [businessId], references: [id], onDelete: SetNull)
   slug        String             @unique
   title       String
   description String
@@ -309,4 +383,194 @@ model UserProgress {
   updatedAt   DateTime     @updatedAt
   
   @@unique([userId, lessonId])
+}
+
+// --- Recursos: departamentos (categorías por curso o bot). El contenido va aparte. ---
+model ResourceDept {
+  id          String   @id @default(cuid())
+  name        String
+  kind        String   @default("curso") // "curso" | "bot"
+  icon        String?  // emoji opcional
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([kind])
+}
+
+// --- Publicidad: cupones de descuento ---
+model Coupon {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  type         String    @default("percent") // "percent" | "fixed"
+  value        Float                          // 10 = 10% (percent) o 10 = $10 (fixed)
+  businessSlug String?                        // opcional: limitar a un negocio
+  active       Boolean   @default(true)
+  expiresAt    DateTime?
+  maxUses      Int?                           // null = ilimitado
+  usedCount    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// --- Archivos subidos (biblioteca de material: documentos, imágenes, videos cortos) ---
+model MediaAsset {
+  id        String   @id @default(cuid())
+  url       String
+  name      String
+  type      String   @default("document") // "image" | "video" | "document"
+  size      Int      @default(0)
+  context   String   @default("publicidad") // dónde se usa
+  createdAt DateTime @default(now())
+
+  @@index([context])
+}
+
+// --- Historial de mensajes enviados (anuncios por email / WhatsApp) ---
+// Se organiza como carpetas en el panel: Sección (comunicacion|publicidad) -> Negocio -> mensajes.
+model SentMessage {
+  id            String   @id @default(cuid())
+  section       String   @default("comunicacion") // "comunicacion" | "publicidad"
+  channel       String   @default("email")        // "email" | "whatsapp"
+  businessSlug  String   @default("")             // "" = todos los negocios
+  businessLabel String   @default("Todos los negocios")
+  title         String                            // asunto/título del mensaje
+  html          String                            // cuerpo del mensaje ya renderizado (HTML)
+  recipients    Int      @default(0)              // nº de destinatarios
+  sentAt        DateTime @default(now())
+
+  @@index([section, businessSlug])
+  @@index([sentAt])
+}
+
+// --- Correo: bitácora de respuestas ENVIADAS desde la bandeja del panel ---
+model EmailLog {
+  id           String   @id @default(cuid())
+  business     String   @default("trading")
+  toAddr       String
+  toName       String   @default("")
+  subject      String
+  html         String   // cuerpo enviado (con formato)
+  attachments  String   @default("[]") // JSON: [{name,url}]
+  createdAt    DateTime @default(now())
+
+  @@index([business])
+  @@index([createdAt])
+}
+
+// --- WhatsApp: contacto/conversación entrante (Cloud API) ---
+model WaContact {
+  id           String      @id @default(cuid())
+  waId         String      @unique // número del cliente (solo dígitos, con código de país)
+  name         String?     // nombre de perfil de WhatsApp
+  state        String      @default("new") // estado del flujo del bot
+  lastInboundAt DateTime?  // último mensaje que ENVIÓ el cliente (para la ventana de 24h)
+  keepaliveAt  DateTime?   // último recordatorio "sesión por expirar" enviado (evita repetir)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  messages     WaMessage[]
+
+  @@index([lastInboundAt])
+}
+
+// Inventario que el bot de WhatsApp menciona en la conversación (precios "de boca").
+// Se llamaba Product, pero ese nombre lo ocupa ahora el catálogo de venta real
+// (el que se cobra y se referencia desde Payment). Son cosas distintas.
+model BotProduct {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name        String
+  price       String?  // texto libre: "$149.99", "RD$2,500/mes"...
+  description String?
+  url         String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([businessId, active])
+}
+
+// Catálogo de venta: lo que el cliente compra y a lo que apunta un Payment.
+// Viene de la app de Trading, que ya lo tenía en producción con datos reales.
+model Product {
+  id             String    @id @default(cuid())
+  businessId     String?
+  business       Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  kind           String    // "course" | "bot" | "plan"
+  slug           String    @unique
+  name           String
+  subtitle       String?
+  description    String    @default("")
+  imageUrl       String?
+  price          Float     @default(0)
+  originalPrice  Float?    // precio tachado / de referencia (opcional)
+  currency       String    @default("USD")
+  badge          String?   // ej. "Más vendido", "VIP"
+  features       Json?     // lista de beneficios (string[])
+  grantsCourseId String?   // curso que desbloquea al comprar (para kind=course|plan)
+  isPublished    Boolean   @default(true)
+  order          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  payments       Payment[]
+
+  @@index([businessId])
+  @@index([kind])
+  @@index([isPublished])
+}
+
+// --- UNIFICACIÓN Fase 3: IDENTIDAD única (una persona a través de los canales) ---
+model Identity {
+  id        String       @id @default(cuid())
+  email     String?      @unique // clave cuando está logueado / dejó su correo
+  waId      String?      @unique // clave del canal WhatsApp (número)
+  name      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  memory    MemoryTurn[]
+}
+
+// Memoria COMPARTIDA entre canales (web, WhatsApp): turnos de conversación por persona.
+model MemoryTurn {
+  id         String   @id @default(cuid())
+  identityId String
+  identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  channel    String   // "web" | "whatsapp" | ...
+  role       String   // "user" | "assistant"
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@index([identityId, createdAt])
+}
+
+// --- WhatsApp: AGENDA / recordatorios de eventos (los agenda el creador CJ) ---
+model Reminder {
+  id         String    @id @default(cuid())
+  ownerWaId  String    // quién lo agendó (el creador identificado)
+  targetWaId String    // a quién se le recuerda (por defecto, el mismo owner)
+  text       String    // qué recordar (el evento)
+  fireAt     DateTime  // cuándo dispararlo (en UTC)
+  recurring  String?   // null | "daily" | "weekly" | "monthly"
+  voice      Boolean   @default(false) // enviar como nota de voz
+  sent       Boolean   @default(false) // ya disparado (para los de una sola vez)
+  canceled   Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+
+  @@index([fireAt, sent, canceled])
+  @@index([ownerWaId])
+}
+
+// --- WhatsApp: bitácora de mensajes (entrantes y salientes) ---
+model WaMessage {
+  id        String    @id @default(cuid())
+  contactId String
+  contact   WaContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  wamid     String?   @unique // id del mensaje en Meta (para no duplicar)
+  direction String    // "in" | "out"
+  type      String    @default("text") // text | template | image | ...
+  body      String?   // texto del mensaje
+  createdAt DateTime  @default(now())
+
+  @@index([contactId])
 }

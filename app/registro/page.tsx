@@ -16,6 +16,9 @@ export default function RegistroPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
+  // Quien ya tenia cuenta Nesux no recibe credenciales nuevas: se le vincula a este
+  // negocio y entra con las de siempre. La pantalla final debe decir eso, no "revisa tu correo".
+  const [avisoCuentaExistente, setAvisoCuentaExistente] = useState("");
   const [apiError, setApiError] = useState("");
 
   const countryOf = (idx: string) => COUNTRIES[Number(idx)];
@@ -76,6 +79,7 @@ export default function RegistroPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al registrar");
       setRegisteredEmail(data.email || formData.email.trim());
+      setAvisoCuentaExistente(data.alreadyRegistered ? data.message || "" : "");
       setSuccess(true);
     } catch (error: any) {
       setApiError(error.message || "Error al procesar el registro");
@@ -91,15 +95,23 @@ export default function RegistroPage() {
           <div className="bg-emerald-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-10 w-10 text-emerald-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-4">¡Registro exitoso!</h1>
-          <p className="text-slate-300 mb-4">
-            Para poder iniciar sesión debes ir a tu <strong className="text-emerald-400">WhatsApp</strong> y a tu <strong className="text-emerald-400">correo</strong>:
-            enviamos tu <strong>ID de usuario por WhatsApp</strong> y tu <strong>contraseña al correo {registeredEmail}</strong>.
-          </p>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            {avisoCuentaExistente ? "¡Ya estás dentro!" : "¡Registro exitoso!"}
+          </h1>
+          {avisoCuentaExistente ? (
+            <p className="text-slate-300 mb-4">{avisoCuentaExistente}</p>
+          ) : (
+            <p className="text-slate-300 mb-4">
+              Para poder iniciar sesión debes ir a tu <strong className="text-emerald-400">WhatsApp</strong> y a tu <strong className="text-emerald-400">correo</strong>:
+              enviamos tu <strong>ID de usuario por WhatsApp</strong> y tu <strong>contraseña al correo {registeredEmail}</strong>.
+            </p>
+          )}
 
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-6">
-            <p className="text-sm text-amber-300">⚠️ Por seguridad, deberás cambiar tu contraseña la primera vez que inicies sesión.</p>
-          </div>
+          {!avisoCuentaExistente && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mb-6">
+              <p className="text-sm text-amber-300">⚠️ Por seguridad, deberás cambiar tu contraseña la primera vez que inicies sesión.</p>
+            </div>
+          )}
           <Link href="/login" className="btn-primary w-full flex items-center justify-center gap-2">
             Ir a Iniciar Sesión <ArrowRight className="h-4 w-4" />
           </Link>

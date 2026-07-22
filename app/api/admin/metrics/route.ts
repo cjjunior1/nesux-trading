@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { guardAdmin } from "@/lib/admin-guard";
 import { getDashboardMetrics } from "@/lib/metrics";
+import { getBusinessId } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,8 @@ export async function GET() {
   if (!guard.ok) return guard.response;
 
   try {
-    const metrics = await getDashboardMetrics();
+    // Métricas solo de este negocio: la base es compartida.
+    const metrics = await getDashboardMetrics(await getBusinessId());
     return NextResponse.json(metrics);
   } catch (e: any) {
     console.error("[admin/metrics]", e);

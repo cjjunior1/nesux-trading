@@ -2,6 +2,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
+import { bizWhere, getBusinessId } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     const courses = await prisma.course.findMany({
-      where: { isPublished: true },
+      where: { isPublished: true, ...(await bizWhere()) },
       include: {
         modules: {
           select: { id: true },
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     const course = await prisma.course.create({
       data: {
+        businessId: await getBusinessId(),
         slug,
         title,
         description: description || "",

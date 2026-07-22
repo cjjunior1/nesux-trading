@@ -14,10 +14,17 @@ export type { PaymentStanding } from "@/lib/metrics-pure";
 //  CONSULTAS A LA BD
 // ========================================================================
 
-export async function getDashboardMetrics() {
+export async function getDashboardMetrics(businessId?: string) {
   const now = new Date();
   const d30 = new Date(now.getTime() - 30 * 86400000);
   const d60 = new Date(now.getTime() - 60 * 86400000);
+
+  // Filtro por negocio (si se indica).
+  // Para USUARIOS va por pertenencia: alguien que entró por otro negocio y luego
+  // se inscribió aquí también cuenta como alumno nuestro (tabla UserBusiness).
+  // Para lo demás (leads, pagos, suscripciones) el negocio es un campo directo.
+  const biz = businessId ? { businessId } : {};
+  const bizUser = businessId ? { businesses: { some: { businessId } } } : {};
 
   const [
     totalUsers,
@@ -34,19 +41,19 @@ export async function getDashboardMetrics() {
     recentSignups,
     recentPayments,
   ] = await Promise.all([
-    prisma.user.count({ where: { role: "user", deletedAt: null } }),
-    prisma.user.count({ where: { role: "user", deletedAt: null, status: "active" } }),
-    prisma.user.count({ where: { role: "user", deletedAt: null, status: "suspended" } }),
-    prisma.user.count({ where: { role: "user", deletedAt: { not: null } } }),
-    prisma.user.count({ where: { role: "user", deletedAt: null, createdAt: { gte: d30 } } }),
-    prisma.lead.count(),
-    prisma.subscription.count({ where: { status: { notIn: ["canceled", "expired"] }, currentPeriodEnd: { gte: now } } }),
-    prisma.subscription.count({ where: { status: { notIn: ["canceled", "expired"] }, OR: [{ currentPeriodEnd: { lt: now } }, { status: "past_due" }] } }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid" } }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", paidAt: { gte: d30 } } }),
-    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", paidAt: { gte: d60, lt: d30 } } }),
-    prisma.user.findMany({ where: { role: "user", createdAt: { gte: d30 } }, select: { createdAt: true } }),
-    prisma.payment.findMany({ where: { status: "paid", paidAt: { gte: d30 } }, select: { paidAt: true, amount: true } }),
+    prisma.user.count({ where: { role: "user", deletedAt: null, ...bizUser } }),
+    prisma.user.count({ where: { role: "user", deletedAt: null, status: "active", ...bizUser } }),
+    prisma.user.count({ where: { role: "user", deletedAt: null, status: "suspended", ...bizUser } }),
+    prisma.user.count({ where: { role: "user", deletedAt: { not: null }, ...bizUser } }),
+    prisma.user.count({ where: { role: "user", deletedAt: null, createdAt: { gte: d30 }, ...bizUser } }),
+    prisma.lead.count({ where: { ...biz } }),
+    prisma.subscription.count({ where: { status: { notIn: ["canceled", "expired"] }, currentPeriodEnd: { gte: now }, ...biz } }),
+    prisma.subscription.count({ where: { status: { notIn: ["canceled", "expired"] }, OR: [{ currentPeriodEnd: { lt: now } }, { status: "past_due" }], ...biz } }),
+    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", ...biz } }),
+    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", paidAt: { gte: d30 }, ...biz } }),
+    prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "paid", paidAt: { gte: d60, lt: d30 }, ...biz } }),
+    prisma.user.findMany({ where: { role: "user", createdAt: { gte: d30 }, ...bizUser }, select: { createdAt: true } }),
+    prisma.payment.findMany({ where: { status: "paid", paidAt: { gte: d30 }, ...biz }, select: { paidAt: true, amount: true } }),
   ]);
 
   const revenue30 = rev30._sum.amount || 0;
@@ -76,13 +83,8 @@ export async function getDashboardMetrics() {
     leads: leadCount,
     trends: {
       signups: bucketByDay(recentSignups.map((u) => ({ date: u.createdAt, value: 1 })), 30, now),
-      revenue: bucketByDay(
-        recentPayments
-          .filter((p): p is { paidAt: Date; amount: number } => p.paidAt !== null)
-          .map((p) => ({ date: p.paidAt, value: p.amount })),
-        30,
-        now,
-      ),
+      // paidAt está garantizado no-nulo por el filtro `paidAt: { gte: d30 }` de la consulta.
+      revenue: bucketByDay(recentPayments.map((p) => ({ date: p.paidAt!, value: p.amount })), 30, now),
     },
   };
 }

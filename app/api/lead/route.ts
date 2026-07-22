@@ -1,5 +1,6 @@
   import { NextResponse } from "next/server";
   import { prisma } from "@/lib/db";
+import { getBusinessId } from "@/lib/business";
 
   export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@
 
       const lead = await prisma.lead.create({
         data: {
+          businessId: await getBusinessId(),
           email: email.toLowerCase(),
           firstName: firstName || null,
           lastName: lastName || null,

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { parseFullName, generateTempPassword, nextClientId } from "@/lib/account";
 import { sendNewAccountCredentials } from "@/lib/notify";
+import { getBusinessId, vincularANegocio } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
@@ -43,10 +44,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "El número de WhatsApp debe incluir el código de país (ej: +521234567890)" }, { status: 400 });
     }
 
-    const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    // La cuenta es ÚNICA en todo Nesux. Se busca por correo Y por WhatsApp: son
+    // los dos datos con los que una persona se identifica, y permitir que repita
+    // cualquiera de ellos crearía dos cuentas para el mismo ser humano.
+    const existing = await prisma.user.findFirst({
+      where: { OR: [{ email: email.toLowerCase() }, { whatsappNumber: cleanWhats }] },
+      include: { businesses: { select: { businessId: true } } },
+    });
+
     if (existing) {
-      return NextResponse.json({ error: "Ya existe una cuenta con este email" }, { status: 400 });
+      // Ya es cliente de Nesux. NO se crea otro usuario ni se toca su contraseña:
+      // se le añade a este negocio y entra con las credenciales que ya tiene.
+      const { yaPertenecia } = await vincularANegocio(existing.id);
+      const porWhatsapp = existing.email !== email.toLowerCase();
+
+      return NextResponse.json({
+        success: true,
+        alreadyRegistered: true,
+        linked: !yaPertenecia,
+        clientId: existing.clientId,
+        email: existing.email,
+        message: yaPertenecia
+          ? `Ya estabas inscrito con este ${porWhatsapp ? "número de WhatsApp" : "correo"}. ` +
+            `Inicia sesión con tu ID ${existing.clientId ?? "de usuario"} o tu correo ${existing.email}, ` +
+            `y la contraseña que ya usas.`
+          : `¡Listo! Ya tenías cuenta en Nesux, así que te sumamos a Trading Academy con ella. ` +
+            `Entra con tu ID ${existing.clientId ?? "de usuario"} o tu correo ${existing.email}, ` +
+            `y la misma contraseña de siempre.`,
+      });
     }
+
+    const businessId = await getBusinessId();
 
     // --- Generar ID y contraseña temporal ALEATORIA ---
     const clientId = await nextClientId(initials);
@@ -55,6 +83,10 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: {
+        // businessId = por dónde entró; la pertenencia real va en `businesses`,
+        // para que mañana pueda estar también en otro negocio sin duplicarse.
+        businessId,
+        businesses: { create: { businessId } },
         email: email.toLowerCase(),
         password: hashedPassword,
         firstName,
@@ -70,6 +102,7 @@ export async function POST(request: Request) {
 
     await prisma.lead.create({
       data: {
+        businessId,
         email: email.toLowerCase(),
         firstName,
         lastName,

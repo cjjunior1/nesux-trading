@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
+import { getBusinessId } from "@/lib/business";
 import {
   getBankAccounts, getUsdToDop, toDop,
   createNowPayment, createStripeSession, createPaypalOrder,
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
 
   // Crear el registro de pago (pending)
   const payment = await prisma.payment.create({
-    data: { userId, productId: resolvedProductId, courseId: grantsCourseId, method, amount, currency, status: "pending" },
+    data: { userId, businessId: await getBusinessId(), productId: resolvedProductId, courseId: grantsCourseId, method, amount, currency, status: "pending" },
   });
 
   try {

@@ -37,6 +37,9 @@ export function useDirectCrypto(): boolean {
  */
 export async function reserveUniqueAmount(baseAmount: number): Promise<number> {
   const since = new Date(Date.now() - CRYPTO_WINDOW_MIN * 60_000);
+  // A PROPOSITO sin filtrar por negocio, aunque la base sea compartida: la wallet
+  // USDT es UNA sola para todos. Si cada negocio reservara montos por separado, dos
+  // podrian reservar el mismo importe y un deposito activaria el pago equivocado.
   const live = await prisma.payment.findMany({
     where: { method: "crypto", status: "pending", createdAt: { gte: since } },
     select: { amount: true },

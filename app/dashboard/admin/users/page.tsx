@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { bizUsersWhere } from "@/lib/business";
 import { requireAdminSession } from "@/lib/admin";
 
 export default async function AdminUsersPage() {
   await requireAdminSession();
 
   const users = await prisma.user.findMany({
+    where: await bizUsersWhere(),
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

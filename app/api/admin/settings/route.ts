@@ -12,6 +12,9 @@ export async function GET() {
   const guard = await guardAdmin();
   if (!guard.ok) return guard.response;
 
+  // AppSetting es global por diseño y se comparte con los demás negocios:
+  // "client_seq" TIENE que ser un contador único para que no se repitan los ID.
+  // Contrapartida asumida: cambiar aquí "password_change_days" afecta a todos.
   const rows = await prisma.appSetting.findMany();
   const map: Record<string, string> = { ...DEFAULTS };
   for (const r of rows) map[r.key] = r.value;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { guardAdmin } from "@/lib/admin-guard";
 import { prisma } from "@/lib/db";
+import { bizUsersWhere } from "@/lib/business";
 import { classifySubscription } from "@/lib/metrics";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,8 @@ export async function GET(request: Request) {
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
   const pageSize = Math.min(100, Math.max(5, parseInt(searchParams.get("pageSize") || "20", 10)));
 
-  const where: any = { role: "user" };
+  // Base compartida entre negocios: sin este filtro saldrían clientes de IA, Litio, etc.
+  const where: any = { role: "user", ...(await bizUsersWhere()) };
   if (status === "deleted") where.deletedAt = { not: null };
   else { where.deletedAt = null; if (status) where.status = status; }
   if (q) {
