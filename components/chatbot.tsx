@@ -193,6 +193,9 @@ export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  // Archivo ya subido pero AÚN NO ENVIADO: se queda esperando a que escribas qué
+  // quieres saber de él. Antes se enviaba solo al pegarlo y no daba tiempo a pedir nada.
+  const [pending, setPending] = useState<{ url: string; fileName: string; fileType: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -751,7 +754,10 @@ export function Chatbot() {
   };
 
   const sendMessage = async (text?: string) => {
-    const msg = (text || input).trim();
+    const adjunto = pending;
+    // Con un adjunto en espera sí se puede enviar sin escribir nada: se usa una
+    // petición por defecto. Sin adjunto, el mensaje vacío se sigue ignorando.
+    const msg = (text || input).trim() || (adjunto ? 'Analiza esta imagen.' : '');
     if (!msg || isLoading) {
       // Evita quedarse bloqueado si se llamó desde la voz mientras se procesaba
       processingRef.current = false;
@@ -761,7 +767,13 @@ export function Chatbot() {
       return;
     }
     setInput("");
-    const userMessage: Message = { id: Date.now().toString(), role: "user", content: msg };
+    setPending(null);
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: msg,
+      ...(adjunto ? { fileUrl: adjunto.url, fileType: adjunto.fileType } : {}),
+    };
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     let replyText = "";
@@ -769,7 +781,7 @@ export function Chatbot() {
       const response = await fetch("/api/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sessionIdRef.current, userMessage: msg, messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })), pageContext: getPageContext(), ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}) }),
+        body: JSON.stringify({ sessionId: sessionIdRef.current, userMessage: msg, messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })), pageContext: getPageContext(), ...(adjunto ? { fileUrl: adjunto.url, fileName: adjunto.fileName } : {}), ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}) }),
       });
       if (!response.ok) throw new Error("Error");
       const data = await response.json();
@@ -851,7 +863,7 @@ export function Chatbot() {
    * `pregunta` es lo que el usuario tenía escrito al pegar: si lo hay, el
    * asistente responde a eso mirando la imagen, en vez de un análisis genérico.
    */
-  const subirYAnalizar = async (file: File, pregunta?: string) => {
+  const adjuntar = async (file: File) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -859,24 +871,9 @@ export function Chatbot() {
       const response = await fetch('/api/upload', { method: 'POST', body: formData });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Error al subir archivo');
-      const esImagen = (data.fileType || '').startsWith('image/');
-      const fileMessage: Message = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: pregunta?.trim()
-          ? pregunta.trim()
-          : esImagen
-            ? '📷 Imagen adjunta\n\nPor favor, analiza esta imagen.'
-            : `📎 Archivo adjunto: ${file.name}\n\nPor favor, analiza este archivo.`,
-        fileUrl: data.url,
-        fileType: data.fileType,
-      };
-      // Añadir mensaje con preview inmediatamente
-      setMessages(prev => [...prev, fileMessage]);
-      setInput('');
-      // Dejar de mostrar 'Subiendo...' y lanzar el análisis en background
-      setIsUploading(false);
-      analyzeFile(data.url, file.name, pregunta).catch(err => console.error('analyzeFile error:', err));
+      // No se envía nada todavía: queda enganchado al lado del campo de texto.
+      setPending({ url: data.url, fileName: data.fileName || file.name, fileType: data.fileType });
+      inputRef.current?.focus();
     } catch (error) {
       console.error('Upload error:', error);
       alert('Error al subir el archivo: ' + (error as Error).message);
@@ -889,7 +886,7 @@ export function Chatbot() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      await subirYAnalizar(file);
+      await adjuntar(file);
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -910,35 +907,7 @@ export function Chatbot() {
     // Las capturas llegan sin nombre útil: le ponemos uno con la extensión correcta.
     const ext = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
     const conNombre = new File([file], file.name || `captura-${Date.now()}.${ext}`, { type: file.type });
-    await subirYAnalizar(conNombre, input);
-  };
-
-  const analyzeFile = async (fileUrl: string, fileName: string, pregunta?: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: sessionIdRef.current,
-          userMessage: pregunta?.trim() || `Analiza este archivo: ${fileName}`,
-          messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
-          fileUrl: fileUrl,
-          fileName: fileName,
-          pageContext: getPageContext(),
-          ...(aliadoModeRef.current ? { systemPrompt: ALIADO_SYSTEM_PROMPT } : {}),
-        }),
-      });
-      if (!response.ok) throw new Error("Error en la respuesta");
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: cleanMarkdown(data.content) }]);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "assistant", content: "Lo siento, tuve un problema analizando el archivo. Por favor intenta nuevamente." }]);
-    } finally {
-      setIsLoading(false);
-    }
+    await adjuntar(conNombre);
   };
 
   // --- CONTROLES DE VENTANA ---
@@ -1259,7 +1228,30 @@ export function Chatbot() {
                   {isUploading ? 'Subiendo...' : 'Adjuntar archivo'}
                 </button>
               </div>
-              
+
+              {/* Adjunto en espera: se queda a la vista hasta que escribas qué
+                  quieres saber y pulses enviar. La X lo descarta. */}
+              {pending && (
+                <div className="flex items-center gap-3 mb-2 p-2 bg-slate-800 border border-slate-600 rounded-lg">
+                  {pending.fileType?.startsWith('image/') ? (
+                    <img src={pending.url} alt="Adjunto" className="h-14 w-14 rounded object-cover border border-slate-600 flex-shrink-0" />
+                  ) : (
+                    <Paperclip size={20} className="text-cyan-400 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-slate-200 truncate">{pending.fileName}</p>
+                    <p className="text-[11px] text-slate-400">Escribe qué quieres saber y pulsa enviar</p>
+                  </div>
+                  <button
+                    onClick={() => setPending(null)}
+                    className="text-slate-400 hover:text-red-400 px-2 text-lg leading-none"
+                    aria-label="Quitar adjunto"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <textarea
                   ref={inputRef}
@@ -1285,7 +1277,7 @@ export function Chatbot() {
                 />
                 <button
                   onClick={() => sendMessage()}
-                  disabled={isLoading || !input.trim() || isUploading}
+                  disabled={isLoading || (!input.trim() && !pending) || isUploading}
                   className="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition-colors"
                 >
                   <Send size={18} />
