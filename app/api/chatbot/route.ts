@@ -1,12 +1,118 @@
 import { NextResponse } from "next/server";
 import { readFile, readdir } from 'fs/promises';
+import fsp from 'fs/promises';
 import path from 'path';
 import Database from 'better-sqlite3';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/db";
+import { getBusinessId } from "@/lib/business";
 import chokidar from 'chokidar';
 
 // --- SQLite LOCAL (en tu PC) ---
 const dbPath = path.join(process.cwd(), 'data', 'chatbot.db');
 let db: Database.Database | null = null;
+
+
+/**
+ * Quién está escribiendo y qué ha comprado.
+ * Sale de la SESIÓN del servidor, no de lo que mande el navegador: así el
+ * asistente no puede ser engañado para tratar a cualquiera como alumno.
+ * Devuelve "" si no hay sesión (visitante anónimo).
+ */
+async function contextoDelAlumno(): Promise<string> {
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as any)?.id;
+    if (!userId) return '';
+
+    const u = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        firstName: true, lastName: true, clientId: true, email: true,
+        courseAccess: { select: { course: { select: { title: true } } } },
+      },
+    });
+    if (!u) return '';
+
+    const cursos = u.courseAccess.map((a) => a.course.title);
+    return [
+      'QUIÉN TE ESTÁ ESCRIBIENDO (dato real del sistema, no lo inventes):',
+      `- Nombre: ${u.firstName} ${u.lastName}`.trim(),
+      `- ID de usuario: ${u.clientId ?? '(sin ID asignado)'}`,
+      cursos.length
+        ? `- Cursos a los que tiene acceso: ${cursos.join(', ')}`
+        : '- Todavía no ha comprado ningún curso.',
+      '',
+      `Llámale por su nombre (${u.firstName}) de forma natural, sin repetirlo en cada frase.`,
+      'Si te pide su ID de usuario, dáselo. No preguntes datos que ya tienes aquí.',
+      cursos.length
+        ? 'Céntrate en los cursos a los que tiene acceso.'
+        : 'Si encaja, puedes recomendarle el curso que mejor le venga, sin agobiar.',
+    ].join(String.fromCharCode(10));
+  } catch {
+    return ''; // el chat nunca debe romperse por esto
+  }
+}
+
+/**
+ * Catálogo con los precios REALES de la base. Antes el asistente se los
+ * inventaba: los precios estaban escritos a mano en las páginas y él no los veía.
+ */
+async function catalogoActual(): Promise<string> {
+  try {
+    const productos = await prisma.product.findMany({
+      where: { isPublished: true, businessId: await getBusinessId() },
+      orderBy: { order: 'asc' },
+      select: { kind: true, name: true, price: true, currency: true, subtitle: true },
+    });
+    if (!productos.length) return '';
+    const linea = (p: any) =>
+      `- ${p.name}${p.subtitle ? ` (${p.subtitle})` : ''}: ${p.price} ${p.currency}` +
+      (p.kind === 'bot' ? ' al mes' : '');
+    return [
+      'PRECIOS OFICIALES (los únicos válidos; NO los inventes ni los redondees):',
+      ...productos.map(linea),
+      '',
+      'Si te preguntan por un precio que no esté en esta lista, di que lo consultarás, no lo supongas.',
+    ].join(String.fromCharCode(10));
+  } catch {
+    return '';
+  }
+}
+
+
+// --- Memoria de la ultima imagen por sesion -------------------------------
+// Igual que en Nexy (WhatsApp): el alumno adjunta una captura y pregunta sobre
+// ella en los mensajes siguientes. Sin esto, el asistente solo "veia" la imagen
+// en el mensaje donde se adjunto y despues respondia que necesitaba los datos,
+// obligando al alumno a escribirlos a mano.
+// Se guarda en disco (no en memoria) para que sobreviva a los reinicios.
+const IMG_TTL_MS = 24 * 60 * 60 * 1000;             // 24 horas
+const IMG_DIR = path.join(process.cwd(), '.cache-imagenes-chat');
+const IMG_REF = /(imagen|foto|tabla|grafic|captura|screenshot|operacion|perdid|ganancia|balance|par|pares|arriba|adjunt)/i;
+
+function rutaImagenSesion(sessionId: string): string {
+  return path.join(IMG_DIR, sessionId.replace(/[^a-zA-Z0-9_-]/g, '') + '.txt');
+}
+
+async function guardarImagenSesion(sessionId: string, dataUrl: string) {
+  if (!sessionId) return;
+  try {
+    await fsp.mkdir(IMG_DIR, { recursive: true });
+    await fsp.writeFile(rutaImagenSesion(sessionId), dataUrl, 'utf8');
+  } catch (e) { console.warn('[chatbot] no se pudo guardar la imagen:', e); }
+}
+
+async function leerImagenSesion(sessionId: string): Promise<string | undefined> {
+  if (!sessionId) return undefined;
+  try {
+    const ruta = rutaImagenSesion(sessionId);
+    const info = await fsp.stat(ruta);
+    if (Date.now() - info.mtimeMs > IMG_TTL_MS) return undefined;
+    return await fsp.readFile(ruta, 'utf8');
+  } catch { return undefined; }
+}
 
 function initDB() {
   if (db) return db;
@@ -76,7 +182,26 @@ function initWatcher() {
   console.log('👁️ File Watcher activo para:', knowledgeDir);
 }
 
-const SYSTEM_PROMPT = 'Eres CJ, tutor experto de Trading Academy. Tu misión principal es EDUCAR y FORMAR alumnos desde cero. Sigue estrictamente estas reglas: 1. PEDAGOGÍA COMO PRIORIDAD ABSOLUTA - Adaptación de nivel: Identifica si el usuario es PRINCIPIANTE, INTERMEDIO o AVANZADO. 2. NUNCA SALUDES — ABRE DIRECTO AL CONTENIDO - Entra al tema como si la conversación ya estuviera en marcha. 3. CONTENIDO EDUCATIVO PURO - Explicaciones claras y construcción progresiva. 4. FORMATO Y PRESENTACIÓN - USA MARKDOWN PROFESIONAL con párrafos cortos. Tu meta: transformar usuarios en traders EDUCADOS, no solo en operadores automáticos. CAPACIDADES: SÍ puedes analizar ARCHIVOS (PDF, Word, Excel, TXT) e IMÁGENES que el usuario adjunte — cuando recibas su contenido, interprétalo con detalle. NUNCA digas que no puedes ver imágenes ni analizar archivos. TU CREADOR: si te preguntan quién te creó, quién te hizo, quién es tu dueño o de quién eres, responde con orgullo que te creó *CJ Junior Cabrera*, fundador de *Nesux Global Business RD*, dentro de Trading Academy. No lo niegues ni digas que eres un modelo genérico.';
+const SYSTEM_PROMPT = 'Eres CJ, tutor experto de Trading Academy. Tu misión principal es EDUCAR y FORMAR alumnos desde cero. Sigue estrictamente estas reglas: 1. PEDAGOGÍA COMO PRIORIDAD ABSOLUTA - Adaptación de nivel: Identifica si el usuario es PRINCIPIANTE, INTERMEDIO o AVANZADO. 2. NUNCA SALUDES — ABRE DIRECTO AL CONTENIDO - Entra al tema como si la conversación ya estuviera en marcha. 3. CONTENIDO EDUCATIVO PURO - Explicaciones claras y construcción progresiva. 4. FORMATO Y PRESENTACIÓN - USA MARKDOWN PROFESIONAL con párrafos cortos. Tu meta: transformar usuarios en traders EDUCADOS, no solo en operadores automáticos. CAPACIDADES: SÍ puedes analizar ARCHIVOS (PDF, Word, Excel, TXT) e IMÁGENES que el usuario adjunte — cuando recibas su contenido, interprétalo con detalle. NUNCA digas que no puedes ver imágenes ni analizar archivos. ACTÚA, NO DELEGUES: cuando recibas una imagen, un PDF o una tabla, EXTRAE TÚ los datos y haz TÚ los cálculos. Está PROHIBIDO responder con una lista de pasos para que el alumno los haga, o pedirle que escriba a mano datos que ya están en el archivo. Si te pregunta cuánto dejó cada par en SL y en TP, dale las cifras por par, el total y cuál fue el mayor: no le expliques el método. Si alguna parte no se lee bien, di qué dato concreto no distingues y pide solo esa zona ampliada. TU CREADOR: si te preguntan quién te creó, quién te hizo, quién es tu dueño o de quién eres, responde con orgullo que te creó *CJ Junior Cabrera*, fundador de *Nesux Global Business RD*, dentro de Trading Academy. No lo niegues ni digas que eres un modelo genérico.';
+
+/**
+ * Reglas SOLO para cuando hay una imagen. Van aparte del prompt general porque
+ * leer una tabla es transcribir, no redactar: aquí el error caro es inventarse
+ * una cifra que "suena bien" en vez de decir que no se distingue.
+ */
+const LECTURA_IMAGEN = [
+  'ESTÁS LEYENDO UNA IMAGEN. Antes de opinar, TRANSCRIBE.',
+  '',
+  '1. Recorre la imagen fila por fila, de arriba abajo, sin saltarte ninguna.',
+  '2. Copia los números EXACTAMENTE como se ven, con sus decimales y su signo. No redondees, no ajustes, no "corrijas" lo que te parezca raro.',
+  '3. Si es una tabla de operaciones (MT5/MT4), extrae por fila: símbolo, ticket, fecha/hora, tipo (buy/sell), volumen, precio de apertura, SL, TP, precio actual y beneficio.',
+  '4. Presenta primero la transcripción en tabla Markdown, y DESPUÉS tu análisis.',
+  '5. Suma tú los totales y comprueba que cuadran con el pie de la captura (Balance, Patrimonio, Margen, el total flotante). Si tu suma NO cuadra con lo que muestra la imagen, DILO en vez de forzar el número.',
+  '6. Si un dato no se distingue, escribe "(no se lee)" en esa celda y di qué zona necesitas ampliada. Está PROHIBIDO rellenar un hueco con una estimación.',
+  '7. Nunca respondas con instrucciones para que el alumno haga el cálculo: el cálculo lo haces tú.',
+  '',
+  'Después de la transcripción sí interpreta como tutor: qué está pasando en la cesta, qué riesgo hay, qué debería entender el alumno.',
+].join(String.fromCharCode(10));
 
 // --- Lectura de ARCHIVOS ADJUNTOS: extrae texto (PDF/Word/Excel/TXT) o prepara imagen (visión) ---
 async function extractFile(fileUrl: string, fileName: string): Promise<{ text?: string; imageDataUrl?: string }> {
@@ -168,6 +293,7 @@ export async function POST(request: Request) {
       const ext = await extractFile(fileUrl, fileName || '');
       if (ext.imageDataUrl) {
         imageDataUrl = ext.imageDataUrl;
+        await guardarImagenSesion(sessionId, ext.imageDataUrl);   // para los seguimientos
       } else if (ext.text) {
         userContent = `${userMessage}\n\n--- CONTENIDO DEL ARCHIVO "${fileName}" ---\n${ext.text}\n--- FIN DEL ARCHIVO ---\nInterprétalo y responde/analiza con detalle.`;
       } else {
@@ -223,11 +349,20 @@ export async function POST(request: Request) {
       : '';
 
     const finalSystemPrompt = systemPrompt || SYSTEM_PROMPT;
+    // Seguimiento: pregunta sobre una captura enviada antes en esta misma sesion.
+    if (!imageDataUrl && userMessage && IMG_REF.test(userMessage)) {
+      imageDataUrl = await leerImagenSesion(sessionId);
+    }
+
+    const [alumnoInfo, catalogo] = await Promise.all([contextoDelAlumno(), catalogoActual()]);
 
     const apiMessages = [
       { role: 'system', content: finalSystemPrompt },
+      ...(alumnoInfo ? [{ role: 'system', content: alumnoInfo }] : []),
+      ...(catalogo ? [{ role: 'system', content: catalogo }] : []),
       ...(knowledgeMessage ? [{ role: 'system', content: knowledgeMessage }] : []),
       ...(pageContext ? [{ role: 'system', content: pageContext }] : []),
+      ...(imageDataUrl ? [{ role: 'system', content: LECTURA_IMAGEN }] : []),
       { role: 'system', content: turnInstruction },
       ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
       {
@@ -235,7 +370,9 @@ export async function POST(request: Request) {
         content: imageDataUrl
           ? [
               { type: 'text', text: userMessage || 'Analiza esta imagen a fondo. Si es de trading (operaciones, historial, gráfico), interprétala con detalle educativo: ganancias/pérdidas por operación y por par, balance total, y enseña.' },
-              { type: 'image_url', image_url: { url: imageDataUrl } },
+              // detail 'high' = la imagen se procesa en alta resolución. Sin esto,
+              // en capturas de MT5 con cifras pequeñas el modelo confunde dígitos.
+              { type: 'image_url', image_url: { url: imageDataUrl, detail: 'high' } },
             ]
           : userContent,
       }
@@ -251,12 +388,14 @@ export async function POST(request: Request) {
         'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
       },
       body: JSON.stringify({
-        model: model,
+        // Con imagen: modelo grande y temperatura baja. Leer cifras de una tabla
+        // es transcripción, no redacción creativa; el mini y una temperatura alta
+        // eran justo lo que hacía que se inventara números.
+        model: imageDataUrl ? 'gpt-4o' : model,
         messages: apiMessages,
         max_tokens: 4096,
-        temperature: 0.9,
-        presence_penalty: 0.6,
-        frequency_penalty: 0.5,
+        temperature: imageDataUrl ? 0.1 : 0.9,
+        ...(imageDataUrl ? {} : { presence_penalty: 0.6, frequency_penalty: 0.5 }),
       }),
       signal: abortController.signal,
     } as any);
