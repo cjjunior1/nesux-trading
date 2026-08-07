@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, ChangeEvent, memo, MutableRefObject } from "react";
+import { useState, useRef, useEffect, ChangeEvent, ClipboardEvent, memo, MutableRefObject } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import {
   MessageCircle, X, Send, Bot, User, Volume2, Mic, MicOff,
@@ -35,7 +35,7 @@ function cleanMarkdown(text: string): string {
     .replace(/```[\s\S]*?```/g, (m) => m.replace(/```/g, "").trim())
     .replace(/`([^`]+)`/g, "$1")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    // Los ENLACES [texto](url) se CONSERVAN para que salgan clicables (ej. "Ir a WhatsApp").
     .replace(/^#{1,6}\s*/gm, "")
     .replace(/\*\*\*([^*]+)\*\*\*/g, "$1")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
@@ -139,7 +139,7 @@ const Markdown = memo(function Markdown({ text, msgId, wordsRef, activeIndex }: 
       <blockquote className="border-l-4 border-emerald-400 bg-emerald-500/10 pl-3 pr-2 py-1.5 my-2 rounded-r-lg italic text-emerald-100">{children}</blockquote>
     ),
     a: ({ children, href }: any) => (
-      <a href={href} target="_blank" rel="noreferrer" className="text-cyan-400 underline decoration-cyan-500/50 hover:text-cyan-300">{children}</a>
+      <a href={href} target="_blank" rel="noreferrer" className="inline-block font-bold text-green-400 underline decoration-green-500/60 hover:text-green-300 break-words">{children}</a>
     ),
     hr: () => <hr className="border-slate-700 my-3" />,
     code: ({ className, children }: any) => {
@@ -443,6 +443,8 @@ export function Chatbot() {
 
   // Abrir el chat desde botones de las landings (evento global) con saludo propio opcional.
   const pendingGreetingRef = useRef<{ greeting?: string; message?: string } | null>(null);
+  // Para saludar UNA vez por cada apertura del chat (aunque ya haya historial).
+  const openGreetedRef = useRef(false);
   useEffect(() => {
     function onOpen(e: any) {
       const d = (e && e.detail) || {};
@@ -471,14 +473,18 @@ export function Chatbot() {
     return () => window.removeEventListener("nx-open-chat", onOpen as EventListener);
   }, []);
 
-  // Cargar saludo inicial
+  // Saludo de BIENVENIDA cada vez que se ABRE el chat, haya o no historial.
+  // (Antes solo saludaba con la conversación vacía; ahora también da la bienvenida
+  //  al reabrir, como último mensaje.)
   useEffect(() => {
-    if (isOpen && messages.length === 0 && persistLoadedRef.current) {
+    if (!isOpen) { openGreetedRef.current = false; return; }
+    if (isOpen && !openGreetedRef.current && persistLoadedRef.current) {
+      openGreetedRef.current = true;
       const dynamicGreeting = generateDynamicGreeting();
       const custom = pendingGreetingRef.current;
       pendingGreetingRef.current = null;
-      setMessages([{
-        id: "init",
+      setMessages(prev => [...prev, {
+        id: "greet-" + Date.now(),
         role: "assistant",
         content: (custom && custom.message) || dynamicGreeting.message,
         greeting: (custom && custom.greeting) || dynamicGreeting.greeting,
@@ -487,7 +493,7 @@ export function Chatbot() {
         emoji: dynamicGreeting.emoji
       }]);
     }
-  }, [isOpen, messages.length]);
+  }, [isOpen]);
 
   // Scroll automático
   useEffect(() => {
@@ -839,9 +845,13 @@ export function Chatbot() {
     }
   };
 
-  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  /**
+   * Sube un archivo y lo manda a analizar. Lo usan tanto el botón de adjuntar
+   * como el pegado de imágenes (Ctrl+V), para que ambos caminos hagan lo mismo.
+   * `pregunta` es lo que el usuario tenía escrito al pegar: si lo hay, el
+   * asistente responde a eso mirando la imagen, en vez de un análisis genérico.
+   */
+  const subirYAnalizar = async (file: File, pregunta?: string) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -849,10 +859,15 @@ export function Chatbot() {
       const response = await fetch('/api/upload', { method: 'POST', body: formData });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Error al subir archivo');
+      const esImagen = (data.fileType || '').startsWith('image/');
       const fileMessage: Message = {
         id: Date.now().toString(),
         role: 'user',
-        content: `📎 Archivo adjunto: ${file.name}\n\nPor favor, analiza este archivo.`,
+        content: pregunta?.trim()
+          ? pregunta.trim()
+          : esImagen
+            ? '📷 Imagen adjunta\n\nPor favor, analiza esta imagen.'
+            : `📎 Archivo adjunto: ${file.name}\n\nPor favor, analiza este archivo.`,
         fileUrl: data.url,
         fileType: data.fileType,
       };
@@ -861,17 +876,44 @@ export function Chatbot() {
       setInput('');
       // Dejar de mostrar 'Subiendo...' y lanzar el análisis en background
       setIsUploading(false);
-      analyzeFile(data.url, file.name).catch(err => console.error('analyzeFile error:', err));
+      analyzeFile(data.url, file.name, pregunta).catch(err => console.error('analyzeFile error:', err));
     } catch (error) {
       console.error('Upload error:', error);
       alert('Error al subir el archivo: ' + (error as Error).message);
     } finally {
-      if (fileInputRef.current) fileInputRef.current.value = '';
       setIsUploading(false);
     }
   };
 
-  const analyzeFile = async (fileUrl: string, fileName: string) => {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      await subirYAnalizar(file);
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  /**
+   * Pegar una imagen con Ctrl+V (captura de pantalla, foto copiada, etc.).
+   * Si en el portapapeles solo hay texto, no hacemos nada y el pegado normal sigue.
+   */
+  const handlePaste = async (event: ClipboardEvent<HTMLTextAreaElement>) => {
+    if (isLoading || isUploading) return;
+    const items = Array.from(event.clipboardData?.items || []);
+    const imagen = items.find(i => i.kind === 'file' && i.type.startsWith('image/'));
+    if (!imagen) return;                      // texto normal: pegado de siempre
+    const file = imagen.getAsFile();
+    if (!file) return;
+    event.preventDefault();
+    // Las capturas llegan sin nombre útil: le ponemos uno con la extensión correcta.
+    const ext = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+    const conNombre = new File([file], file.name || `captura-${Date.now()}.${ext}`, { type: file.type });
+    await subirYAnalizar(conNombre, input);
+  };
+
+  const analyzeFile = async (fileUrl: string, fileName: string, pregunta?: string) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/chatbot", {
@@ -879,7 +921,7 @@ export function Chatbot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId: sessionIdRef.current,
-          userMessage: `Analiza este archivo: ${fileName}`,
+          userMessage: pregunta?.trim() || `Analiza este archivo: ${fileName}`,
           messages: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
           fileUrl: fileUrl,
           fileName: fileName,
@@ -1236,7 +1278,8 @@ export function Chatbot() {
                       sendMessage();
                     }
                   }}
-                  placeholder="Escribe tu pregunta..."
+                  onPaste={handlePaste}
+                  placeholder="Escribe tu pregunta o pega una imagen (Ctrl+V)..."
                   className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none overflow-y-auto"
                   disabled={isLoading || isUploading}
                 />
