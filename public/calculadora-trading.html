@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nesux Calculator Trading · Simulador MG (CJ/Nesux Bot)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1117'/%3E%3Crect x='22' y='16' width='56' height='68' rx='8' fill='%23161b22' stroke='%23f7931a' stroke-width='4'/%3E%3Crect x='30' y='24' width='40' height='16' rx='3' fill='%2358a6ff'/%3E%3Ccircle cx='36' cy='52' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='50' cy='52' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='64' cy='52' r='4' fill='%233fb950'/%3E%3Ccircle cx='36' cy='66' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='50' cy='66' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='64' cy='66' r='4' fill='%23f85149'/%3E%3C/svg%3E">
+<meta property="og:title" content="Nesux Calculator Trading">
+<meta property="og:description" content="Simula la cesta del bot en modo Martingala (MG): respaldos, TP y protección por USD.">
+<meta name="theme-color" content="#0d1117">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
+    --txt:#e6edf3; --muted:#8b949e; --accent:#f7931a; --accent2:#58a6ff;
+    --ok:#3fb950; --bad:#f85149; --warn:#d29922;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:2px solid var(--accent);padding:22px 28px}
+  header h1{margin:0;font-size:20px;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:400px 1fr;gap:22px}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .card h2{margin:0 0 14px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
+    border-radius:8px;padding:9px 10px;font-size:14px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--accent2)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  /* En filas de 2/3 columnas: la etiqueta ocupa alto fijo y el input se alinea abajo,
+     así los bloques quedan parejos aunque un título tenga una o dos líneas. */
+  .row>div>label,.row3>div>label{min-height:34px;display:flex;align-items:flex-end;margin-top:10px}
+  .hint{font-size:11px;color:var(--muted);margin-top:3px}
+  .pill{display:inline-block;font-size:11px;color:#0d1117;background:var(--accent);border-radius:20px;padding:1px 8px;font-weight:600}
+  .verdict{border-radius:12px;padding:18px;margin-bottom:18px;font-size:15px;border:1px solid}
+  .verdict.ok{background:rgba(63,185,80,.12);border-color:var(--ok)}
+  .verdict.bad{background:rgba(248,81,73,.12);border-color:var(--bad)}
+  .verdict.warn{background:rgba(210,153,34,.12);border-color:var(--warn)}
+  .verdict b{font-size:18px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .kpi .v{font-size:20px;font-weight:700;margin-top:4px}
+  .kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
+  .accent{color:var(--accent)} .blue{color:var(--accent2)} .green{color:var(--ok)} .red{color:var(--bad)} .yel{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  th:first-child,td:first-child{text-align:left}
+  tr.open td{background:rgba(88,166,255,.08)}
+  tr.pending td{color:var(--muted);opacity:.55}
+  .tag{font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:600}
+  .tag.o{background:rgba(88,166,255,.18);color:var(--accent2)}
+  .tag.p{background:rgba(139,148,158,.18);color:var(--muted)}
+  .tag.buy{background:rgba(63,185,80,.18);color:var(--ok)}
+  .tag.sell{background:rgba(248,81,73,.18);color:var(--bad)}
+  .footer{color:var(--muted);font-size:11.5px;text-align:center;padding:14px 0 30px}
+  .seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .seg button{flex:1;background:var(--panel2);border:none;color:var(--muted);padding:8px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--accent);color:#0d1117;font-weight:600}
+  .note{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;font-size:13px}
+  .note code{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--accent)}
+  .basket-title{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Nesux <span>Calculator Trading</span> · Simulador Martingala</h1>
+  <p>Simula la cesta del bot en modo MARTINGALA (MG) tal como opera en MT5: entra en compras, ventas o ambas; abre respaldos cuando el precio va en contra, mantiene un solo TP en puntos sobre el precio medio y corta por (24) pérdida / (25) ganancia máxima en USD.</p>
+</header>
+
+<div class="wrap">
+  <!-- ENTRADAS -->
+  <div class="card">
+    <h2>Parámetros del bot (MG)</h2>
+
+    <label>(02) Buy And Sell · dirección</label>
+    <select id="dir">
+      <option value="buy">Solo Compras</option>
+      <option value="sell">Solo Ventas</option>
+      <option value="both">Ambas (compras y ventas)</option>
+    </select>
+    <div class="hint" id="dirHint"></div>
+
+    <div class="row">
+      <div>
+        <label>(04) Lotaje</label>
+        <input id="L" type="number" value="0.01" step="0.01">
+      </div>
+      <div>
+        <label>(05) T/P (pts)</label>
+        <input id="tpPts" type="number" value="100000" step="1000">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>(14) Múltiplo MG</label>
+        <input id="m" type="number" value="1.25" step="0.01">
+      </div>
+      <div>
+        <label>(15) Puntos 1er resp.</label>
+        <input id="D1" type="number" value="50000" step="1000">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>(16) % Incremento</label>
+        <input id="p" type="number" value="35" step="1">
+      </div>
+      <div>
+        <label>(17) Nº Martingalas</label>
+        <input id="N" type="number" value="5" step="1">
+      </div>
+    </div>
+    <div class="hint">(17) = nº TOTAL de operaciones de la cesta (inicial + respaldos), igual que el bot: con 5 hay 1 inicial + 4 respaldos.</div>
+
+    <div class="row">
+      <div>
+        <label>(24) Pérdida Máx (USD)</label>
+        <input id="maxLoss" type="number" value="5000" step="50">
+      </div>
+      <div>
+        <label>(25) Ganancia Máx (USD)</label>
+        <input id="maxGain" type="number" value="5000" step="50">
+      </div>
+    </div>
+    <div class="hint">El bot cierra TODA la cesta en cuanto el beneficio flotante toca −(24) o +(25).</div>
+
+    <h2 style="margin-top:20px">Capital y símbolo</h2>
+    <label>Capital disponible (USD) · <span class="pill">C</span></label>
+    <input id="C" type="number" value="10000" step="100">
+    <div class="hint">Saldo con el que operas. Solo sirve para ver qué % de tu cuenta consume la pérdida flotante.</div>
+
+    <label style="margin-top:14px">Par / Símbolo que operas</label>
+    <select id="preset"></select>
+    <div class="hint" id="specLine"></div>
+    <div class="hint" style="margin-top:6px">
+      <a href="#" id="advToggle" style="color:var(--accent2);text-decoration:none">⚙️ Ajuste avanzado (editar specs a mano)</a>
+    </div>
+
+    <!-- Specs técnicas: ocultas por defecto. El símbolo las rellena solo. -->
+    <div id="advanced" style="display:none">
+      <div class="row3">
+        <div>
+          <label>Contrato</label>
+          <input id="contract" type="number" value="1" step="0.01">
+        </div>
+        <div>
+          <label>Dígitos</label>
+          <input id="digits" type="number" value="2" step="1">
+        </div>
+        <div>
+          <label>Paso lote</label>
+          <input id="step" type="number" value="0.01" step="0.01">
+        </div>
+      </div>
+      <label style="margin-top:12px">Valor de 1 punto por 1.0 lote (USD) · <span class="pill">V</span></label>
+      <input id="V" type="number" value="0.01" step="0.0001">
+      <div class="hint">
+        El <b>tick value</b> de MT5: USD por <b>1 punto</b> con <b>1.0 lote</b>. Base de todo: <code>P/L = puntos × V × lotes</code>.
+        <span class="yel">En cuenta real, cópialo del valor EXACTO de tu bróker</span> (símbolo → Especificación).
+      </div>
+    </div>
+
+    <h2 style="margin-top:20px">Movimiento en contra de la cesta</h2>
+    <div class="seg" id="seg">
+      <button data-u="pts" class="on">Puntos</button>
+      <button data-u="usd">USD de precio</button>
+      <button data-u="loss">Pérdida USD</button>
+    </div>
+    <input id="mov" type="number" value="200000" step="1000" style="margin-top:10px">
+    <div class="hint" id="movHint"></div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div>
+    <div id="verdict" class="verdict ok"></div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="l">Respaldos abiertos</div><div class="v blue" id="k_resp"></div><div class="s" id="k_resp_s"></div></div>
+      <div class="kpi"><div class="l">Lotes abiertos</div><div class="v accent" id="k_lots"></div><div class="s" id="k_lots_s"></div></div>
+      <div class="kpi"><div class="l">Movimiento en contra</div><div class="v" id="k_mov"></div><div class="s" id="k_mov_s"></div></div>
+      <div class="kpi"><div class="l">Pérdida flotante total</div><div class="v red" id="k_loss"></div><div class="s" id="k_loss_s"></div></div>
+      <div class="kpi"><div class="l">Precio medio (breakeven)</div><div class="v" id="k_be"></div><div class="s" id="k_be_s"></div></div>
+      <div class="kpi" id="tpTile"><div class="l">Beneficio a favor (cerrado)</div><div class="v green" id="k_tp"></div><div class="s" id="k_tp_s"></div></div>
+    </div>
+
+    <div class="card">
+      <h2 id="tblTitle">Detalle nivel por nivel</h2>
+      <table id="tbl">
+        <thead><tr>
+          <th>Nivel</th><th>Estado</th><th>Lote</th><th>Lotes acum.</th>
+          <th>Dist. apertura (pts)</th><th>Dist. entre ops (pts)</th><th>Pérdida en este punto (USD)</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="hint" style="margin-top:8px">«Dist. apertura» = puntos en contra (desde la 1ª entrada) a los que el bot abriría ese respaldo. «Pérdida en este punto» = lo que pierde cada posición ya abierta con el movimiento indicado. Los niveles aún no abiertos aparecen atenuados. Lotes TRUNCADOS al paso, como MT5.</div>
+    </div>
+
+    <!-- LADO OPUESTO (solo en Ambas) -->
+    <div class="card" id="oppCard" style="margin-top:18px;display:none">
+      <div class="basket-title">🔁 Lado opuesto (Ambas) — <span id="oppSide"></span></div>
+      <div class="hint" id="oppTxt"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Disparadores de la cesta</h2>
+      <table>
+        <thead><tr><th>Evento</th><th>Ocurre en (pts en contra)</th><th>= USD de precio</th><th>Pérdida flotante</th></tr></thead>
+        <tbody id="trg"></tbody>
+      </table>
+      <div class="hint" style="margin-top:8px">Cada fila muestra a cuántos puntos en contra salta cada respaldo y dónde el bot cortaría por (24) Pérdida Máxima.</div>
+    </div>
+
+    <div class="note">
+      <b class="yel">Cómo simula al bot (igual que MT5 / CJBot v2.50)</b><br>
+      • Respaldo i abre a <code>dist_i = (15) × (1+(16)%)^(i−1)</code> desde la posición previa; el bot mide desde la última posición.<br>
+      • Lote nivel i = <code>truncar( (04) × (14)^i )</code> al paso de volumen (MathFloor), nunca por debajo del inicial.<br>
+      • TP unificado: la cesta cierra cuando el precio recorre <code>(05)</code> puntos a favor desde el <b>precio medio ponderado</b>. Beneficio ≈ <code>(05) × V × lotes_abiertos</code>.<br>
+      • Protección de equidad: cierra TODO al tocar <code>−(24)</code> o <code>+(25)</code> USD de flotante (POSITION_PROFIT en vivo, cada tick).<br>
+      • En <b>Ambas</b> corren dos cestas independientes (una de compras y otra de ventas); un mismo movimiento carga una y hace que la otra toque su TP.
+    </div>
+
+    <div class="footer">
+      Nesux Calculator Trading · basado en CJ Bot Calculator v2.44 · Nesux Global Business RD.<br>
+      ⚠️ Simulación educativa. El mercado real añade spread, slippage, swaps y los (18) seg de confirmación de respaldo.
+    </div>
+  </div>
+</div>
+
+<script>
+let movUnit = 'pts';
+
+const fmt=(n,d=2)=>isFinite(n)?n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
+const usd=n=>(n<0?'-$':'$')+fmt(Math.abs(n),2);
+
+// V autocalculado desde contrato y dígitos
+['contract','digits'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    const c=+document.getElementById('contract').value;
+    const d=+document.getElementById('digits').value;
+    document.getElementById('V').value = +(c*Math.pow(10,-d)).toFixed(8);
+    calc();
+  });
+});
+
+// Símbolos con sus specs típicas. El usuario solo elige el par; el resto se rellena solo.
+const PRESETS={
+  eur:   {name:'EUR/USD',        contract:100000, digits:5, step:0.01, V:1},
+  gbp:   {name:'GBP/USD',        contract:100000, digits:5, step:0.01, V:1},
+  aud:   {name:'AUD/USD',        contract:100000, digits:5, step:0.01, V:1},
+  nzd:   {name:'NZD/USD',        contract:100000, digits:5, step:0.01, V:1},
+  usdjpy:{name:'USD/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+  usdcad:{name:'USD/CAD',        contract:100000, digits:5, step:0.01, V:0.73, approx:true},
+  usdchf:{name:'USD/CHF',        contract:100000, digits:5, step:0.01, V:1.10, approx:true},
+  eurjpy:{name:'EUR/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+  gbpjpy:{name:'GBP/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+  xau:   {name:'XAU/USD · Oro',  contract:100,    digits:2, step:0.01, V:1},
+  xag:   {name:'XAG/USD · Plata',contract:5000,   digits:3, step:0.01, V:5},
+  btc:   {name:'BTC/USD',        contract:1,      digits:2, step:0.01, V:0.01},
+  eth:   {name:'ETH/USD',        contract:1,      digits:2, step:0.01, V:0.01},
+  us30:  {name:'US30 · Dow',     contract:1,      digits:2, step:0.01, V:0.01, approx:true},
+  nas:   {name:'NAS100',         contract:1,      digits:2, step:0.01, V:0.01, approx:true},
+  spx:   {name:'SPX500',         contract:1,      digits:2, step:0.01, V:0.01, approx:true}
+};
+
+// Poblar el selector + opción avanzada
+(function(){
+  const sel=document.getElementById('preset');
+  for(const k in PRESETS){ const o=document.createElement('option'); o.value=k; o.textContent=PRESETS[k].name; sel.appendChild(o); }
+  const o=document.createElement('option'); o.value='otro'; o.textContent='Otro / personalizado…'; sel.appendChild(o);
+  sel.value='eur';                // símbolo por defecto
+  aplicarPreset('eur', false);
+})();
+
+function aplicarPreset(k, recalcular=true){
+  const specLine=document.getElementById('specLine');
+  const adv=document.getElementById('advanced');
+  if(k==='otro'){
+    adv.style.display='block';    // deja editar a mano
+    specLine.innerHTML='Modo personalizado: edita Contrato, Dígitos, Paso y V abajo.';
+  } else {
+    const s=PRESETS[k];
+    document.getElementById('contract').value=s.contract;
+    document.getElementById('digits').value=s.digits;
+    document.getElementById('step').value=s.step;
+    document.getElementById('V').value=s.V;
+    const point=Math.pow(10,-s.digits);
+    specLine.innerHTML=`<b>${s.name}</b> · 1 punto = ${point} · V = $${s.V} por punto/lote`+
+      (s.approx?` <span class="yel">(aprox — verifica el tick value en tu bróker)</span>`:``);
+  }
+  if(recalcular) calc();
+}
+
+document.getElementById('preset').addEventListener('change', e=>aplicarPreset(e.target.value));
+document.getElementById('advToggle').addEventListener('click', e=>{
+  e.preventDefault();
+  const adv=document.getElementById('advanced');
+  adv.style.display = adv.style.display==='none' ? 'block' : 'none';
+});
+
+document.getElementById('seg').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  movUnit = e.target.dataset.u;
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b===e.target));
+  calc();
+});
+
+document.querySelectorAll('input,select').forEach(i=>i.addEventListener('input',calc));
+
+// Trunca el lote al paso, como NormalizarLotaje (MathFloor), nunca por debajo del inicial.
+function normLot(x, step, Lmin){
+  let l = Math.floor(x/step + 1e-8)*step;
+  l = +l.toFixed(2);
+  if(l < Lmin) l = Lmin;
+  return l;
+}
+
+function calc(){
+  const g=id=>+document.getElementById(id).value;
+  const dir=document.getElementById('dir').value;
+  const C=g('C'), L=g('L'), m=g('m'), D1=g('D1'),
+        p=g('p')/100, N=Math.max(1,Math.round(g('N'))),
+        V=g('V'), digits=g('digits'), tpPts=g('tpPts'),
+        step=g('step')||0.01, maxLoss=g('maxLoss'), maxGain=g('maxGain');
+  const point=Math.pow(10,-digits);
+
+  // Distancias acumuladas (desde L0), lotes truncados y sumas ponderadas.
+  const cum=[0], lot=[normLot(L,step,L)], cumLots=[normLot(L,step,L)], S=[0]; // S[k]=Σ lot_j*cum_j
+  for(let j=1;j<N;j++){
+    // dist entre niveles = D1*(1+p)^(j-1); acumulada = suma geométrica
+    cum[j] = p>0 ? D1*(Math.pow(1+p,j)-1)/p : D1*j;
+    lot[j] = normLot(L*Math.pow(m,j), step, L);
+    cumLots[j]=cumLots[j-1]+lot[j];
+    S[j]=S[j-1]+lot[j]*cum[j];
+  }
+
+  // Pérdida flotante para x puntos en contra desde L0
+  function lossAt(x){
+    let l=0; for(let j=0;j<N;j++){ if(x>=cum[j]) l+=lot[j]*(x-cum[j]); } return V*l;
+  }
+  // Inverso: puntos en contra para una pérdida flotante T (USD)
+  function xFromLoss(T){
+    if(T<=0) return 0;
+    for(let k=0;k<N;k++){
+      const segEnd = k<N-1? cum[k+1] : Infinity;
+      const x=(T/V + S[k])/cumLots[k];
+      if(x<=segEnd+1e-9) return x;
+    }
+    return (T/V + S[N-1])/cumLots[N-1];
+  }
+
+  // ---- Entrada del movimiento ----
+  const movVal=+document.getElementById('mov').value;
+  let x;
+  if(movUnit==='pts')      x = movVal;
+  else if(movUnit==='usd') x = movVal/point;
+  else                     x = xFromLoss(movVal);
+  if(!isFinite(x)||x<0) x=0;
+
+  const hints={
+    pts:'Cuántos PUNTOS se movió el precio en contra de la cesta desde la primera entrada.',
+    usd:'Cuántos USD de PRECIO se movió en contra (se convierte a puntos con los dígitos).',
+    loss:'Cuántos USD REALES pierdes ahora (flotante). Calculo a qué punto/respaldos equivale.'
+  };
+  document.getElementById('movHint').textContent = hints[movUnit];
+
+  const dirHints={
+    buy:'Cesta de COMPRAS: los respaldos se abren cuando el precio BAJA (va en contra).',
+    sell:'Cesta de VENTAS: los respaldos se abren cuando el precio SUBE (va en contra).',
+    both:'AMBAS: dos cestas independientes. El movimiento carga una y la otra toca su TP.'
+  };
+  document.getElementById('dirHint').textContent = dirHints[dir];
+
+  // ---- Nivel abierto máximo (k) ----
+  let k=0;
+  for(let j=1;j<N;j++){ if(cum[j]<=x+1e-9) k=j; else break; }
+  const respaldos = k;
+  const openPos   = k+1;
+  const openLots  = cumLots[k];
+  const Sk        = S[k];
+  let floatLoss   = V*(openLots*x - Sk);
+  const bePts     = openLots>0 ? Sk/openLots : 0;
+
+  // ---- Protección (24): ¿la cesta ya se habría cerrado por pérdida máx? ----
+  const xMaxLoss  = maxLoss>0 ? xFromLoss(maxLoss) : Infinity;
+  const cortadaPorPerdida = maxLoss>0 && x >= xMaxLoss - 1e-9;
+  const burnedCapital = floatLoss >= C;
+
+  // ---- TP: (05) puntos sobre el precio medio ----
+  const tpProfit  = tpPts*V*openLots;                 // beneficio si ESTA cesta se recupera al TP
+  const retroceso = Math.max(0,(x - bePts) + tpPts);  // pts que el precio debe recuperar desde aquí hasta el TP
+  const tpCortaGanancia = maxGain>0 && tpProfit >= maxGain; // (25) cerraría incluso antes
+
+  // ---- Beneficio REAL del lado a favor (solo AMBAS) ----
+  // Mientras esta cesta carga respaldos, la cesta contraria va a favor y cierra
+  // en TP con su inicial cada vez que el precio recorre (05) puntos. Eso es beneficio
+  // ya realizado (operaciones cerradas), no flotante.
+  const ganCiclo   = tpPts*V*normLot(L,step,L);       // beneficio de cada cierre en TP (inicial)
+  const ciclosFav  = tpPts>0 ? Math.floor(x/tpPts) : 0;
+  const favorReal  = ciclosFav*ganCiclo;              // beneficio real acumulado a favor
+
+  // ---- KPIs ----
+  document.getElementById('k_resp').textContent = respaldos+(respaldos===1?' respaldo':' respaldos');
+  document.getElementById('k_resp_s').textContent = openPos+' de '+N+' operaciones abiertas';
+  document.getElementById('k_lots').textContent = fmt(openLots,2)+' lotes';
+  document.getElementById('k_lots_s').textContent = 'suma de lotes abiertos';
+  document.getElementById('k_mov').textContent = fmt(x,0)+' pts';
+  document.getElementById('k_mov_s').textContent = usd(x*point)+' de precio en contra';
+  document.getElementById('k_loss').textContent = usd(floatLoss);
+  document.getElementById('k_loss_s').textContent = burnedCapital? '🔥 supera tu capital ('+usd(C)+')' : fmt(floatLoss/C*100,1)+'% del capital';
+  document.getElementById('k_be').textContent = fmt(bePts,0)+' pts';
+  document.getElementById('k_be_s').textContent = usd(bePts*point)+' desde la 1ª entrada';
+  // "Beneficio a favor (cerrado)": SOLO en Ambas (necesita el lado contrario). En un
+  // solo sentido no hay lado a favor cerrando en TP, así que el bloque se oculta.
+  const tpTile=document.getElementById('tpTile');
+  if(dir==='both'){
+    tpTile.style.display='';
+    document.getElementById('k_tp').textContent = usd(favorReal);
+    document.getElementById('k_tp_s').textContent = ciclosFav+(ciclosFav===1?' cierre':' cierres')+' en TP × '+usd(ganCiclo);
+  } else {
+    tpTile.style.display='none';
+  }
+
+  // ---- Veredicto ----
+  const v=document.getElementById('verdict');
+  const sideTxt = dir==='buy'?'COMPRAS':dir==='sell'?'VENTAS':'AMBAS';
+  if(cortadaPorPerdida){
+    v.className='verdict bad';
+    v.innerHTML = `<b class="red">🛑 CIERRE POR (24) PÉRDIDA MÁXIMA</b> — cesta ${sideTxt}.<br>
+      A ${fmt(xMaxLoss,0)} pts en contra (${usd(xMaxLoss*point)}) el flotante llega a −${usd(maxLoss)} y el bot cierra TODA la cesta.
+      Con los ${fmt(x,0)} pts indicados el flotante sería ${usd(floatLoss)}.`;
+  } else if(burnedCapital){
+    v.className='verdict bad';
+    v.innerHTML = `<b class="red">🔥 CUENTA QUEMADA</b> antes de este punto (cesta ${sideTxt}).<br>
+      Con ${fmt(x,0)} pts en contra hay <b>${respaldos} respaldos</b> y la pérdida flotante es <b>${usd(floatLoss)}</b>, que supera tu capital de ${usd(C)}.
+      Nota: (24) está en ${usd(maxLoss)} → el bot habría cortado a ${fmt(xMaxLoss,0)} pts.`;
+  } else {
+    v.className='verdict ok';
+    v.innerHTML = `<b class="green">✅ ${respaldos} respaldos abiertos</b> con ${fmt(x,0)} pts en contra (${usd(x*point)}) — cesta ${sideTxt}.<br>
+      Pérdida flotante: <b>${usd(floatLoss)}</b> (${fmt(floatLoss/C*100,1)}% del capital). Colchón restante: ${usd(C-floatLoss)}.<br>
+      Si la cesta vuelve al TP cierras con <b class="green">+${usd(tpProfit)}</b> (el precio debe recuperar ${fmt(retroceso,0)} pts = ${usd(retroceso*point)}).
+      ${tpCortaGanancia?`<br><span class="yel">⚑ Ese beneficio (${usd(tpProfit)}) ya alcanza (25) Ganancia Máxima (${usd(maxGain)}): el bot cerraría por equidad.</span>`:''}`;
+  }
+
+  // ---- Título tabla ----
+  document.getElementById('tblTitle').textContent = 'Detalle nivel por nivel · cesta '+sideTxt;
+
+  // ---- Tabla niveles ----
+  let rows='';
+  for(let j=0;j<N;j++){
+    const isOpen = j<=k;
+    const flo = isOpen ? V*lot[j]*(x-cum[j]) : 0;
+    const paso = j===0 ? 0 : cum[j]-cum[j-1];   // distancia de esta op respecto a la anterior
+    rows+=`<tr class="${isOpen?'open':'pending'}">
+      <td>${j===0?'Inicial':'Resp. '+j}</td>
+      <td><span class="tag ${isOpen?'o':'p'}">${isOpen?'ABIERTA':'pendiente'}</span></td>
+      <td>${fmt(lot[j],2)}</td>
+      <td>${fmt(cumLots[j],2)}</td>
+      <td>${fmt(cum[j],0)}</td>
+      <td>${j===0?'—':fmt(paso,0)}</td>
+      <td>${isOpen?usd(flo):'—'}</td></tr>`;
+  }
+  document.querySelector('#tbl tbody').innerHTML=rows;
+
+  // ---- Disparadores ----
+  let trg='';
+  for(let j=1;j<N;j++){
+    trg+=`<tr><td><span class="tag o">Respaldo ${j}</span></td>
+      <td>${fmt(cum[j],0)}</td><td>${usd(cum[j]*point)}</td><td>${usd(lossAt(cum[j]))}</td></tr>`;
+  }
+  if(maxLoss>0 && isFinite(xMaxLoss)){
+    trg+=`<tr><td><span class="tag sell">(24) Cierre por pérdida</span></td>
+      <td>${fmt(xMaxLoss,0)}</td><td>${usd(xMaxLoss*point)}</td><td class="red">${usd(maxLoss)}</td></tr>`;
+  }
+  document.getElementById('trg').innerHTML=trg;
+
+  // ---- Lado opuesto (Ambas) ----
+  const opp=document.getElementById('oppCard');
+  if(dir==='both'){
+    opp.style.display='block';
+    document.getElementById('oppSide').textContent = 'la otra cesta va a favor y toca su TP';
+    document.getElementById('oppTxt').innerHTML =
+      `Mientras esta cesta acumula respaldos, la cesta contraria va a favor. Cada vez que el precio recorre ${tpPts.toLocaleString('es-ES')} pts (el (05) TP) a su favor, esa cesta cierra en <b class="green">+${usd(ganCiclo)}</b> con su operación inicial y vuelve a abrir. `+
+      `Con ${fmt(x,0)} pts de recorrido total, el lado a favor habría cerrado en TP ≈ <b>${ciclosFav}</b> ${ciclosFav===1?'vez':'veces'} = <b class="green">${usd(favorReal)}</b> real (sin contar sus propios respaldos si el precio retrocede).`;
+  } else {
+    opp.style.display='none';
+  }
+}
+
+calc();
+</script>
+</body>
+</html>
