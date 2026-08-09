@@ -26,12 +26,13 @@ export const metadata: Metadata = {
 // Página interna: muestra la calculadora embebida DENTRO de la app (no en pestaña aparte).
 export default function CalculadoraTradingPage() {
   return (
-    <main className="w-full bg-[#0d1117]" style={{ minHeight: "calc(100vh - 64px)" }}>
+    // pt-16 = alto del navbar fijo: sin esto el título de la calculadora queda debajo del menú.
+    <main className="w-full bg-[#0d1117] pt-16" style={{ minHeight: "100dvh" }}>
       <iframe
         src="/calculadora-trading.html"
         title="Nesux Calculator Trading"
         className="w-full border-0"
-        style={{ width: "100%", height: "calc(100vh - 64px)", display: "block" }}
+        style={{ width: "100%", height: "calc(100dvh - 64px)", display: "block" }}
       />
     </main>
   );

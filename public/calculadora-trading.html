@@ -15,6 +15,7 @@
     --ok:#3fb950; --bad:#f85149; --warn:#d29922;
   }
   *{box-sizing:border-box}
+  html,body{max-width:100%;overflow-x:hidden}   /* móvil: NUNCA scroll horizontal de la página */
   body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
   header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:2px solid var(--accent);padding:22px 28px}
   header h1{margin:0;font-size:20px;letter-spacing:.3px}
@@ -65,6 +66,34 @@
   .note{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;font-size:13px}
   .note code{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--accent)}
   .basket-title{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
+  /* Las tablas anchas se desplazan DENTRO de su caja, no arrastran la página. */
+  .tblwrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tblwrap table{min-width:640px}
+
+  /* ---- MÓVIL: todo cabe de lado a lado, sin mover la pantalla ---- */
+  @media(max-width:640px){
+    header{padding:16px 14px}
+    header h1{font-size:17px;line-height:1.25}
+    header p{font-size:12px}
+    .wrap{padding:14px;gap:14px}
+    .card{padding:14px;border-radius:10px}
+    .verdict{padding:14px;font-size:14px}
+    .verdict b{font-size:16px}
+    .kpis{gap:10px}
+    .kpi{padding:12px}
+    .kpi .v{font-size:18px}
+    input,select{font-size:16px}          /* 16px evita el zoom automático de iOS */
+    .tblwrap table{min-width:560px;font-size:12px}
+    th,td{padding:7px 8px}
+    .note,.footer{font-size:12px}
+    /* nada puede desbordar: números y palabras largas se parten */
+    .card,.verdict,.note,.kpi{word-break:break-word;overflow-wrap:anywhere}
+  }
+  @media(max-width:380px){
+    .kpis{grid-template-columns:1fr}
+    .row,.row3{grid-template-columns:1fr}
+    .row>div>label,.row3>div>label{min-height:0}
+  }
 </style>
 </head>
 <body>
@@ -193,13 +222,15 @@
 
     <div class="card">
       <h2 id="tblTitle">Detalle nivel por nivel</h2>
-      <table id="tbl">
-        <thead><tr>
-          <th>Nivel</th><th>Estado</th><th>Lote</th><th>Lotes acum.</th>
-          <th>Dist. apertura (pts)</th><th>Dist. entre ops (pts)</th><th>Pérdida en este punto (USD)</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
+      <div class="tblwrap">
+        <table id="tbl">
+          <thead><tr>
+            <th>Nivel</th><th>Estado</th><th>Lote</th><th>Lotes acum.</th>
+            <th>Dist. apertura (pts)</th><th>Dist. entre ops (pts)</th><th>Pérdida en este punto (USD)</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
       <div class="hint" style="margin-top:8px">«Dist. apertura» = puntos en contra (desde la 1ª entrada) a los que el bot abriría ese respaldo. «Pérdida en este punto» = lo que pierde cada posición ya abierta con el movimiento indicado. Los niveles aún no abiertos aparecen atenuados. Lotes TRUNCADOS al paso, como MT5.</div>
     </div>
 
@@ -211,10 +242,12 @@
 
     <div class="card" style="margin-top:18px">
       <h2>Disparadores de la cesta</h2>
-      <table>
-        <thead><tr><th>Evento</th><th>Ocurre en (pts en contra)</th><th>= USD de precio</th><th>Pérdida flotante</th></tr></thead>
-        <tbody id="trg"></tbody>
-      </table>
+      <div class="tblwrap">
+        <table>
+          <thead><tr><th>Evento</th><th>Ocurre en (pts en contra)</th><th>= USD de precio</th><th>Pérdida flotante</th></tr></thead>
+          <tbody id="trg"></tbody>
+        </table>
+      </div>
       <div class="hint" style="margin-top:8px">Cada fila muestra a cuántos puntos en contra salta cada respaldo y dónde el bot cortaría por (24) Pérdida Máxima.</div>
     </div>
 
@@ -251,29 +284,65 @@ const usd=n=>(n<0?'-$':'$')+fmt(Math.abs(n),2);
 });
 
 // Símbolos con sus specs típicas. El usuario solo elige el par; el resto se rellena solo.
+// g = grupo en el desplegable. approx:true = specs orientativas (verifica en tu bróker).
 const PRESETS={
-  eur:   {name:'EUR/USD',        contract:100000, digits:5, step:0.01, V:1},
-  gbp:   {name:'GBP/USD',        contract:100000, digits:5, step:0.01, V:1},
-  aud:   {name:'AUD/USD',        contract:100000, digits:5, step:0.01, V:1},
-  nzd:   {name:'NZD/USD',        contract:100000, digits:5, step:0.01, V:1},
-  usdjpy:{name:'USD/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
-  usdcad:{name:'USD/CAD',        contract:100000, digits:5, step:0.01, V:0.73, approx:true},
-  usdchf:{name:'USD/CHF',        contract:100000, digits:5, step:0.01, V:1.10, approx:true},
-  eurjpy:{name:'EUR/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
-  gbpjpy:{name:'GBP/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
-  xau:   {name:'XAU/USD · Oro',  contract:100,    digits:2, step:0.01, V:1},
-  xag:   {name:'XAG/USD · Plata',contract:5000,   digits:3, step:0.01, V:5},
-  btc:   {name:'BTC/USD',        contract:1,      digits:2, step:0.01, V:0.01},
-  eth:   {name:'ETH/USD',        contract:1,      digits:2, step:0.01, V:0.01},
-  us30:  {name:'US30 · Dow',     contract:1,      digits:2, step:0.01, V:0.01, approx:true},
-  nas:   {name:'NAS100',         contract:1,      digits:2, step:0.01, V:0.01, approx:true},
-  spx:   {name:'SPX500',         contract:1,      digits:2, step:0.01, V:0.01, approx:true}
+  eur:   {g:'Forex', name:'EUR/USD',        contract:100000, digits:5, step:0.01, V:1},
+  gbp:   {g:'Forex', name:'GBP/USD',        contract:100000, digits:5, step:0.01, V:1},
+  aud:   {g:'Forex', name:'AUD/USD',        contract:100000, digits:5, step:0.01, V:1},
+  nzd:   {g:'Forex', name:'NZD/USD',        contract:100000, digits:5, step:0.01, V:1},
+  usdjpy:{g:'Forex', name:'USD/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+  usdcad:{g:'Forex', name:'USD/CAD',        contract:100000, digits:5, step:0.01, V:0.73, approx:true},
+  usdchf:{g:'Forex', name:'USD/CHF',        contract:100000, digits:5, step:0.01, V:1.10, approx:true},
+  eurjpy:{g:'Forex', name:'EUR/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+  gbpjpy:{g:'Forex', name:'GBP/JPY',        contract:100000, digits:3, step:0.01, V:0.67, approx:true},
+
+  xau:   {g:'Metales', name:'XAU/USD · Oro',   contract:100,  digits:2, step:0.01, V:1},
+  xag:   {g:'Metales', name:'XAG/USD · Plata', contract:5000, digits:3, step:0.01, V:5},
+
+  us30:  {g:'Índices', name:'US30 · Dow',   contract:1, digits:2, step:0.01, V:0.01, approx:true},
+  nas:   {g:'Índices', name:'NAS100',       contract:1, digits:2, step:0.01, V:0.01, approx:true},
+  spx:   {g:'Índices', name:'SPX500',       contract:1, digits:2, step:0.01, V:0.01, approx:true},
+
+  // --- Sintéticos de Deriv (MT5). Contrato 1: 1 punto con 1.0 lote = 10^−dígitos USD. ---
+  v10:    {g:'Sintéticos Deriv', name:'Volatility 10 Index',      contract:1, digits:3, step:0.01,  V:0.001,  approx:true},
+  v25:    {g:'Sintéticos Deriv', name:'Volatility 25 Index',      contract:1, digits:3, step:0.01,  V:0.001,  approx:true},
+  v50:    {g:'Sintéticos Deriv', name:'Volatility 50 Index',      contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
+  v75:    {g:'Sintéticos Deriv', name:'Volatility 75 Index',      contract:1, digits:4, step:0.001, V:0.0001, approx:true},
+  v100:   {g:'Sintéticos Deriv', name:'Volatility 100 Index',     contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  v10s:   {g:'Sintéticos Deriv', name:'Volatility 10 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  v25s:   {g:'Sintéticos Deriv', name:'Volatility 25 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  v50s:   {g:'Sintéticos Deriv', name:'Volatility 50 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  v75s:   {g:'Sintéticos Deriv', name:'Volatility 75 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  v100s:  {g:'Sintéticos Deriv', name:'Volatility 100 (1s) Index',contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  boom500:{g:'Sintéticos Deriv', name:'Boom 500 Index',           contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
+  boom1k: {g:'Sintéticos Deriv', name:'Boom 1000 Index',          contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
+  crash500:{g:'Sintéticos Deriv',name:'Crash 500 Index',          contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
+  crash1k:{g:'Sintéticos Deriv', name:'Crash 1000 Index',         contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
+  step:   {g:'Sintéticos Deriv', name:'Step Index',               contract:1, digits:1, step:0.1,   V:0.1,    approx:true},
+  jump25: {g:'Sintéticos Deriv', name:'Jump 25 Index',            contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  jump75: {g:'Sintéticos Deriv', name:'Jump 75 Index',            contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+  jump100:{g:'Sintéticos Deriv', name:'Jump 100 Index',           contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
+
+  // --- Criptomonedas más operadas ---
+  btc:   {g:'Criptomonedas', name:'BTC/USD · Bitcoin',  contract:1, digits:2, step:0.01, V:0.01},
+  eth:   {g:'Criptomonedas', name:'ETH/USD · Ethereum', contract:1, digits:2, step:0.01, V:0.01},
+  xrp:   {g:'Criptomonedas', name:'XRP/USD · Ripple',   contract:1, digits:4, step:0.01, V:0.0001, approx:true},
+  sol:   {g:'Criptomonedas', name:'SOL/USD · Solana',   contract:1, digits:2, step:0.01, V:0.01,   approx:true},
+  bnb:   {g:'Criptomonedas', name:'BNB/USD · Binance',  contract:1, digits:2, step:0.01, V:0.01,   approx:true},
+  ada:   {g:'Criptomonedas', name:'ADA/USD · Cardano',  contract:1, digits:4, step:0.01, V:0.0001, approx:true},
+  doge:  {g:'Criptomonedas', name:'DOGE/USD · Dogecoin',contract:1, digits:5, step:0.01, V:0.00001,approx:true},
+  ltc:   {g:'Criptomonedas', name:'LTC/USD · Litecoin', contract:1, digits:2, step:0.01, V:0.01,   approx:true}
 };
 
-// Poblar el selector + opción avanzada
+// Poblar el selector agrupado (Forex · Metales · Índices · Sintéticos Deriv · Criptos)
 (function(){
   const sel=document.getElementById('preset');
-  for(const k in PRESETS){ const o=document.createElement('option'); o.value=k; o.textContent=PRESETS[k].name; sel.appendChild(o); }
+  const grupos={};
+  for(const k in PRESETS){
+    const g=PRESETS[k].g||'Otros';
+    if(!grupos[g]){ grupos[g]=document.createElement('optgroup'); grupos[g].label=g; sel.appendChild(grupos[g]); }
+    const o=document.createElement('option'); o.value=k; o.textContent=PRESETS[k].name; grupos[g].appendChild(o);
+  }
   const o=document.createElement('option'); o.value='otro'; o.textContent='Otro / personalizado…'; sel.appendChild(o);
   sel.value='eur';                // símbolo por defecto
   aplicarPreset('eur', false);

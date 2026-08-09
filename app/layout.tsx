@@ -49,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <PageTracker />
           <InstallAppBanner />
+          {/* HumanCheck retirado: la captura de leads la hace el único popup oficial (lead-popup.js). */}
           <LayoutShell>{children}</LayoutShell>
         </Providers>
         <Script
