@@ -13,9 +13,11 @@ import {
   BookOpen,
   Bot,
   Users,
+  Calculator,
   LogIn,
   LogOut,
   User,
+  Download,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -40,7 +42,7 @@ function DropdownLanding() {
 
   return (
     <div className="relative group">
-      <button className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors rounded-md ${
+      <button className={`flex items-center gap-1 px-2 py-2 text-sm font-medium whitespace-nowrap transition-colors rounded-md ${
         isLandingActive
           ? "text-blue-400 font-bold drop-shadow-lg"
           : "text-slate-300 hover:text-emerald-400"
@@ -56,6 +58,14 @@ function DropdownLanding() {
           <Link href="/landing/cj-bot" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors" prefetch={false}>
             <Bot className="h-4 w-4 text-emerald-500" />
             <span className="font-semibold">CJ Bot</span>
+          </Link>
+          <Link href="/landing/trading-academy" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800" prefetch={false}>
+            <Bot className="h-4 w-4 text-blue-400" />
+            <span className="font-semibold">Trading Academy</span>
+          </Link>
+          <Link href="/landing/calculadora" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800" prefetch={false}>
+            <Calculator className="h-4 w-4 text-amber-400" />
+            <span className="font-semibold">Calculadora</span>
           </Link>
         </div>
       </div>
@@ -105,6 +115,38 @@ function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
               </span>
             </div>
           </Link>
+          <Link
+            href="/landing/trading-academy"
+            className="flex items-center p-2 bg-blue-900/20 rounded gap-2 border-l-4 border-blue-500 text-blue-300 mt-1"
+            prefetch={false}
+            onClick={e => {
+              sendNavAnalytics('nav_landing_click', 'trading_academy');
+              if (typeof closeMenu === 'function') closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Bot className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">Trading Academy</span>
+              <span className="block text-xs font-bold text-white mt-2">Formación y automatización</span>
+            </div>
+          </Link>
+          <Link
+            href="/landing/calculadora"
+            className="flex items-center p-2 bg-amber-900/20 rounded gap-2 border-l-4 border-amber-500 text-amber-300 mt-1"
+            prefetch={false}
+            onClick={() => {
+              sendNavAnalytics('nav_landing_click', 'calculadora');
+              if (typeof closeMenu === 'function') closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Calculator className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">Calculadora</span>
+              <span className="block text-xs font-bold text-white mt-2">Calcula tu riesgo y tamaño de lote</span>
+            </div>
+          </Link>
         </div>
       )}
     </div>
@@ -147,22 +189,22 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <TrendingUp className="h-8 w-8 text-emerald-500" />
-            <span className="text-xl font-bold text-white">
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <TrendingUp className="h-8 w-8 flex-shrink-0 text-emerald-500" />
+            <span className="text-base lg:text-xl font-bold text-white whitespace-nowrap">
               Trading Academy <span className="text-emerald-500">A Otro Nivel</span>
             </span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-3 lg:gap-6">
             {navLinks.map((link) => {
               const active = isActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1 text-sm font-medium whitespace-nowrap transition-colors ${
                     active
                       ? "text-blue-400 font-bold drop-shadow-lg"
                       : "text-slate-300 hover:text-emerald-400"
@@ -192,7 +234,7 @@ export function Navbar() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/login"
-                  className={`transition-colors text-sm font-medium ${
+                  className={`transition-colors text-sm font-medium whitespace-nowrap ${
                     pathname === "/login"
                       ? "text-blue-400 font-bold drop-shadow-lg"
                       : "text-slate-300 hover:text-white"
@@ -202,7 +244,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/registro"
-                  className="text-sm font-bold text-white py-2 px-6 rounded-full transition-all hover:shadow-lg hover:scale-105"
+                  className="text-sm font-bold text-white whitespace-nowrap py-2 px-5 rounded-full transition-all hover:shadow-lg hover:scale-105"
                   style={{ backgroundColor: '#B64183' }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#9E3570')}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#B64183')}
@@ -211,6 +253,15 @@ export function Navbar() {
                 </Link>
               </div>
             ) : null}
+            {/* Descargar la app (PC y móvil). El componente InstallApp atiende el clic. */}
+            <button
+              data-instalar-app
+              title="Descargar la app"
+              className="flex items-center gap-1 text-sm font-medium whitespace-nowrap text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              <Download className="h-4 w-4" />
+              App
+            </button>
             <ThemeToggle />
           </div>
 
@@ -256,6 +307,15 @@ export function Navbar() {
                 );
               })}
               <MobileDropdownLanding closeMenu={() => setIsOpen(false)} />
+              {/* Descargar la app desde el menú móvil */}
+              <button
+                data-instalar-app
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 py-2 text-emerald-400 hover:text-emerald-300 w-full text-left"
+              >
+                <Download className="h-5 w-5" />
+                Descargar la app
+              </button>
               <div className="pt-4 border-t border-slate-700">
                 {mounted && status === "authenticated" ? (
                   <button
