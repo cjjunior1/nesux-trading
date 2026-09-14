@@ -421,9 +421,11 @@ function decimalesDe(n){
 }
 function precio(n,d){
   if(!isFinite(n)) return '∞';
-  const max=Math.max(0,Math.min(8,d|0));
-  const min=Math.min(max,decimalesDe(n));
-  return n.toLocaleString('en-US',{minimumFractionDigits:min,maximumFractionDigits:max});
+  // Se completan SIEMPRE los decimales del símbolo: 45200 en un índice de dos
+  // decimales se escribe 45,200.00. Una columna de precios con distinto número
+  // de decimales no se puede comparar de un vistazo.
+  const dec=Math.max(0,Math.min(8,d|0));
+  return n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
 }
 
 /**

@@ -339,8 +339,11 @@ const usd=n=>(n<0?'-$':'$')+nf(Math.abs(n),2,'en-US');
 function decimalesDe(n){ const s=String(n), i=s.indexOf('.'); return i<0?0:Math.min(8,s.length-i-1); }
 function precio(n,d){
   if(!isFinite(n)) return '∞';
-  const max=Math.max(0,Math.min(8,d|0)), min=Math.min(max,decimalesDe(n));
-  return n.toLocaleString('en-US',{minimumFractionDigits:min,maximumFractionDigits:max});
+  // Se completan SIEMPRE los decimales del símbolo: 45200 en un índice de dos
+  // decimales se escribe 45,200.00. Una columna con distinto número de decimales
+  // en cada fila no se puede comparar de un vistazo.
+  const dec=Math.max(0,Math.min(8,d|0));
+  return n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
 }
 
 /**
@@ -521,7 +524,6 @@ function calcAbiertas(){
   const prox=niveles[mg] || null;
   campoMG.value=mg;
 
-  const flotante = V*(est.lotes*x - est.ponderada);
   const proxDist = prox ? prox.dist : est.dist;
   const proxPrecio = dir==='buy' ? primera-proxDist*point : primera+proxDist*point;
   const proxLote = prox ? prox.l : est.l;
@@ -538,7 +540,7 @@ function calcAbiertas(){
   document.getElementById('tpGanancia').value = usaTP ? usd(ganaTP) : '';
   document.getElementById('tpFaltan').value   = usaTP ? `${pts(faltan)} pts` : '';
 
-  // ---- Detalle: la suma de las filas tiene que dar el flotante ----
+  // ---- Detalle: su suma ES el resultado flotante de la cesta ----
   const filas=abiertos.map((n,i)=>{
     const entrada = dir==='buy' ? primera-n.dist*point : primera+n.dist*point;
     const puntos = (dir==='buy' ? actual-entrada : entrada-actual)/point;
@@ -553,7 +555,10 @@ function calcAbiertas(){
     ['Respaldos alcanzados', String(mg-1), 'v-num'],
     ['Lotes abiertos', fmt(est.lotes,2), 'v-lote'],
     ['Estado de la cesta', 'ABIERTA', 'v-estado'],
-    ['Pérdida flotante', usd(-flotante), 'v-menos'],
+    // Antes salía de los puntos EN CONTRA, que se quedan en cero cuando el
+    // precio va a favor: la cesta ganaba 33.98 y aquí aparecía 0.00. Ahora es
+    // la suma real de las operaciones abiertas, con su signo.
+    ['Resultado flotante', usd(total), total<0 ? 'v-menos' : 'v-mas'],
     ['Distancia próximo respaldo', pts(proxDist)+' pts', 'v-pts'],
     ['Precio próximo respaldo', proxPrecio>0 ? precio(proxPrecio,digits) : 'fuera de rango', 'v-precio'],
     ['Lotaje próximo respaldo', fmt(proxLote,2), 'v-lote'],
