@@ -18,6 +18,8 @@ import {
   LogOut,
   User,
   Download,
+  Percent,
+  Network,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -59,14 +61,43 @@ function DropdownLanding() {
             <Bot className="h-4 w-4 text-emerald-500" />
             <span className="font-semibold">CJ Bot</span>
           </Link>
+          <a href="/cj-bot-manual.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800">
+            <BookOpen className="h-4 w-4 text-emerald-400" />
+            <span className="font-semibold">CJ Bot Manual</span>
+          </a>
           <Link href="/landing/trading-academy" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800" prefetch={false}>
             <Bot className="h-4 w-4 text-blue-400" />
             <span className="font-semibold">Trading Academy</span>
           </Link>
           <Link href="/landing/calculadora" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800" prefetch={false}>
             <Calculator className="h-4 w-4 text-amber-400" />
-            <span className="font-semibold">Calculadora</span>
+            <span className="font-semibold">Calculator Plus</span>
           </Link>
+          <Link href="/landing/trading-calculator" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800" prefetch={false}>
+            <Calculator className="h-4 w-4 text-teal-400" />
+            <span className="font-semibold">Trading Calculator</span>
+          </Link>
+          {/* GJ Calculator vive fuera de esta aplicacion, asi que va con <a>
+              y no con <Link>: Next intentaria enrutarla por dentro y daria
+              404. Se abre en pestana nueva para no perder lo que el alumno
+              estuviera haciendo aqui. */}
+          <a
+            href="https://nesuxglobalbusinessrd.com/gj/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800"
+          >
+            <Percent className="h-4 w-4 text-violet-400" />
+            <span className="font-semibold">GJ Calculator</span>
+          </a>
+          <a href="/comite-ejecutivo.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800">
+            <Users className="h-4 w-4 text-sky-400" />
+            <span className="font-semibold">Comité Ejecutivo</span>
+          </a>
+          <a href="/organismo-estructural.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors border-t border-slate-800">
+            <Network className="h-4 w-4 text-rose-400" />
+            <span className="font-semibold">Organismo Estructural</span>
+          </a>
         </div>
       </div>
     </div>
@@ -115,6 +146,23 @@ function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
               </span>
             </div>
           </Link>
+          <a
+            href="/cj-bot-manual.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center p-2 bg-emerald-900/10 rounded gap-2 border-l-4 border-emerald-400 text-emerald-200 mt-1"
+            onClick={() => {
+              sendNavAnalytics("nav_landing_click", "cj_bot_manual");
+              if (typeof closeMenu === "function") closeMenu();
+              setOpen(false);
+            }}
+          >
+            <BookOpen className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">CJ Bot Manual</span>
+              <span className="block text-xs font-bold text-white mt-2">Manual completo + curso desde cero</span>
+            </div>
+          </a>
           <Link
             href="/landing/trading-academy"
             className="flex items-center p-2 bg-blue-900/20 rounded gap-2 border-l-4 border-blue-500 text-blue-300 mt-1"
@@ -143,10 +191,77 @@ function MobileDropdownLanding({closeMenu}: {closeMenu?: () => void}) {
           >
             <Calculator className="h-5 w-5 flex-shrink-0" />
             <div className="flex flex-col ml-1">
-              <span className="font-bold leading-tight">Calculadora</span>
+              <span className="font-bold leading-tight">Calculator Plus</span>
               <span className="block text-xs font-bold text-white mt-2">Calcula tu riesgo y tamaño de lote</span>
             </div>
           </Link>
+          <Link
+            href="/landing/trading-calculator"
+            className="flex items-center p-2 bg-teal-900/20 rounded gap-2 border-l-4 border-teal-500 text-teal-300 mt-1"
+            prefetch={false}
+            onClick={() => {
+              sendNavAnalytics('nav_landing_click', 'trading_calculator');
+              if (typeof closeMenu === 'function') closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Calculator className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">Trading Calculator</span>
+              <span className="block text-xs font-bold text-white mt-2">Cestas del CJ Bot, operación por operación</span>
+            </div>
+          </Link>
+          <a
+            href="https://nesuxglobalbusinessrd.com/gj/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center p-2 bg-violet-900/20 rounded gap-2 border-l-4 border-violet-500 text-violet-300 mt-1"
+            onClick={() => {
+              sendNavAnalytics('nav_landing_click', 'gj-calculator');
+              if (typeof closeMenu === 'function') closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Percent className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">GJ Calculator</span>
+              <span className="block text-xs font-bold text-white mt-2">Porcentajes al instante · PDF, imagen y Excel</span>
+            </div>
+          </a>
+          <a
+            href="/comite-ejecutivo.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center p-2 bg-sky-900/20 rounded gap-2 border-l-4 border-sky-500 text-sky-300 mt-1"
+            onClick={() => {
+              sendNavAnalytics("nav_landing_click", "comite_ejecutivo");
+              if (typeof closeMenu === "function") closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Users className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">Comité Ejecutivo</span>
+              <span className="block text-xs font-bold text-white mt-2">Los siete cargos y sus responsabilidades</span>
+            </div>
+          </a>
+          <a
+            href="/organismo-estructural.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center p-2 bg-rose-900/20 rounded gap-2 border-l-4 border-rose-500 text-rose-300 mt-1"
+            onClick={() => {
+              sendNavAnalytics("nav_landing_click", "organismo_estructural");
+              if (typeof closeMenu === "function") closeMenu();
+              setOpen(false);
+            }}
+          >
+            <Network className="h-5 w-5 flex-shrink-0" />
+            <div className="flex flex-col ml-1">
+              <span className="font-bold leading-tight">Organismo Estructural</span>
+              <span className="block text-xs font-bold text-white mt-2">Plan estratégico en siete puntos</span>
+            </div>
+          </a>
         </div>
       )}
     </div>
@@ -188,10 +303,20 @@ export function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex justify-between items-center gap-2 md:gap-6 lg:gap-10 h-16">
+          {/* Claro/oscuro a la IZQUIERDA en el móvil.
+              Antes iba pegado al menú, los dos a la derecha, y como el logo no
+              se dejaba encoger empujaba ese grupo fuera de la pantalla: el
+              botón de menú quedaba escondido y no había forma de abrirlo. */}
+          <div className="md:hidden flex-shrink-0">
+            <ThemeToggle />
+          </div>
+
+          {/* El logo ya puede encogerse: en un móvil estrecho se recorta el
+              texto en vez de tapar los botones. */}
+          <Link href="/" className="flex items-center gap-2 min-w-0 md:flex-shrink-0">
             <TrendingUp className="h-8 w-8 flex-shrink-0 text-emerald-500" />
-            <span className="text-base lg:text-xl font-bold text-white whitespace-nowrap">
+            <span className="text-base lg:text-xl font-bold text-white truncate md:whitespace-nowrap">
               Trading Academy <span className="text-emerald-500">A Otro Nivel</span>
             </span>
           </Link>
@@ -265,11 +390,12 @@ export function Navbar() {
             <ThemeToggle />
           </div>
 
-          {/* Mobile: tema + botón de menú */}
-          <div className="md:hidden flex items-center gap-2">
-            <ThemeToggle />
+          {/* Mobile: solo el menú, a la derecha. El claro/oscuro se movió al
+              otro extremo para que ninguno de los dos pueda quedar tapado. */}
+          <div className="md:hidden flex-shrink-0">
             <button
               className="text-white p-2"
+              aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

@@ -122,6 +122,17 @@ function CheckoutInner() {
           </>
         )}
 
+        {result && (
+          <button
+            type="button"
+            onClick={() => { setResult(null); setPayStatus(""); setError(""); }}
+            style={{ backgroundColor: "rgb(187,62,129)" }}
+            className="mb-5 inline-flex items-center gap-2 rounded-full text-white hover:opacity-90 px-6 py-3 text-base font-semibold transition-opacity shadow-lg"
+          >
+            <span className="text-xl leading-none">←</span> Volver a elegir método de pago
+          </button>
+        )}
+
         {/* Resultado: TRANSFERENCIA (varios bancos) */}
         {result?.bank_accounts && (
           <div className="card">
@@ -199,7 +210,7 @@ function CheckoutInner() {
               {copied === "amt" && <span className="text-emerald-400 text-xs">✓ Copiado</span>}
               {result.exact_amount && (
                 <p className="text-xs text-amber-300 mt-2">
-                  Envía este monto <b>al céntimo</b>: así identificamos tu pago automáticamente. Si envías otra cantidad, la activación tardará.
+                  Favor de enviar el <b>monto exacto</b>: así identificamos tu pago automáticamente. Si envías otra cantidad, la activación puede tardar.
                 </p>
               )}
             </div>

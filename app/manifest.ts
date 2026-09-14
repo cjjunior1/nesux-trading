@@ -4,28 +4,21 @@ import type { MetadataRoute } from 'next';
 // En modo standalone el sitio se abre a pantalla completa, como una app.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Asistente Trading Academy',
-    short_name: 'Asistente',
-    description: 'Tu asistente de trading con IA: conversa por voz o texto, aprende y automatiza.',
-    start_url: '/?chat=1',
+    name: 'Trading Academy · A Otro Nivel',
+    short_name: 'Trading Academy',
+    description: 'Cursos, bots y asistente de trading con IA. Todo Nesux Trading Academy en tu pantalla de inicio.',
+    start_url: '/',
     display: 'standalone',
     background_color: '#020617',
     theme_color: '#059669',
     lang: 'es',
-    orientation: 'portrait-primary',
+    // Sin 'orientation' fija: en PC la app se abre como ventana normal.
+    // PNG 192 y 512: es lo que Chrome/Edge exigen para ofrecer "Instalar" en escritorio y Android.
     icons: [
-      {
-        src: '/icon.svg',
-        sizes: '512x512',
-        type: 'image/svg+xml',
-        purpose: 'any',
-      },
-      {
-        src: '/icon.svg',
-        sizes: '512x512',
-        type: 'image/svg+xml',
-        purpose: 'maskable',
-      },
+      { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
     ],
   };
 }

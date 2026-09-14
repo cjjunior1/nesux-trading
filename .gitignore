@@ -25,3 +25,7 @@ components/chatbot.backup.tsx
 
 # Paquete de migración a Nesux (no pertenece al build de este proyecto)
 _export-nesux/
+
+# Cache de compilacion de TypeScript: se regenera sola
+tsconfig.tsbuildinfo
+

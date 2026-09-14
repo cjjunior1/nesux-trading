@@ -106,7 +106,7 @@ const features = [
 const courses = [
   {
     id: "academia-plus-2",
-    title: "Academia Plus/Bots 2 Users",
+    title: "Socio Starter",
     subtitle: "Beneficios del Plan",
     description:
       "Ideal para principiantes. Todo tipo de trading con énfasis en trading binario y diferentes plataformas. Construye las bases sólidas que necesitas.",
@@ -126,7 +126,7 @@ const courses = [
   },
   {
     id: "academia-plus-3",
-    title: "Academia Plus/Bots 3 Users",
+    title: "Socio Pro",
     subtitle: "Estrategias Avanzadas",
     description:
       "Lleva tu trading al siguiente nivel con estrategias probadas. Todo tipo de trading con énfasis en trading binario en diferentes plataformas.",
@@ -147,7 +147,7 @@ const courses = [
   },
   {
     id: "academia-plus-5",
-    title: "Academia Plus/Bots 5 Users",
+    title: "Socio Élite",
     subtitle: "Trading Institucional",
     description:
       "Todo lo del Curso Básico y del Intermedio más Trading Institucional. Incluye mentoría personalizada y acceso a bots automáticos.",

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CJ Bot — Manual de Usuario + Curso de Trading desde Cero</title>
+<style>
+  @page { size: A4; margin: 1.8cm; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; line-height: 1.55; font-size: 11pt; max-width: 920px; margin: 0 auto; padding: 20px; background: #fff; }
+  h1 { color: #b8860b; font-size: 22pt; border-bottom: 3px solid #b8860b; padding-bottom: 6px; margin-top: 30px; }
+  h2 { color: #0b3d6b; font-size: 15pt; border-bottom: 1px solid #9cc; margin-top: 22px; padding-bottom: 3px; }
+  h3 { color: #0b8a3e; font-size: 12.5pt; margin-top: 14px; }
+  .parte { background: #0b3d6b; color: #fff; padding: 16px 20px; border-radius: 8px; margin-top: 30px; font-size: 18pt; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th, td { border: 1px solid #b0b0b0; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #0b3d6b; color: #fff; }
+  tr:nth-child(even) { background: #f1f5fa; }
+  .nota { background: #fff8e1; border-left: 5px solid #f0a500; padding: 10px 14px; margin: 12px 0; }
+  .riesgo { background: #fdecea; border-left: 5px solid #d32f2f; padding: 10px 14px; margin: 12px 0; }
+  .ok { background: #e8f5e9; border-left: 5px solid #2e7d32; padding: 10px 14px; margin: 12px 0; }
+  .ej { background: #eef3f8; border-left: 5px solid #0b3d6b; padding: 10px 14px; margin: 12px 0; }
+  .paso { background: #eef3f8; border-radius: 6px; padding: 5px 12px; margin: 5px 0; }
+  code { background: #eee; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 10pt; }
+  .portada { text-align: center; margin-top: 80px; }
+  .portada h1 { border: none; font-size: 34pt; }
+  .portada p { font-size: 14pt; color: #555; }
+  ul, ol { margin: 6px 0 10px 0; } li { margin-bottom: 5px; }
+  .pagebreak { page-break-before: always; }
+  .indice { background: #f7f9fc; border: 1px solid #d6e0ec; border-radius: 8px; padding: 14px 22px; }
+  .indice ul { margin: 4px 0; } .indice li { margin-bottom: 3px; }
+  tr.rev td { background: #f1f8f2; }
+  tr.ten td { background: #fff6ec; }
+  .badge { display: inline-block; font-size: 9pt; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
+  .b-rev { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .b-ten { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <h1>CJ BOT</h1>
+  <p><b>Manual de Usuario Completo + Curso de Trading desde Cero</b></p>
+  <p>Robot de trading automático para MetaTrader 5</p>
+  <p style="font-size:12pt">CJ Junior Cabrera &nbsp;|&nbsp; cjjuniorstore.com</p>
+  <p style="font-size:11pt; color:#777">Dos partes: (1) cómo funciona el bot &nbsp;·&nbsp; (2) formación completa desde cero</p>
+</div>
+
+<div class="pagebreak"></div>
+
+<div class="indice">
+<h2 style="margin-top:0">Índice</h2>
+<b>PARTE 1 — Manual del bot</b>
+<ul>
+  <li>1. Qué es el CJ Bot &nbsp;·&nbsp; 2. Conceptos básicos &nbsp;·&nbsp; 3. Requisitos &nbsp;·&nbsp; 4. Instalación</li>
+  <li>5. Licencia y seguridad &nbsp;·&nbsp; 6. Los 25 parámetros &nbsp;·&nbsp; 7. El Número Mágico &nbsp;·&nbsp; 8. Modos de operación</li>
+  <li>9. Las 18 estrategias por familia (nones / pares)</li>
+  <li>10. Cómo trabaja el bot por dentro (función por función)</li>
+  <li>11. Martingala y Recuperación &nbsp;·&nbsp; 12. Trailing Stop &nbsp;·&nbsp; 13. Protección de equidad</li>
+  <li>14. El panel visual &nbsp;·&nbsp; 15. Reportes &nbsp;·&nbsp; 16. Backtest &nbsp;·&nbsp; 17. Buenas prácticas</li>
+  <li>18. Errores comunes y soluciones &nbsp;·&nbsp; 19. Preguntas frecuentes</li>
+</ul>
+<b>PARTE 2 — Curso de trading desde cero</b>
+<ul>
+  <li>C1 Qué es el trading &nbsp;·&nbsp; C2 Velas &nbsp;·&nbsp; C3 Temporalidades &nbsp;·&nbsp; C4 Tendencia, soporte y resistencia</li>
+  <li>C5 Conceptos de dinero &nbsp;·&nbsp; C6 Los indicadores &nbsp;·&nbsp; C7 Gestión de riesgo &nbsp;·&nbsp; C8 La martingala</li>
+  <li>C9 Psicología &nbsp;·&nbsp; C10 Plan de práctica &nbsp;·&nbsp; C11 Errores del principiante</li>
+</ul>
+</div>
+
+<div class="parte">PARTE 1 — MANUAL DEL BOT</div>
+
+<h1>1. Qué es el CJ Bot</h1>
+<p>El CJ Bot es un robot de trading (técnicamente un <b>Expert Advisor</b> o EA) que funciona dentro de <b>MetaTrader 5</b>. Un robot de trading <b>abre, gestiona y cierra operaciones por ti</b>, siguiendo reglas fijas, sin que estés frente a la pantalla.</p>
+<p>El CJ Bot combina <b>18 estrategias técnicas</b> (03–20) organizadas por familia (<b>nones = reversión, pares = tendencia</b>), un <b>modo por tiempo</b> y un <b>modo seguidor</b>, gestión de capital (<b>martingala</b> y <b>recuperación</b>), <b>trailing stop</b>, <b>protección de equidad</b> y un <b>panel visual</b> en el gráfico.</p>
+<div class="nota"><b>Si nunca has usado un robot:</b> piénsalo como un "piloto automático". Tú defines las reglas (los parámetros), lo activas y el bot opera siguiéndolas. Este manual explica cada botón y cada parámetro con palabras sencillas. Si no entiendes una palabra, mira la <b>PARTE 2</b>: es un curso completo desde cero.</div>
+<div class="ok"><b>Para principiantes:</b> usa siempre <b>cuenta demo</b> primero, con lote 0.01, y observa el panel varios días antes de pensar en dinero real.</div>
+
+<h1>2. Conceptos básicos</h1>
+<table>
+<tr><th>Término</th><th>Qué significa</th></tr>
+<tr><td>Operación / Posición</td><td>Una compra o una venta abierta en el mercado.</td></tr>
+<tr><td>Lote / Lotaje</td><td>El tamaño de la operación. Más lote = más dinero por cada movimiento del precio.</td></tr>
+<tr><td>Punto</td><td>La mínima variación de precio. El bot mide todas las distancias en puntos.</td></tr>
+<tr><td>Take Profit (TP)</td><td>Precio objetivo donde se cierra <b>con ganancia</b>.</td></tr>
+<tr><td>Stop Loss (SL)</td><td>Precio donde se cierra <b>con pérdida</b> para no perder más.</td></tr>
+<tr><td>Número Mágico</td><td>"Etiqueta" numérica que identifica las operaciones de este bot.</td></tr>
+<tr><td>Cuenta Demo / Real</td><td>Demo = práctica con dinero ficticio (ideal para empezar). Real = dinero real.</td></tr>
+<tr><td>Hedging / Netting</td><td>Hedging = varias operaciones a la vez en el mismo símbolo (lo necesita la cesta). Netting = una sola posición por símbolo.</td></tr>
+</table>
+
+<h1>3. Requisitos antes de empezar</h1>
+<ul>
+  <li><b>Plataforma:</b> MetaTrader 5 (MT5). <b>No funciona en MT4.</b></li>
+  <li><b>Tipo de cuenta:</b> se recomienda <b>Hedging</b> (cobertura). En Netting la cesta de martingala no funciona correctamente.</li>
+  <li><b>Licencia:</b> contraseña correcta y número de cuenta autorizado (sección 5).</li>
+  <li><b>Capital suficiente</b>, sobre todo si usas martingala.</li>
+</ul>
+<div class="nota"><b>Hedging vs Netting:</b><br>
+a) <b>Hedging:</b> permite varias operaciones a la vez en el mismo símbolo. El bot la necesita para la cesta de martingala.<br>
+b) <b>Netting:</b> solo una posición por símbolo. No sirve para la cesta.</div>
+
+<h1>4. Instalación paso a paso</h1>
+<div class="paso"><b>Paso 1.</b> Copia <code>CJBot.ex5</code> en la carpeta <b>MQL5 &gt; Experts</b> (menú: <b>Archivo &gt; Abrir carpeta de datos</b>).</div>
+<div class="paso"><b>Paso 2.</b> Reinicia MT5 o actualiza la lista de Asesores Expertos (clic derecho &gt; Actualizar) en el Navegador.</div>
+<div class="paso"><b>Paso 3.</b> Abre el gráfico del símbolo y la temporalidad deseada.</div>
+<div class="paso"><b>Paso 4.</b> Arrastra el CJ Bot desde el Navegador hasta el gráfico.</div>
+<div class="paso"><b>Paso 5.</b> Activa <b>"Permitir Algo Trading"</b> y configura los parámetros (sección 6).</div>
+<div class="paso"><b>Paso 6.</b> Asegúrate de que el botón <b>"Algo Trading"</b> de la barra de MT5 esté encendido (verde).</div>
+<div class="ok">Cuando el bot está corriendo, verás el <b>panel visual</b> en el gráfico. Si aparece, todo está en marcha.</div>
+
+<h1>5. Licencia y seguridad</h1>
+<p>El acceso lo controla el desarrollador desde el código antes de compilar. El usuario final no cambia estos valores:</p>
+<table>
+<tr><th>Control</th><th>Para qué sirve</th></tr>
+<tr><td>Modo de cuenta permitido</td><td>Define dónde puede correr: Solo Demo, Solo Real o Ambas.</td></tr>
+<tr><td>Contraseña maestra</td><td>El usuario debe escribir la contraseña correcta.</td></tr>
+<tr><td>Lista de cuentas autorizadas</td><td>Opcional: limita el bot a cuentas específicas.</td></tr>
+<tr><td>Fecha de vencimiento</td><td>La licencia deja de funcionar tras una fecha.</td></tr>
+<tr><td>Rango de balance</td><td>El bot no inicia si el balance está fuera de rango.</td></tr>
+</table>
+<p><b>Parámetros de licencia que SÍ ve el usuario:</b></p>
+<ul>
+  <li><b>Número de Cuenta de Licencia:</b> tu número de cuenta MT5 autorizado.</li>
+  <li><b>Contraseña de Licencia:</b> la contraseña que te entregaron.</li>
+</ul>
+<div class="nota">Si alguna validación falla, el bot <b>no arranca</b> y muestra el error exacto en el <b>Diario</b> (<i>Journal</i>) de MT5. Lee ese mensaje: casi siempre te dice justo qué falta.</div>
+
+<h1>6. Los 25 parámetros, uno por uno</h1>
+<table>
+<tr><th>#</th><th>Parámetro</th><th>Qué hace</th><th>Por defecto</th></tr>
+<tr><td>1</td><td>Estrategia de Entrada</td><td>Cómo decide entrar: Por Tiempo, Seguidor o una de las 18 (03–20).</td><td>Solo Tiempo</td></tr>
+<tr><td>2</td><td>Dirección de Operaciones</td><td>Solo Comprar, solo Vender o Ambas.</td><td>Ambas</td></tr>
+<tr><td>3</td><td>Temporalidad de la Señal</td><td>Marco de tiempo de las señales. "Actual" = la del gráfico.</td><td>Actual</td></tr>
+<tr><td>4</td><td>Lotaje Inicial</td><td>Tamaño de la primera operación. Principiantes: el mínimo (0.01).</td><td>0.01</td></tr>
+<tr><td>5</td><td>Take Profit (puntos)</td><td>A cuántos puntos de ganancia cierra.</td><td>100000</td></tr>
+<tr><td>6</td><td>Stop Loss (puntos)</td><td>A cuántos puntos de pérdida cierra (individual / recuperación).</td><td>50000</td></tr>
+<tr><td>7</td><td>Activar Trailing TP</td><td>Si el objetivo persigue al precio para dejar correr la ganancia.</td><td>Sí</td></tr>
+<tr><td>8</td><td>% Activación Trailing TP</td><td>A qué % del TP se activa ese seguimiento.</td><td>70%</td></tr>
+<tr><td>9</td><td>% Distancia Trailing TP</td><td>Qué tan lejos del precio se coloca el TP al seguirlo.</td><td>30%</td></tr>
+<tr><td>10</td><td>Activar Trailing SL</td><td>Si el SL se mueve a favor para asegurar ganancia.</td><td>Sí</td></tr>
+<tr><td>11</td><td>% Activación Trailing SL</td><td>A qué % del TP empieza a moverse el SL.</td><td>60%</td></tr>
+<tr><td>12</td><td>% Distancia Trailing SL</td><td>Qué tan cerca del precio se coloca el SL.</td><td>30%</td></tr>
+<tr><td>13</td><td>Activar Martingala</td><td>Modo de gestión: Desactivada / Martingala (cesta) / Recuperación.</td><td>Martingala</td></tr>
+<tr><td>14</td><td>Multiplicador Martingala</td><td>Cuánto crece el lote en cada respaldo (2.0 = doble).</td><td>2.0</td></tr>
+<tr><td>15</td><td>Puntos primer respaldo</td><td>Distancia en contra para el primer respaldo.</td><td>50000</td></tr>
+<tr><td>16</td><td>Incremento % respaldos</td><td>Cuánto se aleja cada respaldo respecto al anterior.</td><td>25%</td></tr>
+<tr><td>17</td><td>Cantidad de Martingalas</td><td>Máximo de respaldos en la cesta.</td><td>7</td></tr>
+<tr><td>18</td><td>Segundos de espera / estabilidad</td><td>Tiempo que la condición debe mantenerse antes de respaldar o reentrar.</td><td>10</td></tr>
+<tr><td>19</td><td>Frecuencia de Vigilancia (ms)</td><td>Cada cuánto revisa el mercado. 1000 = cada segundo.</td><td>1000</td></tr>
+<tr><td>20</td><td>ID Mágico</td><td>Etiqueta que identifica las operaciones del bot (sección 7).</td><td>100</td></tr>
+<tr><td>21</td><td>Comentario</td><td>Texto en cada orden del bot (se le añade el nivel de martingala).</td><td>CJ Bot</td></tr>
+<tr><td>22</td><td>Activar Protección de Equidad</td><td>Cierra TODO al llegar a un tope de ganancia o pérdida en USD.</td><td>Sí</td></tr>
+<tr><td>23</td><td>Activar Ventanas Emergentes</td><td>Muestra avisos en pantalla.</td><td>Sí</td></tr>
+<tr><td>24</td><td>Pérdida Máxima (USD)</td><td>Si la pérdida total llega a este monto, cierra todo.</td><td>5000</td></tr>
+<tr><td>25</td><td>Ganancia Máxima (USD)</td><td>Si la ganancia total llega a este monto, cierra todo.</td><td>5000</td></tr>
+</table>
+<div class="nota"><b>Internos (no editables):</b> el retardo del trailing del <b>SL es de 3 segundos</b> y el del <b>TP de 5 segundos</b>, para que los niveles no "bailen" con velas rápidas.</div>
+
+<h1>7. El Número Mágico en detalle</h1>
+<p>El <b>Número Mágico</b> (parámetro 20) es la etiqueta que el bot pone a sus operaciones para reconocerlas. Es fundamental en el <b>modo Seguidor</b>.</p>
+<p><b>Reglas correctas:</b></p>
+<ul>
+  <li><b>Seguir operaciones MANUALES:</b> las manuales tienen magia <code>0</code>; el mágico del bot debe ser <b>distinto de 0</b> (ej. 100). Así el bot las ve como externas y las copia.</li>
+  <li><b>Seguir OTRO bot:</b> mágico <b>distinto al de ese bot</b> y <b>distinto de 0</b> (ej. 777).</li>
+</ul>
+<div class="riesgo">En modo Seguidor el mágico <b>nunca</b> debe ser 0, o el bot no distinguirá sus copias de los originales.</div>
+<div class="ok"><b>Recomendación pro:</b> usa un mágico distinto por activo (V75 = 40, GBPUSD = 41, USDJPY = 42…). Así cada instancia gestiona solo lo suyo y los reportes no se mezclan.</div>
+<div class="nota"><b>Caso especial:</b> si pones el mágico en <b>0</b>, el bot considera suyas <b>todas</b> las operaciones del símbolo (incluidas manuales o de otro EA). Útil a propósito, peligroso por accidente.</div>
+
+<h1>8. Modos de operación</h1>
+<ul>
+  <li><b>Por Tiempo (01):</b> entra en <b>cada barra nueva</b>, sí o sí; la dirección la deciden <b>5 estrategias al azar</b> (empate → alterna). Modo típico para martingala.</li>
+  <li><b>Seguidor (02):</b> copia operaciones externas (manuales o de otro bot) y cierra su copia cuando la externa se cierra. Ver sección 7.</li>
+  <li><b>Estrategia individual (03–20):</b> opera con una sola estrategia técnica.</li>
+  <li><b>Multi-estrategia (botón MULTI ON):</b> combina las estrategias 03–20 marcadas y entra cuando un <b>mínimo de confirmaciones</b> coincide. Las 01 y 02 no participan.</li>
+</ul>
+<div class="ok"><b>Consejo:</b> en multi conviene marcar estrategias de <b>una sola familia</b> (todas nones o todas pares) para que tendencia y reversión <b>no se anulen</b>.</div>
+
+<h1>9. Las 18 estrategias por familia (nones / pares)</h1>
+<p>Las 18 estrategias (03–20) se organizan por <b>paridad del número</b> en dos familias iguales (9 y 9):</p>
+<ul>
+  <li><span class="badge b-rev">NONES (impares) = Reversión</span> &nbsp;apuestan a que el precio <b>rebota</b> desde un extremo. Rinden mejor en <b>rango</b>.</li>
+  <li><span class="badge b-ten">PARES = Tendencia</span> &nbsp;apuestan a que el movimiento <b>continúa</b>. Rinden mejor en <b>tendencia</b>.</li>
+</ul>
+<p>En el panel se distinguen por color: botones <b>pares en verde oscuro</b> y <b>nones en verde más claro</b>, con letras de distinto color.</p>
+
+<h3>9.1 Nones — Reversión (rebote)</h3>
+<table>
+<tr><th>#</th><th>Nombre</th><th>Regla (compra; venta al revés)</th><th>Efectividad</th></tr>
+<tr class="rev"><td>03</td><td>EMA + RSI</td><td>Precio bajo la EMA media, RSI venía &lt; 30 y gira al alza.</td><td>Media-Alta</td></tr>
+<tr class="rev"><td>05</td><td>Solo RSI</td><td>RSI cruza al alza el 30 (sale de sobreventa).</td><td>Media-Baja</td></tr>
+<tr class="rev"><td>07</td><td>MACD + Bollinger</td><td>Precio en banda baja + MACD sobre su señal.</td><td>Media-Alta</td></tr>
+<tr class="rev"><td>09</td><td>Bollinger + Stochastic</td><td>Banda baja + Stoch venía &lt; 20 y cruza arriba.</td><td>Alta</td></tr>
+<tr class="rev"><td>11</td><td>MACD + Stochastic</td><td>Stoch &lt; 20 cruza arriba + MACD alcista.</td><td>Media-Alta</td></tr>
+<tr class="rev"><td>13</td><td>Stochastic + Volumen</td><td>Stoch &lt; 20 cruza arriba + volumen sube.</td><td>Media</td></tr>
+<tr class="rev"><td>15</td><td>Bollinger + Volumen</td><td>Banda baja + volumen sube.</td><td>Media-Baja</td></tr>
+<tr class="rev"><td>17</td><td>Aroon + Stochastic</td><td>Stoch &lt; 20 cruza arriba + Aroon up &gt; down.</td><td>Media</td></tr>
+<tr class="rev"><td>19</td><td>EMA + Bollinger + Stochastic</td><td>Banda baja + Stoch cruza + precio sobre EMA-100 (rebote a favor de la tendencia mayor).</td><td>Alta (poco frecuente)</td></tr>
+</table>
+
+<h3>9.2 Pares — Tendencia (continuación)</h3>
+<table>
+<tr><th>#</th><th>Nombre</th><th>Regla (compra; venta al revés)</th><th>Efectividad</th></tr>
+<tr class="ten"><td>04</td><td>Cruce EMA</td><td>EMA rápida cruza arriba la media.</td><td>Media-Baja</td></tr>
+<tr class="ten"><td>06</td><td>Triple EMA + Aroon</td><td>3 EMAs alineadas arriba + Aroon &gt; 70.</td><td>Alta</td></tr>
+<tr class="ten"><td>08</td><td>MACD + Volumen</td><td>MACD cruza arriba + volumen sube.</td><td>Media</td></tr>
+<tr class="ten"><td>10</td><td>Triple EMA + RSI + Aroon</td><td>3 EMAs + RSI &gt; 50 + Aroon &gt; 70.</td><td>Alta (poco frecuente)</td></tr>
+<tr class="ten"><td>12</td><td>Aroon + Volumen</td><td>Aroon &gt; 70 + volumen sube.</td><td>Media</td></tr>
+<tr class="ten"><td>14</td><td>Aroon + MACD</td><td>Aroon &gt; 70 + MACD alcista.</td><td>Media-Alta</td></tr>
+<tr class="ten"><td>16</td><td>Aroon + RSI</td><td>Aroon &gt; 70 + RSI &gt; 50.</td><td>Media</td></tr>
+<tr class="ten"><td>18</td><td>Aroon + MACD + RSI</td><td>Aroon &gt; 70 + MACD alcista + RSI &gt; 50.</td><td>Alta (poco frecuente)</td></tr>
+<tr class="ten"><td>20</td><td>EMA + MACD + Volumen</td><td>EMA media &gt; lenta + MACD alcista + volumen sube.</td><td>Media-Alta</td></tr>
+</table>
+<div class="nota"><b>Cómo leerlo:</b> más condiciones = señales <b>más fiables pero menos frecuentes</b> (09, 19, 06, 10, 18). El volumen en índices sintéticos (V75) es de <i>ticks</i> y aporta poco. La efectividad es <b>relativa</b>, no una garantía; en sintéticos ninguna estrategia tiene un <i>edge</i> fuerte por sí sola: lo que más pesa es la <b>gestión de riesgo</b>.</div>
+<div class="ok"><b>Indicadores usados:</b> EMA 10/30/100, RSI 14 (30/70), Aroon 14 (umbral 70), MACD 12/26/9, Estocástico 5/3/3, Bollinger 20/2.0. Todas leen la <b>última vela cerrada</b>.</div>
+
+<div class="pagebreak"></div>
+<h1>10. Cómo trabaja el bot por dentro (función por función)</h1>
+<p>Aquí se explica, una por una, cada rutina interna del robot: qué hace y por qué. No necesitas esto para usarlo, pero te ayuda a entender lo que ves en el panel.</p>
+
+<h3>10.1 Arranque y validaciones</h3>
+<p>Al iniciar revisa: rango de balance, tipo de cuenta permitido, contraseña, número de cuenta, lista blanca y vencimiento. Si algo falla, <b>NO arranca</b> y muestra el error. Prepara los indicadores, marca activas las estrategias 03–20 y detecta si la cuenta es Hedging o Netting.</p>
+
+<h3>10.2 Ciclo de vigilancia (cada segundo)</h3>
+<p>Cada 1 segundo (parámetro 19): actualiza el panel, revisa la exportación por día, comprueba licencia y permiso de trading, comprueba que el mercado esté abierto, aplica la protección de equidad y, según el caso, <b>gestiona lo abierto</b> o <b>busca señal</b>.</p>
+
+<h3>10.3 Filtro de mercado abierto</h3>
+<p>Si el mercado no está operativo, no hace nada en ese ciclo. Evita órdenes rechazadas fuera de horario.</p>
+
+<h3>10.4 Validación de margen</h3>
+<p>Antes de abrir, exige margen libre al menos <b>20% mayor</b> que el necesario; si no lo hay, no abre y avisa.</p>
+
+<h3>10.5 Conteo de operaciones propias</h3>
+<p>Cuenta cuántas operaciones abiertas llevan su Número Mágico, para decidir si toca gestionar o buscar señal nueva.</p>
+
+<h3>10.6 Gestión de la cesta de martingala</h3>
+<p>Calcula el <b>precio promedio ponderado</b>, fija un <b>Take Profit único</b> para toda la cesta, lo aplica a cada posición, aplica trailing si solo hay una, y decide si toca abrir respaldos.</p>
+
+<h3>10.7 Gestión individual</h3>
+<p>En modo recuperación / individual: coloca y ajusta el SL y el TP de cada operación y aplica el trailing.</p>
+
+<h3>10.8 Trailing Stop (con retardos)</h3>
+<p>Mueve el SL para asegurar ganancia (espera 3 seg) y/o aleja el TP (espera 5 seg). Solo actúa cuando hay <b>una sola operación</b>. El SL <b>nunca retrocede</b>.</p>
+
+<h3>10.9 Apertura de respaldo</h3>
+<p>Abre un respaldo solo si: no se superó el máximo (param 17), pasó el tiempo de espera, la distancia en contra es suficiente <b>y</b> se mantuvo estable los segundos del parámetro 18. El lote se multiplica por el parámetro 14.</p>
+<div class="ok"><b>Distancia acumulada desde L0:</b> el umbral del siguiente respaldo se mide como <b>distancia acumulada desde la primera operación (L0)</b>, leída de las posiciones abiertas. Así el respaldo se abre <b>donde de verdad corresponde</b>, aunque haya habido un reinicio de MT5 o las operaciones las haya abierto otro EA.</div>
+
+<h3>10.10 Modo Seguidor</h3>
+<p>Detecta operaciones externas (con mágico distinto), abre copias y cierra su copia cuando la externa se cierra. Requiere Número Mágico distinto de 0.</p>
+
+<h3>10.11 Búsqueda de señal</h3>
+<p>Una vez por vela: en <b>multi</b> cuenta votos hasta llegar al mínimo de confirmaciones; en <b>Por Tiempo</b> elige dirección con 5 estrategias al azar; en <b>individual</b> evalúa esa estrategia. Después calcula el lote y abre en la dirección permitida por el parámetro 2.</p>
+
+<h3>10.12 Ganancia en TP y lote de recuperación</h3>
+<p>Calcula cuánto gana un lote al llegar al TP y, con ese dato, el lote de recuperación (recuperar lo perdido + el objetivo inicial), <b>nunca menor al lote inicial</b>.</p>
+
+<h3>10.13 Evaluación de las estrategias</h3>
+<p>Cada estrategia lee sus indicadores en la <b>última vela cerrada</b> y devuelve <i>comprar</i>, <i>vender</i> o <i>nada</i>.</p>
+
+<h3>10.14 Abrir operación</h3>
+<p>Normaliza el lote al mínimo permitido por el broker, valida margen, envía la orden con comentario y nivel, y guarda qué estrategias la originaron (eso es lo que ves en "Cesta actual" y en los reportes).</p>
+
+<h3>10.15 Protección de equidad, historial y exportación</h3>
+<p>La protección suma el resultado de todas las operaciones y cierra si llega al tope. Cada cierre se guarda en el historial de sesión. La exportación vuelca todo a CSV y HTML.</p>
+
+<h1>11. Gestión de capital: Martingala y Recuperación</h1>
+<h3>a) Martingala (cesta)</h3>
+<p>Cuando una operación va en contra, el bot abre <b>respaldos en la misma dirección</b> para promediar el precio. Toda la cesta comparte un <b>Take Profit único sobre el promedio</b>; cuando el precio regresa, cierra todo junto con ganancia.</p>
+<ul>
+  <li>Cada respaldo <b>multiplica el lote</b> (parámetro 14).</li>
+  <li>La distancia de cada respaldo <b>crece un porcentaje</b> (parámetro 16).</li>
+  <li>Máximo de respaldos: parámetro 17. La condición debe mantenerse estable los segundos del parámetro 18.</li>
+  <li>La cesta <b>no lleva Stop Loss por operación</b> (sería ilógico promediar y cortar a la vez): su protección es el <b>TP único</b> y la <b>protección de equidad</b> (parámetro 24).</li>
+</ul>
+<div class="ej"><b>Ejemplo numérico.</b> Lote 0.01, multiplicador 2.0, primer respaldo 50000 puntos, incremento 25%:<br>
+Compra 0.01 → baja 50000 → respaldo 0.02 → baja 62500 → 0.04 → baja ~78000 → 0.08 → 0.16 → 0.32 → 0.64 → 1.28 (respaldo 7).<br>
+El TP único se calcula sobre el promedio ponderado; al rebotar, cierra <b>toda la cesta</b> en ganancia.</div>
+
+<h3>b) Recuperación</h3>
+<p>Modo de <b>una operación a la vez</b>. Tras una pérdida, calcula un lote que recupere <b>lo perdido en la racha + la ganancia objetivo inicial</b>, y <b>nunca baja del lote inicial</b>. Tras una ganancia, reinicia. Espera los segundos del parámetro 18 antes de reentrar.</p>
+<div class="ej"><b>Ejemplo numérico.</b> El lote 0.01 deja +10 USD al TP. Pierde 10, luego pierde 15 (acumulado 25). La siguiente operación apunta a 25 + 10 = <b>35 USD</b>. Si gana, reinicia a 0.01.</div>
+<div class="ok"><b>Recuperación dirigida por estrategias:</b> en este modo el bot <b>no entra por tiempo</b>; tanto la entrada inicial como la reentrada las deciden las <b>estrategias reales</b> (el modo "Solo Tiempo" queda exclusivo de Martingala). Además, al iniciar <b>reconstruye el estado de la racha leyendo el historial</b>, de modo que recompilar o reiniciar MT5 no borra la recuperación en curso.</div>
+<div class="riesgo"><b>Advertencia de riesgo:</b> la martingala y la recuperación pueden generar <b>pérdidas grandes</b> si el mercado va en contra de forma prolongada. Usa lote mínimo, distancias prudentes, capital suficiente y mantén activa la protección de equidad.</div>
+
+<h1>12. Trailing Stop (protección de ganancias)</h1>
+<ul>
+  <li><b>Trailing SL:</b> cuando la ganancia supera el % de activación (parámetro 11), el SL se mueve hacia el precio para asegurar parte de la ganancia. <b>Nunca retrocede.</b> Esto convierte muchas operaciones que se girarían en <b>ganadoras parciales</b>, en vez de volver al SL completo.</li>
+  <li><b>Trailing TP:</b> cuando la ganancia supera su % (parámetro 8), el objetivo se aleja para <b>dejar correr</b> la ganancia.</li>
+  <li><b>Estabilidad:</b> el SL espera 3 segundos y el TP 5 segundos antes de moverse, para no reaccionar a velas rápidas.</li>
+  <li>El trailing solo actúa cuando hay <b>una sola operación</b> abierta en esa dirección.</li>
+</ul>
+<div class="ej"><b>Ejemplo con TP de 100000 puntos:</b> el SL se activa al 60% (60000 puntos de ganancia) y se coloca a un 30% de distancia (30000 puntos), tras 3 segundos estables. El TP se activa al 70% y se aleja un 30%, tras 5 segundos.</div>
+
+<h1>13. Protección de equidad</h1>
+<p>Si está activada (parámetro 22), el bot suma la ganancia/pérdida de <b>todas</b> sus operaciones y cierra todo cuando llega a la <b>ganancia máxima</b> (parámetro 25) o a la <b>pérdida máxima</b> (parámetro 24). Funciona en <b>todos los modos</b>, incluida la cesta. Es tu red de seguridad principal, sobre todo porque la cesta no lleva Stop Loss propio.</p>
+<div class="ok"><b>Consejo:</b> ajusta el parámetro 24 a un porcentaje de tu balance que estés dispuesto a arriesgar (por ejemplo, no más del 20–30%).</div>
+
+<h1>14. El panel visual</h1>
+<table>
+<tr><th>Elemento</th><th>Función</th></tr>
+<tr><td>Estado</td><td>Bot (Activo / Parado / MT5 off), Estrategia, Martingala, Dirección, Mercado y Cuenta.</td></tr>
+<tr><td>Rango</td><td>Máximo/Mínimo del activo, con botón que cicla Hora / Día / Semana / Mes.</td></tr>
+<tr><td>Estadísticas de sesión</td><td>Abiertas, cerradas, ganadas, perdidas, % de aciertos, G/P flotante y realizado, rendimiento.</td></tr>
+<tr><td>Cesta actual</td><td>Estrategias usadas, posiciones, lotaje, precio promedio, G/P y distancia al objetivo.</td></tr>
+<tr><td>Botones 03–20</td><td>Marcar estrategias para multi: <b>pares en verde oscuro</b>, <b>nones en verde más claro</b>, con letras de distinto color.</td></tr>
+<tr><td>− / +</td><td>Mínimo de confirmaciones en multi (de 1 a 5).</td></tr>
+<tr><td>MULTI / BOT ACTIVO-PARADO</td><td>Activa el modo multi / pausa el bot.</td></tr>
+<tr><td>Color de fondo</td><td>Cambia el color del panel.</td></tr>
+<tr><td>Exportar CSV / HTML</td><td>Genera los reportes.</td></tr>
+</table>
+<p><b>Atajos de teclado:</b> <code>V</code> muestra/oculta el panel; <code>+</code> y <code>-</code> cambian el tamaño de letra.</p>
+<div class="nota"><b>Sobre BOT ACTIVO/PARADO:</b> pausa el bot, pero <b>no</b> puede apagar el "Algo Trading" de MT5 (protección de la plataforma). Si lo apagas en MT5, el panel lo refleja como <b>"MT5 off"</b>.</div>
+
+<h1>15. Reportes y exportación</h1>
+<p>El bot genera reportes en <b>CSV</b> (Excel) y <b>HTML</b> a color (navegador) con: operaciones cerradas, posiciones abiertas (foto actual), estrategias usadas y un resumen (ganadas, perdidas, % de aciertos, resultado). Se generan con los botones, al cambiar de día o al detener el bot. Quedan en <b>MQL5 &gt; Files</b> y el bot muestra la ruta completa. Todos los textos están en español.</p>
+
+<h1>16. Cómo hacer un backtest correctamente</h1>
+<ul>
+  <li><b>Licencia:</b> en el Probador se usa tu cuenta actual. El Número de Cuenta de Licencia debe coincidir, la Contraseña debe ser correcta (vacía = no arranca), y el rango de fechas debe ser anterior al vencimiento. Si no opera, revisa el <b>Diario/Journal</b>: casi siempre es un mensaje de licencia.</li>
+  <li><b>Modelado:</b> "Cada tick basado en ticks reales" (en sintéticos como V75 los ticks importan).</li>
+  <li><b>Modo visual ON</b> para ver entradas y cesta en el gráfico.</li>
+  <li>Símbolo, depósito y apalancamiento <b>como tu cuenta real</b>.</li>
+  <li>El panel no es interactivo en el Probador, pero el bot opera igual (arranca encendido).</li>
+</ul>
+
+<h1>17. Buenas prácticas y protección del capital</h1>
+<ul>
+  <li>Empieza en <b>demo</b>, lote 0.01, y observa el panel varios días.</li>
+  <li>Activa la <b>protección de equidad</b> (param 22) y fija una pérdida máxima (param 24) acorde a tu balance.</li>
+  <li>Usa un <b>mágico distinto por activo</b> para no mezclar gestión ni reportes.</li>
+  <li>En martingala, con multiplicador 2.0 el lote crece rápido (0.01 → 1.28 en el respaldo 7): <b>lote inicial pequeño y capital suficiente</b>.</li>
+  <li>En multi, marca <b>pocas y de una sola familia</b>; sube el mínimo de confirmaciones para señales más fiables.</li>
+  <li>En índices sintéticos, no esperes un <i>edge</i> mágico de los indicadores: <b>la gestión de riesgo manda</b>.</li>
+</ul>
+
+<h1>18. Errores comunes y soluciones</h1>
+<table>
+<tr><th>Síntoma</th><th>Causa probable</th><th>Solución</th></tr>
+<tr><td>No arranca</td><td>Licencia / cuenta / contraseña / vencimiento</td><td>Lee el mensaje exacto en el Diario de MT5.</td></tr>
+<tr><td>No opera</td><td>Algo Trading apagado / mercado cerrado / bot en pausa</td><td>Enciende todo y revisa el horario del activo.</td></tr>
+<tr><td>Margen insuficiente</td><td>Poco margen libre</td><td>Baja el lote o aumenta el capital.</td></tr>
+<tr><td>El Seguidor no copia</td><td>Número Mágico en 0</td><td>Pon un mágico distinto de 0.</td></tr>
+<tr><td>La cesta no respalda</td><td>Cuenta Netting</td><td>Usa una cuenta Hedging.</td></tr>
+<tr><td>Señales que se anulan en multi</td><td>Mezcla de nones y pares</td><td>Marca estrategias de una sola familia.</td></tr>
+</table>
+
+<h1>19. Preguntas frecuentes</h1>
+<table>
+<tr><th>Pregunta</th><th>Respuesta</th></tr>
+<tr><td>¿Por dónde empiezo?</td><td>Cuenta <b>demo</b>, lote 0.01, observa el panel.</td></tr>
+<tr><td>¿Sirve para cualquier activo?</td><td>Sí, opera sobre el símbolo del gráfico.</td></tr>
+<tr><td>¿Por qué cuenta Hedging?</td><td>La cesta de martingala necesita varias operaciones a la vez.</td></tr>
+<tr><td>¿Cómo sigo operaciones manuales?</td><td>Modo Seguidor, mágico <b>distinto de 0</b>.</td></tr>
+<tr><td>¿Cómo sigo otro bot?</td><td>Modo Seguidor, mágico distinto al de ese bot y distinto de 0.</td></tr>
+<tr><td>¿Garantiza ganancias?</td><td><b>No.</b> Ningún sistema lo hace; la martingala tiene riesgo.</td></tr>
+<tr><td>¿Puedo pausarlo?</td><td>Sí, con el botón <b>BOT ACTIVO/PARADO</b>.</td></tr>
+<tr><td>¿Qué familia es cada estrategia?</td><td>Impares = reversión, pares = tendencia. El número te lo dice.</td></tr>
+</table>
+
+<div class="pagebreak"></div>
+<div class="parte">PARTE 2 — CURSO DE TRADING DESDE CERO</div>
+<div class="nota"><b>Apartado formativo:</b> enseña trading desde cero, paso a paso, independiente del manual del bot. Es un curso. Si algo de la PARTE 1 no se entendió, la respuesta suele estar aquí.</div>
+
+<h1>C1. Qué es el trading</h1>
+<p>El trading es comprar y vender activos (divisas, índices, criptomonedas, acciones) buscando ganar con la <b>diferencia de precio</b>. En Forex se negocian <b>pares</b> (ej. EUR/USD). Si el precio va a tu favor, ganas; si va en contra, pierdes.</p>
+
+<h1>C2. El gráfico y las velas japonesas</h1>
+<ul>
+  <li><b>Cuerpo:</b> entre la apertura y el cierre del periodo.</li>
+  <li><b>Mechas:</b> el máximo y el mínimo que tocó el precio.</li>
+  <li><b>Vela alcista:</b> cerró más arriba (suele ser verde).</li>
+  <li><b>Vela bajista:</b> cerró más abajo (suele ser roja).</li>
+</ul>
+
+<h1>C3. Temporalidades</h1>
+<p>Es el "zoom" de cada vela: M1, M5, M15, H1, H4, D1. Temporalidades <b>altas</b> = señales lentas y más fiables; <b>bajas</b> = más señales y más ruido.</p>
+
+<h1>C4. Tendencia, soporte y resistencia</h1>
+<ul>
+  <li><b>Alcista:</b> máximos y mínimos cada vez más altos.</li>
+  <li><b>Bajista:</b> máximos y mínimos cada vez más bajos.</li>
+  <li><b>Lateral (rango):</b> el precio se mueve de lado.</li>
+  <li><b>Soporte:</b> zona donde el precio rebota hacia arriba.</li>
+  <li><b>Resistencia:</b> zona donde frena y baja.</li>
+</ul>
+<div class="ok">"La tendencia es tu amiga": operar a favor de la tendencia suele tener más probabilidad. Y aquí conecta con el bot: en <b>rango</b> rinden mejor las estrategias <b>nones</b> (reversión); en <b>tendencia</b>, las <b>pares</b>.</div>
+
+<h1>C5. Conceptos de dinero</h1>
+<table>
+<tr><th>Término</th><th>Explicación</th></tr>
+<tr><td>Pip / Punto</td><td>Mínima variación del precio.</td></tr>
+<tr><td>Lote</td><td>Tamaño de la operación (0.01 = micro-lote).</td></tr>
+<tr><td>Apalancamiento</td><td>El broker te presta para mover más (ej. 1:100). Multiplica ganancias <b>Y</b> pérdidas.</td></tr>
+<tr><td>Margen</td><td>Dinero reservado para mantener la operación.</td></tr>
+<tr><td>Spread</td><td>Diferencia entre compra y venta (es un costo).</td></tr>
+<tr><td>Equidad</td><td>Balance + lo que ganas/pierdes ahora mismo.</td></tr>
+</table>
+
+<h1>C6. Los indicadores técnicos</h1>
+<table>
+<tr><th>Indicador</th><th>Qué mide</th><th>Cómo se lee</th></tr>
+<tr><td>EMA</td><td>Precio promedio reciente.</td><td>Precio sobre la EMA = alcista; los cruces marcan cambio de tendencia.</td></tr>
+<tr><td>RSI</td><td>Fuerza (0–100).</td><td>&lt; 30 sobrevendido; &gt; 70 sobrecomprado.</td></tr>
+<tr><td>MACD</td><td>Impulso.</td><td>El cruce de su línea con la señal marca cambio de momentum.</td></tr>
+<tr><td>Aroon</td><td>Fuerza de la tendencia.</td><td>&gt; 70 = tendencia fuerte.</td></tr>
+<tr><td>Estocástico</td><td>Oscilador (0–100).</td><td>&lt; 20 sobrevendido; &gt; 80 sobrecomprado.</td></tr>
+<tr><td>Bollinger</td><td>Volatilidad.</td><td>Banda baja = barato; banda alta = caro.</td></tr>
+<tr><td>Volumen</td><td>Actividad.</td><td>Volumen creciente confirma fuerza.</td></tr>
+</table>
+<div class="nota">Estos son exactamente los indicadores que usan las 18 estrategias del bot (sección 9). Si entiendes esta tabla, entiendes por qué cada estrategia entra donde entra.</div>
+
+<h1>C7. Gestión de riesgo (lo más importante)</h1>
+<ul>
+  <li>Arriesga poco por operación (muchos no pasan del <b>1–2%</b>).</li>
+  <li>Usa siempre <b>Stop Loss</b> (o, en la cesta, la protección de equidad).</li>
+  <li>Busca ganar más de lo que arriesgas (relación riesgo/beneficio).</li>
+  <li>Ajusta el lote a tu capital. En martingala, <b>lote inicial pequeño</b>.</li>
+  <li>No te sobreapalanques.</li>
+</ul>
+
+<h1>C8. La martingala (concepto y peligro)</h1>
+<p>Consiste en aumentar el tamaño tras una pérdida para recuperar con el rebote. <b>Funciona muchas veces</b>, y eso da una falsa seguridad. El peligro: una racha en contra prolongada hace crecer la exposición muy rápido. La <b>gestión de capital</b> decide si sobrevives.</p>
+
+<h1>C9. Psicología del trading</h1>
+<ul>
+  <li><b>Disciplina:</b> sigue tu plan.</li>
+  <li>Controla el miedo y la avaricia.</li>
+  <li>Acepta las pérdidas como parte del negocio.</li>
+  <li>No persigas el mercado.</li>
+</ul>
+
+<h1>C10. Plan de práctica para el alumno</h1>
+<div class="paso"><b>1.</b> Abre una cuenta demo.</div>
+<div class="paso"><b>2.</b> Aprende a leer velas y tendencia en H1.</div>
+<div class="paso"><b>3.</b> Identifica soportes y resistencias.</div>
+<div class="paso"><b>4.</b> Observa los indicadores (RSI, MACD, EMA).</div>
+<div class="paso"><b>5.</b> Prueba el CJ Bot en demo con lote 0.01.</div>
+<div class="paso"><b>6.</b> Lleva un registro (usa los reportes CSV/HTML del bot).</div>
+<div class="paso"><b>7.</b> Solo después, considera cuenta real con dinero que puedas permitirte perder.</div>
+
+<h1>C11. Errores típicos del principiante</h1>
+<ul>
+  <li>Operar sin Stop Loss.</li>
+  <li>Lotes demasiado grandes.</li>
+  <li>Operar por emoción o por venganza.</li>
+  <li>No practicar en demo.</li>
+  <li>Creer que un robot "no puede perder".</li>
+</ul>
+
+<div class="riesgo"><b>Aviso legal / de riesgo:</b> el trading con apalancamiento es de alto riesgo y puede no ser adecuado para todos. Puedes perder todo tu capital. Los resultados pasados no garantizan resultados futuros. Practica en demo y opera solo con dinero que puedas permitirte perder. Material educativo, no asesoramiento financiero.</div>
+
+<p style="text-align:center; margin-top:40px; color:#888;">CJ Bot — Manual de Usuario + Curso de Trading — CJ Junior Cabrera — cjjuniorstore.com</p>
+
+</body>
+</html>

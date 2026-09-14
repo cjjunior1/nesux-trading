@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Calculator · Nesux</title>
+<meta name="theme-color" content="#0d1117">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
+    --txt:#e6edf3; --muted:#8b949e; --accent:#f7931a; --accent2:#58a6ff;
+    --ok:#3fb950; --bad:#f85149; --warn:#d29922; --lila:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  html,body{max-width:100%;overflow-x:hidden}
+  body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+
+  /* Color del modo: ABIERTAS rosa, CERRADAS verde.
+     La letra del título va al revés (--xc-titulo): en abiertas el título es verde
+     sobre acento rosa y en cerradas rosa sobre acento verde. Así el título nunca
+     se funde con el selector de modo que tiene al lado. */
+  .app{--xc:#c96aa6; --xc-titulo:#3aa585; --xc-borde:#8f4b77}
+  .app.cerradas{--xc:#3aa585; --xc-titulo:#c96aa6; --xc-borde:#1c6b57}
+
+  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:2px solid var(--xc);padding:20px 26px}
+  header h1{margin:0;font-size:21px;letter-spacing:.3px}
+  header h1 span{color:var(--xc-titulo)}
+  header p{margin:4px 0 0;color:var(--muted);font-size:12.5px;max-width:70ch}
+
+  /* Izquierda lo que se escribe, derecha lo que sale. Las dos columnas miden
+     lo mismo y las tarjetas se estiran a la misma altura: stretch en vez de
+     start, que es lo que dejaba la de resultados a media altura. */
+  .wrap{max-width:1240px;margin:0 auto;padding:22px;display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:stretch}
+  @media(max-width:940px){.wrap{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+  /* La tarjeta va neutra. El color del modo se queda en los TÍTULOS y en el
+     selector de modo; tiñendo la caja entera cansaba la vista. */
+  .card.entradas{border-left:1px solid var(--border)}
+  .card h2{margin:0 0 14px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--xc-titulo)}
+  .card h2 .t-modo{color:var(--txt)}
+
+  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
+    border-radius:9px;padding:9px 10px;font-size:14px;font-family:inherit}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)}
+  textarea{resize:vertical;line-height:1.7;font-variant-numeric:tabular-nums}
+  /* El relleno automático del navegador pinta el campo de BLANCO y sobre este
+     fondo oscuro queda ilegible. Se fuerza el color con una sombra interior,
+     que es lo único que Chrome respeta ahí. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus{
+    -webkit-text-fill-color:var(--txt);
+    -webkit-box-shadow:0 0 0 1000px var(--panel2) inset;
+    caret-color:var(--txt);
+    transition:background-color 9999s ease-in-out 0s;
+  }
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .row>div>label,.row3>div>label{min-height:34px;display:flex;align-items:flex-end;margin-top:10px}
+  .hint{font-size:11px;color:var(--muted);margin-top:3px}
+  .pill{display:inline-block;font-size:10.5px;color:#0d1117;background:var(--accent);border-radius:20px;padding:1px 8px;font-weight:600}
+
+  /* Campo que rellena la calculadora sola. Bloqueado y resaltado para que no se
+     confunda con lo que escribe el usuario. Cada uno lleva el color de su dato. */
+  input.auto{font-weight:700;background:rgba(13,17,23,.7);border-color:var(--border);cursor:default}
+  input.auto.a-mg{color:var(--lila)}
+  input.auto.a-precio{color:var(--txt)}
+  input.auto.a-dinero{color:var(--accent2)}
+  input.auto.a-pts{color:var(--warn)}
+  .auto-hint{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+
+  /* Ajuste avanzado en DOS colores: en azul lo que define el bróker y tú copias,
+     en naranja lo que sale solo de esos datos. Así se ve de un vistazo cuál de
+     los cuatro campos no hay que tocar. */
+  #advanced .dato input{color:var(--accent2);font-weight:600}
+  #advanced .dato label{color:var(--accent2);opacity:.8}
+  #advanced .calc input{color:var(--accent);font-weight:700}
+  #advanced .calc label{color:var(--accent);opacity:.8}
+
+  .seg{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+  .seg button{flex:1;background:var(--panel2);border:none;color:var(--muted);padding:10px;font-size:13px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--xc);color:#0d1117;font-weight:700}
+
+  /* ---- Resultados ---- */
+  .res h2{color:var(--txt)}
+  .res-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .res-cab h2{margin-bottom:14px}
+  .exporta{display:flex;gap:8px;margin-bottom:14px}
+  .exporta button{background:var(--panel2);border:1px solid var(--border);color:var(--txt);
+    border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .exporta button:hover{border-color:var(--xc);color:var(--xc)}
+  .exporta button:disabled{opacity:.5;cursor:default}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  /* Si el número de datos queda impar, el último ocupa la fila entera: nunca
+     se queda media rejilla vacía al final. */
+  .kpis .kpi:last-child:nth-child(odd){grid-column:1/-1}
+  @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:13px}
+  .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .kpi .v{font-size:19px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--txt)}
+  .kpi .v.v-pts{color:var(--warn)}
+  .kpi .v.v-lote{color:var(--accent)}
+  .kpi .v.v-num{color:var(--lila)}
+  .kpi .v.v-estado{color:var(--xc)}
+  .kpi .v.v-mas{color:var(--accent2)}
+  .kpi .v.v-menos{color:var(--bad)}
+  /* Dos precios seguidos en blanco no se distinguen: el estimado del próximo
+     respaldo va en cian y el medio de la cesta en blanco. */
+  .kpi .v.v-precio{color:#7fd3e8}
+
+  .detalle{margin-top:18px}
+  .detalle h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--txt)}
+  .lista{list-style:none;margin:8px 0 0;padding:0}
+  /* Dos líneas por operación: arriba quién, a qué precio y cuánto deja; abajo el
+     resto. En una sola fila de cinco columnas los datos se partían a la mitad. */
+  .lista li{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:baseline;
+    padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13.5px}
+  .lista li:last-child{border-bottom:0}
+  .op{color:var(--txt);font-weight:700;font-size:12px;white-space:nowrap;
+    background:rgba(255,255,255,.08);border-radius:6px;padding:2px 8px}
+  .pr{color:var(--txt);font-variant-numeric:tabular-nums}
+  .mo{text-align:right;font-weight:700;font-size:14.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .l2{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+  .l2 span{white-space:nowrap}
+  .l2 .lo{color:var(--accent)}
+  .l2 .pt{color:var(--warn)}
+  .l2 .se{color:#b9c4d0;font-weight:600}
+  .l2 .se b{color:var(--txt);font-weight:700}
+  .l2 i{color:var(--muted);font-style:normal;font-weight:400}
+  .total{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:14.5px}
+  .total b{font-size:18px}
+  .mas{color:var(--accent2)} .menos{color:var(--bad)} .yel{color:var(--warn)}
+
+  .aviso{border:1px dashed var(--border);border-radius:11px;padding:26px 18px;text-align:center;color:var(--muted)}
+  .footer{color:var(--muted);font-size:11.5px;text-align:center;padding:16px 0 30px}
+  @media(max-width:640px){
+    header{padding:16px 14px} header h1{font-size:18px}
+    .wrap{padding:14px;gap:14px} .card{padding:14px}
+    input,select,textarea{font-size:16px}   /* evita el zoom de iOS */
+  }
+  @media(max-width:400px){ .row,.row3{grid-template-columns:1fr} .row>div>label,.row3>div>label{min-height:0} }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<header>
+  <h1>Trading <span>Calculator</span></h1>
+  <p>Calcula una cesta del CJ Bot con datos reales: cuántas martingalas lleva, qué deja cada operación y a qué precio cierra en beneficio.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= ENTRADAS ================= -->
+  <div class="card entradas">
+    <!-- Dos colores: el nombre de la tarjeta en el color del modo y el modo en
+         blanco, para que no compitan y se lea de un golpe cuál está activo. -->
+    <h2 id="tituloEntradas">Datos de la cesta <span class="t-modo">· Operaciones abiertas</span></h2>
+
+    <label>Operaciones</label>
+    <div class="seg" id="seg">
+      <button type="button" data-modo="abiertas" class="on">Abiertas</button>
+      <button type="button" data-modo="cerradas">Cerradas</button>
+    </div>
+    <div class="hint" id="segHint"></div>
+
+    <div class="row">
+      <div>
+        <label>Dirección</label>
+        <select id="dir">
+          <option value="buy">Compra</option>
+          <option value="sell">Venta</option>
+        </select>
+      </div>
+      <div>
+        <label>(17) Nº Martingalas</label>
+        <input id="mg" class="auto a-mg" type="text" readonly tabindex="-1" placeholder="—">
+        <div class="auto-hint" id="mgHint">rellenado automático</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="primeraWrap">
+        <label>Precio primera operación</label>
+        <input id="primera" class="pfmt" type="text" inputmode="decimal" placeholder="ej. 51,173.61">
+      </div>
+      <div>
+        <label id="actualLabel">Precio actual</label>
+        <input id="actual" class="pfmt" type="text" inputmode="decimal" placeholder="ej. 49,440.63">
+      </div>
+    </div>
+
+    <!-- CERRADAS: se pegan las aperturas tal cual salen del historial. -->
+    <div id="pegarWrap" style="display:none">
+      <label>Precios de apertura · pega todas las operaciones</label>
+      <textarea id="pegar" rows="5" placeholder="51,173.61&#10;50,453.96&#10;49,440.63"></textarea>
+      <div class="hint">Uno por línea, en el orden en que abrieron. El volumen sale del (04) Lotaje y el (14) Múltiplo. Si una llevó otro volumen, escríbelo al lado del precio separado por un espacio.</div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>(04) Lotaje</label>
+        <input id="lote" type="number" value="0.01" min="0" step="0.01">
+      </div>
+      <div>
+        <label>(14) Múltiplo MG</label>
+        <input id="mult" type="number" value="2" min="0" step="0.01">
+      </div>
+    </div>
+
+    <!-- Solo ABIERTAS: sirven para saber dónde entraría el próximo respaldo. En
+         una cesta cerrada ya no hay nada que predecir. -->
+    <div class="row" id="distRow">
+      <div>
+        <label>(15) Puntos 1er resp.</label>
+        <input id="d1" class="fmt-pts" type="text" inputmode="numeric" value="70.000">
+      </div>
+      <div>
+        <label>(16) % Incremento</label>
+        <input id="inc" type="number" value="35" min="0" step="1">
+      </div>
+    </div>
+
+    <div id="tpRow">
+      <div class="row">
+        <div>
+          <label>(05) T/P en puntos <span class="pill">opcional</span></label>
+          <input id="tp" class="fmt-pts" type="text" inputmode="numeric" placeholder="vacío = no se calcula">
+        </div>
+        <div>
+          <label>Precio al cerrar en T/P</label>
+          <input id="tpPrecio" class="auto a-precio" type="text" readonly tabindex="-1" placeholder="—">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Ganancia al cerrar</label>
+          <input id="tpGanancia" class="auto a-dinero" type="text" readonly tabindex="-1" placeholder="—">
+        </div>
+        <div>
+          <label>Puntos que faltan</label>
+          <input id="tpFaltan" class="auto a-pts" type="text" readonly tabindex="-1" placeholder="—">
+        </div>
+      </div>
+      <div class="hint">El cierre se mide desde el precio medio ponderado de la cesta, como hace el bot, no desde la primera entrada.</div>
+    </div>
+
+    <label style="margin-top:16px">Par / Símbolo que operas</label>
+    <select id="preset"></select>
+    <div class="hint" id="specLine"></div>
+    <div class="hint" style="margin-top:6px">
+      <a href="#" id="advToggle" style="color:var(--accent2);text-decoration:none">⚙️ Ajuste avanzado (editar specs a mano)</a>
+    </div>
+    <div id="advanced" style="display:none">
+      <div class="row3">
+        <div class="dato"><label>Contrato</label><input id="contract" class="fmt-pts" type="text" inputmode="numeric" value="1"></div>
+        <div class="dato"><label>Dígitos</label><input id="digits" type="number" value="2" step="1"></div>
+        <div class="dato"><label>Paso lote</label><input id="step" type="number" value="0.01" step="0.001"></div>
+      </div>
+      <div class="calc">
+        <label style="margin-top:12px">Valor de 1 punto por 1.0 lote (USD)</label>
+        <input id="V" type="number" value="0.01" step="0.0001">
+      </div>
+      <div class="hint">El <b>tick value</b> de MT5. En cuenta real, cópialo del valor exacto de tu bróker.</div>
+    </div>
+  </div>
+
+  <!-- ================= RESULTADOS ================= -->
+  <div class="card res">
+    <div class="res-cab">
+      <h2>Resultado</h2>
+      <div class="exporta">
+        <button type="button" id="btnCopiar">⧉ Copiar</button>
+        <button type="button" id="btnPNG">⬇ PNG</button>
+        <button type="button" id="btnPDF">⬇ PDF</button>
+      </div>
+    </div>
+    <div id="salida"></div>
+    <div class="footer">
+      Trading Calculator · Nesux Global Business RD · basado en las reglas del CJ Bot.<br>
+      Los precios reales llevan el retraso y el deslizamiento del mercado.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script src="/historial-form.js"></script>
+<script>
+/**
+ * Formatos de número de toda la calculadora.
+ *
+ * Puntos y dinero se escriben distinto a propósito, para que no haya forma de
+ * confundirlos leyendo por encima:
+ *   puntos  →  70.000       (sin decimales, punto de millar)
+ *   dinero  →  $70,000.00   (dos decimales, coma de millar)
+ * Los precios llevan como mucho los decimales del símbolo, y nunca ceros de relleno.
+ */
+const nf=(n,d,loc)=>isFinite(n)?n.toLocaleString(loc,{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
+const pts=n=>nf(n,0,'es-ES');
+const fmt=(n,d=2)=>nf(n,d,'en-US');
+const usd=n=>(n<0?'-$':'$')+nf(Math.abs(n),2,'en-US');
+function decimalesDe(n){ const s=String(n), i=s.indexOf('.'); return i<0?0:Math.min(8,s.length-i-1); }
+function precio(n,d){
+  if(!isFinite(n)) return '∞';
+  const max=Math.max(0,Math.min(8,d|0)), min=Math.min(max,decimalesDe(n));
+  return n.toLocaleString('en-US',{minimumFractionDigits:min,maximumFractionDigits:max});
+}
+
+/**
+ * Campos con separadores.
+ *
+ *   fmt-pts → el punto es separador de miles: se quita entero.
+ *   pfmt    → precio: la coma es de miles y el punto es el decimal.
+ * Confundirlos es el fallo clásico: 50.000 leído como cincuenta con decimales.
+ */
+function leer(el){
+  if(!el) return NaN;
+  let t=String(el.value||'').replace(/\s/g,'');
+  t = el.classList.contains('fmt-pts') ? t.replace(/[.,]/g,'') : t.replace(/,/g,'');
+  return t==='' ? NaN : +t;
+}
+const v=id=>leer(document.getElementById(id));
+function pintar(el){
+  const n=leer(el);
+  if(!isFinite(n)) return;
+  el.value = el.classList.contains('fmt-pts') ? pts(n) : precio(n, v('digits')||2);
+}
+
+// ---- Catálogo de símbolos (mismas specs que el simulador grande) ----
+const PRESETS={
+  eur:{g:'Forex',name:'EUR/USD',contract:100000,digits:5,step:0.01,V:1},
+  gbp:{g:'Forex',name:'GBP/USD',contract:100000,digits:5,step:0.01,V:1},
+  aud:{g:'Forex',name:'AUD/USD',contract:100000,digits:5,step:0.01,V:1},
+  usdjpy:{g:'Forex',name:'USD/JPY',contract:100000,digits:3,step:0.01,V:0.67,approx:true},
+  xau:{g:'Metales',name:'XAU/USD · Oro',contract:100,digits:2,step:0.01,V:1},
+  xag:{g:'Metales',name:'XAG/USD · Plata',contract:5000,digits:3,step:0.01,V:5},
+  us30:{g:'Índices',name:'US30 · Dow',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  nas:{g:'Índices',name:'NAS100',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  spx:{g:'Índices',name:'SPX500',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  v10:{g:'Sintéticos Deriv',name:'Volatility 10 Index',contract:1,digits:3,step:0.01,V:0.001,approx:true},
+  v25:{g:'Sintéticos Deriv',name:'Volatility 25 Index',contract:1,digits:3,step:0.01,V:0.001,approx:true},
+  v50:{g:'Sintéticos Deriv',name:'Volatility 50 Index',contract:1,digits:4,step:0.01,V:0.0001,approx:true},
+  // V75 con 2 dígitos: es lo que muestra el historial real de la cuenta.
+  v75:{g:'Sintéticos Deriv',name:'Volatility 75 Index',contract:1,digits:2,step:0.001,V:0.01,approx:true},
+  v100:{g:'Sintéticos Deriv',name:'Volatility 100 Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  v75s:{g:'Sintéticos Deriv',name:'Volatility 75 (1s) Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  v100s:{g:'Sintéticos Deriv',name:'Volatility 100 (1s) Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
+  boom1k:{g:'Sintéticos Deriv',name:'Boom 1000 Index',contract:1,digits:4,step:0.01,V:0.0001,approx:true},
+  crash1k:{g:'Sintéticos Deriv',name:'Crash 1000 Index',contract:1,digits:4,step:0.01,V:0.0001,approx:true},
+  step:{g:'Sintéticos Deriv',name:'Step Index',contract:1,digits:1,step:0.1,V:0.1,approx:true},
+  btc:{g:'Criptomonedas',name:'BTC/USD · Bitcoin',contract:1,digits:2,step:0.01,V:0.01},
+  eth:{g:'Criptomonedas',name:'ETH/USD · Ethereum',contract:1,digits:2,step:0.01,V:0.01},
+  sol:{g:'Criptomonedas',name:'SOL/USD · Solana',contract:1,digits:2,step:0.01,V:0.01,approx:true}
+};
+
+(function(){
+  const sel=document.getElementById('preset'), grupos={};
+  for(const k in PRESETS){
+    const g=PRESETS[k].g;
+    if(!grupos[g]){ grupos[g]=document.createElement('optgroup'); grupos[g].label=g; sel.appendChild(grupos[g]); }
+    const o=document.createElement('option'); o.value=k; o.textContent=PRESETS[k].name; grupos[g].appendChild(o);
+  }
+  const o=document.createElement('option'); o.value='otro'; o.textContent='Otro / personalizado…'; sel.appendChild(o);
+  sel.value='v75';
+  aplicarPreset('v75',false);
+})();
+
+function aplicarPreset(k, recalcular=true){
+  const linea=document.getElementById('specLine'), adv=document.getElementById('advanced');
+  if(k==='otro'){
+    adv.style.display='block';
+    linea.innerHTML='Modo personalizado: edita Contrato, Dígitos, Paso y el valor del punto abajo.';
+  } else {
+    const s=PRESETS[k];
+    document.getElementById('contract').value=s.contract;
+    pintar(document.getElementById('contract'));
+    document.getElementById('digits').value=s.digits;
+    document.getElementById('step').value=s.step;
+    document.getElementById('V').value=s.V;
+    linea.innerHTML=`<b>${s.name}</b> · 1 punto = ${Math.pow(10,-s.digits)} · V = $${s.V} por punto/lote`+
+      (s.approx?` <span class="yel">(aprox — verifica el tick value en tu bróker)</span>`:``);
+  }
+  if(recalcular) calc();
+}
+document.getElementById('preset').addEventListener('change',e=>aplicarPreset(e.target.value));
+document.getElementById('advToggle').addEventListener('click',e=>{
+  e.preventDefault();
+  const a=document.getElementById('advanced');
+  a.style.display = a.style.display==='none' ? 'block' : 'none';
+});
+['contract','digits'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById('V').value = +(v('contract')*Math.pow(10,-v('digits'))).toFixed(8);
+    calc();
+  });
+});
+
+/**
+ * Lote del nivel i, truncado al paso como hace MT5 (nunca bajo el inicial).
+ *
+ * Se redondea a los decimales que tenga EL PASO, no a dos fijos. Con paso 0.001
+ * y múltiplo 1.25 el nivel 1 sale 0.012, y fijando dos decimales se convertía en
+ * 0.010: la calculadora enseñaba un volumen que no era el que abre el bot.
+ */
+function loteNivel(i, lote, mult, paso){
+  const dec=decimalesDe(paso);
+  const bruto=lote*Math.pow(mult,i);
+  const truncado=+((Math.floor(bruto/paso+1e-8))*paso).toFixed(dec);
+  return Math.max(lote, truncado);
+}
+
+/** Specs activas del símbolo. */
+function specs(){
+  const digits=v('digits');
+  return { digits, point:Math.pow(10,-digits), V:v('V'), paso:v('step')||0.01 };
+}
+
+/**
+ * Una fila del detalle.
+ *
+ * Los puntos van en valor absoluto con "a favor" o "en contra" detrás, nunca con
+ * el signo delante: con separador de miles, "-19.589 pts" se lee como menos
+ * diecinueve coma quinientos ochenta y nueve, lo contrario de lo que significa.
+ */
+function fila({op, entrada, lote, puntos, dinero, digits, calculado, extra}){
+  return `<li>
+    <span class="op">Op ${op}</span>
+    <span class="pr">${precio(entrada,digits)}</span>
+    <span class="mo ${dinero<0?'menos':'mas'}">${usd(dinero)}</span>
+    <span class="l2">
+      <span class="lo">${fmt(lote,Math.max(2,decimalesDe(v('step')||0.01)))} lotes${calculado?' <i>calc.</i>':''}</span>
+      <span class="pt">${pts(Math.abs(puntos))} pts ${puntos>=0?'a favor':'en contra'}</span>
+      ${extra||''}
+    </span>
+  </li>`;
+}
+
+function kpi(l, valor, clase){ return `<div class="kpi"><div class="l">${l}</div><div class="v ${clase||''}">${valor}</div></div>`; }
+
+let modo='abiertas';
+
+function calc(){ return modo==='cerradas' ? calcCerradas() : calcAbiertas(); }
+
+/**
+ * ABIERTAS — la cesta sigue viva.
+ *
+ * Con (15) y (16) se sabe dónde entra cada respaldo, así que el número de
+ * martingalas se deduce en lugar de escribirse, igual que hace el bot.
+ */
+function calcAbiertas(){
+  const dir=document.getElementById('dir').value;
+  const primera=leer(document.getElementById('primera'));
+  const actual=leer(document.getElementById('actual'));
+  const lote=v('lote'), mult=v('mult'), d1=v('d1'), inc=v('inc')/100;
+  const {digits,point,V,paso}=specs();
+  const salida=document.getElementById('salida');
+  const campoMG=document.getElementById('mg');
+
+  if(![primera,actual,lote,mult,d1,inc,digits,V].every(Number.isFinite) || primera<=0 || actual<=0 || lote<=0 || V<=0){
+    campoMG.value='';
+    salida.innerHTML='<div class="aviso">Completa los datos de la cesta para calcular.</div>';
+    limpiarTP();
+    return;
+  }
+
+  const enContra=p=>Math.max(0,(dir==='buy' ? primera-p : p-primera)/point);
+  const x=enContra(actual);
+
+  // Niveles mientras quepan en el recorrido de hoy, más uno para poder enseñar
+  // cuál sería el próximo respaldo.
+  const niveles=[]; let dist=0, lotes=0, ponderada=0;
+  for(let i=0;i<400;i++){
+    if(i>0) dist += d1*Math.pow(1+inc,i-1);
+    const l=loteNivel(i,lote,mult,paso);
+    if(i>0 && dist > x+1e-9){ niveles.push({dist,l,lotes,ponderada,abierto:false}); break; }
+    lotes+=l; ponderada+=l*dist;
+    niveles.push({dist,l,lotes,ponderada,abierto:true});
+    if(d1<=0) break;
+  }
+
+  const abiertos=niveles.filter(n=>n.abierto);
+  const mg=abiertos.length;
+  const est=abiertos[mg-1];
+  const prox=niveles[mg] || null;
+  campoMG.value=mg;
+
+  const flotante = V*(est.lotes*x - est.ponderada);
+  const proxDist = prox ? prox.dist : est.dist;
+  const proxPrecio = dir==='buy' ? primera-proxDist*point : primera+proxDist*point;
+  const proxLote = prox ? prox.l : est.l;
+
+  // ---- T/P: el bot cierra a (05) puntos del PRECIO MEDIO ponderado ----
+  const tp=v('tp');
+  const usaTP=Number.isFinite(tp) && tp>0;
+  const bePts = est.lotes>0 ? est.ponderada/est.lotes : 0;
+  const medio = dir==='buy' ? primera-bePts*point : primera+bePts*point;
+  const precioTP = dir==='buy' ? medio+tp*point : medio-tp*point;
+  const ganaTP = tp*V*est.lotes;
+  const faltan = Math.max(0,(dir==='buy' ? precioTP-actual : actual-precioTP)/point);
+  document.getElementById('tpPrecio').value   = usaTP ? precio(precioTP,digits) : '';
+  document.getElementById('tpGanancia').value = usaTP ? usd(ganaTP) : '';
+  document.getElementById('tpFaltan').value   = usaTP ? `${pts(faltan)} pts` : '';
+
+  // ---- Detalle: la suma de las filas tiene que dar el flotante ----
+  const filas=abiertos.map((n,i)=>{
+    const entrada = dir==='buy' ? primera-n.dist*point : primera+n.dist*point;
+    const puntos = (dir==='buy' ? actual-entrada : entrada-actual)/point;
+    const sep = i>0 ? n.dist-abiertos[i-1].dist : null;
+    return {op:i+1, entrada, lote:n.l, puntos, dinero:+(puntos*V*n.l).toFixed(2), sep};
+  });
+  const total=filas.reduce((s,f)=>s+f.dinero,0);
+
+  const kpis=[
+    ['Movimiento en contra', pts(x)+' pts', 'v-pts'],
+    ['Martingalas usadas', String(mg), 'v-num'],
+    ['Respaldos alcanzados', String(mg-1), 'v-num'],
+    ['Lotes abiertos', fmt(est.lotes,2), 'v-lote'],
+    ['Estado de la cesta', 'ABIERTA', 'v-estado'],
+    ['Pérdida flotante', usd(-flotante), 'v-menos'],
+    ['Distancia próximo respaldo', pts(proxDist)+' pts', 'v-pts'],
+    ['Precio próximo respaldo', proxPrecio>0 ? precio(proxPrecio,digits) : 'fuera de rango', 'v-precio'],
+    ['Lotaje próximo respaldo', fmt(proxLote,2), 'v-lote'],
+    // El precio medio se enseña siempre: es desde donde el bot mide el T/P, y
+    // además deja el resumen en número par para que no quede un hueco al final.
+    ['Precio medio de la cesta', precio(medio,digits), ''],
+  ];
+  if(usaTP){
+    kpis.push(['Cierra en T/P', precio(precioTP,digits), '']);
+    kpis.push(['Ganancia en T/P', usd(ganaTP), 'v-mas']);
+    kpis.push(['Puntos que faltan', pts(faltan)+' pts', 'v-pts']);
+    kpis.push(['Faltan en precio', usd(faltan*point), '']);
+  }
+
+  const detalle=filas.map(f=>({
+    op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, calculado:true,
+    notas: f.sep===null ? ['primera entrada de la cesta']
+      : [`separada: ${pts(f.sep)} pts`, `${usd(f.sep*point)} de precio`]
+  }));
+
+  guardarReporte({
+    modo:'Cesta abierta', digits,
+    kpis, detalle, total,
+    tituloDetalle:'Resultado por operación',
+    pie:'Precios de apertura calculados con (15) y (16): son los que el bot buscaría.'
+  });
+
+  salida.innerHTML=`
+    <div class="kpis">${kpis.map(k=>kpi(k[0],k[1],k[2])).join('')}</div>
+    <div class="detalle">
+      <h3>Resultado por operación</h3>
+      <ol class="lista">${detalle.map(f=>fila({
+        op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, digits, calculado:f.calculado,
+        extra: f.notas.map(n=>`<span class="se">${n}</span>`).join('')
+      })).join('')}</ol>
+      <div class="total">Flotante de la cesta <b class="${total<0?'menos':'mas'}">${usd(total)}</b></div>
+      <div class="hint" style="margin-top:6px">Precios de apertura calculados con (15) y (16): son los que el bot buscaría.</div>
+    </div>`;
+}
+
+/**
+ * CERRADAS — la cesta ya terminó.
+ *
+ * (15) y (16) no pintan nada aquí: sirven para predecir el próximo respaldo y ya
+ * no hay nada que predecir. Cada operación entró donde el historial dice, con
+ * retraso y deslizamiento incluidos, así que se pegan los precios reales.
+ */
+function calcCerradas(){
+  const dir=document.getElementById('dir').value;
+  const cierre=leer(document.getElementById('actual'));
+  const lote=v('lote'), mult=v('mult');
+  const {digits,point,V,paso}=specs();
+  const salida=document.getElementById('salida');
+  const campoMG=document.getElementById('mg');
+  limpiarTP();
+
+  const ops=leerPegadas();
+  campoMG.value = ops.length || '';
+
+  if(![cierre,digits,V].every(Number.isFinite) || cierre<=0 || V<=0){
+    salida.innerHTML='<div class="aviso">Completa el precio de cierre y el símbolo.</div>';
+    return;
+  }
+  if(!ops.length){
+    salida.innerHTML='<div class="aviso">Pega los precios de apertura, uno por línea, en el orden en que abrieron.</div>';
+    return;
+  }
+
+  // Igual que MT5: beneficio = puntos recorridos × valor del punto × volumen.
+  // Se redondea cada fila ANTES de sumar, que es lo que hace el bróker.
+  const filas=ops.map((o,i)=>{
+    const puntos=(dir==='buy' ? cierre-o.entrada : o.entrada-cierre)/point;
+    const sep = i>0 ? Math.abs(o.entrada-ops[i-1].entrada)/point : null;
+    return {...o, puntos, sep, dinero:+(puntos*V*o.lote).toFixed(2)};
+  });
+  filas.forEach((f,i)=>{
+    const prev = i>1 ? filas[i-1].sep : null;
+    f.incremento = (prev && f.sep) ? (f.sep/prev-1)*100 : null;
+  });
+
+  const total=filas.reduce((s,f)=>s+f.dinero,0);
+  const lotes=filas.reduce((s,f)=>s+f.lote,0);
+  const entradas=filas.map(f=>f.entrada);
+  const profundidad=(Math.max(...entradas)-Math.min(...entradas))/point;
+  const verdes=filas.filter(f=>f.dinero>0).length;
+
+  const kpis=[
+    ['Operaciones de la cesta', String(filas.length), 'v-num'],
+    ['Respaldos usados', String(filas.length-1), 'v-num'],
+    ['Lotes totales', fmt(lotes,2), 'v-lote'],
+    ['Profundidad de la cesta', pts(profundidad)+' pts', 'v-pts'],
+    ['Operaciones en verde', verdes+' de '+filas.length, 'v-num'],
+    ['Precio de cierre', precio(cierre,digits), ''],
+    ['Estado de la cesta', 'CERRADA', 'v-estado'],
+    ['Resultado de la cesta', usd(total), total<0?'v-menos':'v-mas'],
+  ];
+
+  const detalle=filas.map(f=>({
+    op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, calculado:!f.propio,
+    notas: f.sep===null ? ['primera entrada de la cesta']
+      : [`separada: ${pts(f.sep)} pts`, `${usd(f.sep*point)} de precio`]
+        .concat(f.incremento===null ? [] : [`incremento ${fmt(f.incremento,1)}%`])
+  }));
+
+  guardarReporte({
+    modo:'Cesta cerrada', digits,
+    kpis, detalle, total,
+    tituloDetalle:'Beneficio por operación',
+    pie:'Usa el precio de CIERRE de la operación, no el Take Profit.'
+  });
+
+  salida.innerHTML=`
+    <div class="kpis">${kpis.map(k=>kpi(k[0],k[1],k[2])).join('')}</div>
+    <div class="detalle">
+      <h3>Beneficio por operación</h3>
+      <ol class="lista">${detalle.map(f=>fila({
+        op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, digits, calculado:f.calculado,
+        extra: f.notas.map(n=>`<span class="se">${n}</span>`).join('')
+      })).join('')}</ol>
+      <div class="total">El total de las filas suma <b class="${total<0?'menos':'mas'}">${usd(total)}</b></div>
+      <div class="hint" style="margin-top:6px">Usa el precio de CIERRE de la operación, no el Take Profit: en el historial son columnas distintas y se parecen mucho.</div>
+    </div>`;
+}
+
+/* ================= EXPORTAR: PNG y PDF =================
+ *
+ * Los dos salen del MISMO dibujo. Se pinta el informe en un canvas y de ahí sale
+ * la imagen: el PNG se descarga tal cual y el PDF es esa misma imagen mandada a
+ * imprimir, donde el navegador ofrece "Guardar como PDF".
+ *
+ * Se dibuja a mano en vez de fotografiar la pantalla para no depender de ninguna
+ * librería externa: la app instalada tiene que funcionar sin conexión.
+ */
+let reporte=null;
+
+function guardarReporte(r){
+  reporte={
+    ...r,
+    simbolo: document.getElementById('preset').selectedOptions[0]?.textContent || '',
+    direccion: document.getElementById('dir').value==='buy' ? 'Compra' : 'Venta',
+    fecha: new Date().toLocaleString('es-DO')
+  };
+}
+
+const COLOR={
+  fondo:'#0d1117', panel:'#161b22', panel2:'#1c2330', borde:'#30363d',
+  txt:'#e6edf3', muted:'#8b949e', naranja:'#f7931a', azul:'#58a6ff',
+  rojo:'#f85149', ambar:'#d29922', lila:'#a78bfa', verde:'#3aa585', rosa:'#c96aa6'
+};
+const COLOR_CLASE={'v-pts':COLOR.ambar,'v-lote':COLOR.naranja,'v-num':COLOR.lila,
+  'v-mas':COLOR.azul,'v-menos':COLOR.rojo,'':COLOR.txt};
+
+function dibujarInforme(){
+  if(!reporte) return null;
+  const acento = modo==='cerradas' ? COLOR.rosa : COLOR.verde;
+  const esc=2;                        // el doble de resolución: no se ve borroso
+  const W=900, M=36, colW=(W-M*2-16)/2;
+
+  /**
+   * Medidas del informe.
+   *
+   * Las dos imágenes, la de cesta abierta y la de cesta cerrada, tienen que
+   * salir con la misma pinta aunque una tenga 8 datos y la otra 9. Por eso el
+   * resumen se rellena hasta completar filas de dos: si sobra uno suelto, la
+   * última tarjeta ocupa el ancho entero y no queda un hueco a la derecha.
+   *
+   * El detalle se mide ANTES de dibujar, porque una fila con notas largas ocupa
+   * dos renglón y si no se cuenta, el texto se sale por abajo del lienzo.
+   */
+  const filasKpi=Math.ceil(reporte.kpis.length/2);
+  const altoKpis=filasKpi*78;
+  const impar = reporte.kpis.length % 2 === 1;
+
+  const medidor=document.createElement('canvas').getContext('2d');
+  medidor.font=`400 12px 'Segoe UI', system-ui, sans-serif`;
+  const anchoUtil=W-M*2;
+  const lineasDe=f=>{
+    const trozos=trozosDe(f);
+    let lineas=1, x=0;
+    trozos.forEach(([t])=>{
+      const w=medidor.measureText(t).width+18;
+      if(x+w>anchoUtil){ lineas++; x=w; } else x+=w;
+    });
+    return lineas;
+  };
+  const altosDet=reporte.detalle.map(f=>46+lineasDe(f)*16);
+  const altoDet=altosDet.reduce((a,b)=>a+b,0);
+  const Hnat=150+altoKpis+56+altoDet+90;   // lo que ocupa este informe
+
+  /**
+   * TAMAÑO FIJO: 900 × 1150 siempre.
+   *
+   * Da igual que la cesta tenga 3 operaciones o 12, y da igual si es abierta o
+   * cerrada: la imagen copiada o descargada mide lo mismo. Así se ven iguales
+   * puestas una al lado de otra y no bailan de tamaño al pegarlas en un chat.
+   *
+   * Si el contenido no cabe, se reduce en proporción hasta que entre. Si sobra
+   * sitio, se centra: el hueco queda arriba y abajo por igual, no colgando.
+   */
+  const H=1150;
+  const escala=Math.min(1,(H-48)/Hnat);
+  const dx=(W-W*escala)/2, dy=(H-Hnat*escala)/2;
+
+  const c=document.createElement('canvas');
+  c.width=W*esc; c.height=H*esc;
+  const g=c.getContext('2d');
+  g.scale(esc,esc);
+  const F=(p,w='400')=>`${w} ${p}px 'Segoe UI', system-ui, sans-serif`;
+
+  // Fondo y franja del modo, siempre a lo ancho entero del lienzo.
+  g.fillStyle=COLOR.fondo; g.fillRect(0,0,W,H);
+  g.fillStyle=acento; g.fillRect(0,0,W,5);
+
+  // A partir de aquí se dibuja con las coordenadas de siempre, ya encajadas.
+  g.translate(dx,dy); g.scale(escala,escala);
+
+  // Cabecera
+  g.fillStyle=COLOR.txt; g.font=F(25,'700');
+  g.fillText('Trading Calculator',M,52);
+  g.fillStyle=acento; g.font=F(14,'700');
+  g.fillText(reporte.modo.toUpperCase(),M,78);
+  g.fillStyle=COLOR.muted; g.font=F(13);
+  g.fillText(`${reporte.simbolo} · ${reporte.direccion} · ${reporte.fecha}`,M,100);
+
+  // Resumen en dos columnas
+  let y=124;
+  reporte.kpis.forEach((k,i)=>{
+    const solo = impar && i===reporte.kpis.length-1;   // el último, si sobra
+    const ancho = solo ? colW*2+16 : colW;
+    const x=M+(solo?0:(i%2)*(colW+16)), fy=y+Math.floor(i/2)*78;
+    g.fillStyle=COLOR.panel2; redondeado(g,x,fy,ancho,66,10); g.fill();
+    g.strokeStyle=COLOR.borde; g.lineWidth=1; redondeado(g,x,fy,ancho,66,10); g.stroke();
+    g.fillStyle=COLOR.muted; g.font=F(11,'600');
+    g.fillText(k[0].toUpperCase(),x+14,fy+24);
+    g.fillStyle=COLOR_CLASE[k[2]] ?? (k[2]==='v-estado'?acento:COLOR.txt);
+    g.font=F(20,'700');
+    g.fillText(k[1],x+14,fy+50);
+  });
+  y+=altoKpis+30;
+
+  // Detalle
+  g.fillStyle=COLOR.txt; g.font=F(14,'700');
+  g.fillText(reporte.tituloDetalle.toUpperCase(),M,y);
+  y+=18;
+
+  reporte.detalle.forEach(f=>{
+    g.strokeStyle='rgba(255,255,255,.08)'; g.beginPath();
+    g.moveTo(M,y+4); g.lineTo(W-M,y+4); g.stroke();
+    g.fillStyle=COLOR.panel2; redondeado(g,M,y+16,54,22,6); g.fill();
+    g.fillStyle=COLOR.txt; g.font=F(12,'700');
+    g.fillText('Op '+f.op,M+10,y+31);
+    g.font=F(15); g.fillStyle=COLOR.txt;
+    g.fillText(precio(f.entrada,reporte.digits),M+70,y+32);
+    g.font=F(16,'700'); g.fillStyle=f.dinero<0?COLOR.rojo:COLOR.azul;
+    g.textAlign='right'; g.fillText(usd(f.dinero),W-M,y+32); g.textAlign='left';
+
+    // Segunda línea: si no cabe, salta de renglón en vez de salirse del lienzo.
+    const base=y+52;
+    let x=M, lineas=1;
+    g.font=F(12);
+    trozosDe(f).forEach(([t,col])=>{
+      const w=g.measureText(t).width+18;
+      if(x-M+w>anchoUtil){ x=M; lineas++; }
+      g.fillStyle=col; g.fillText(t,x,base+(lineas-1)*16); x+=w;
+    });
+    // Mismo alto que el medido antes de dibujar, para que nada se salga.
+    y+=46+lineas*16;
+  });
+
+  // Total
+  g.strokeStyle=COLOR.borde; g.beginPath(); g.moveTo(M,y+6); g.lineTo(W-M,y+6); g.stroke();
+  g.fillStyle=COLOR.txt; g.font=F(15);
+  g.fillText('El total de las filas suma',M,y+38);
+  g.font=F(20,'700'); g.fillStyle=reporte.total<0?COLOR.rojo:COLOR.azul;
+  g.fillText(usd(reporte.total),M+g.measureText('  ').width+205,y+38);
+  g.fillStyle=COLOR.muted; g.font=F(11);
+  g.fillText(reporte.pie,M,y+62);
+  g.fillText('Nesux Global Business RD · reglas del CJ Bot',M,H-22);
+
+  return c;
+}
+
+/** Los datos de la segunda línea de cada operación, con su color. */
+function trozosDe(f){
+  const dec=Math.max(2,decimalesDe(v('step')||0.01));
+  return [
+    [fmt(f.lote,dec)+' lotes'+(f.calculado?' (calc.)':''),COLOR.naranja],
+    [pts(Math.abs(f.puntos))+' pts '+(f.puntos>=0?'a favor':'en contra'),COLOR.ambar],
+    ...f.notas.map(n=>[n,COLOR.muted])
+  ];
+}
+
+function redondeado(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+}
+
+function nombreArchivo(ext){
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  return `trading-calculator-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${ext}`;
+}
+
+document.getElementById('btnPNG').addEventListener('click',()=>{
+  const c=dibujarInforme();
+  if(!c) return;
+  c.toBlob(b=>{
+    const url=URL.createObjectURL(b);
+    const a=document.createElement('a');
+    a.href=url; a.download=nombreArchivo('png');
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+  },'image/png');
+});
+
+/**
+ * Copiar el informe al portapapeles COMO IMAGEN.
+ *
+ * Es el mismo dibujo que el PNG, pero en vez de descargarse va al portapapeles,
+ * listo para pegar en WhatsApp, Telegram o un correo sin pasar por el disco.
+ * Funciona en los dos modos porque el informe se guarda igual en los dos.
+ */
+document.getElementById('btnCopiar').addEventListener('click',async ()=>{
+  const btn=document.getElementById('btnCopiar');
+  const c=dibujarInforme();
+  if(!c) return;
+  const original=btn.textContent;
+  const avisar=t=>{ btn.textContent=t; setTimeout(()=>{btn.textContent=original;},1800); };
+  try{
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    // El navegador exige que la escritura salga del gesto del usuario y que el
+    // documento tenga permiso; si algo falla se avisa en el propio botón.
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    avisar('✓ Copiado');
+  }catch(e){
+    avisar('No se pudo copiar');
+  }
+});
+
+document.getElementById('btnPDF').addEventListener('click',()=>{
+  const c=dibujarInforme();
+  if(!c) return;
+  /**
+   * El PDF sale por el diálogo de impresión del navegador, que en todos ofrece
+   * "Guardar como PDF". Se manda a un iframe oculto en vez de abrir una ventana
+   * nueva porque los bloqueadores de ventanas emergentes matan la ventana.
+   */
+  const img=c.toDataURL('image/png');
+  const marco=document.createElement('iframe');
+  marco.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(marco);
+  const d=marco.contentWindow.document;
+  d.open();
+  d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${nombreArchivo('pdf')}</title>
+    <style>@page{margin:10mm} html,body{margin:0;background:#fff}
+    img{width:100%;display:block}</style></head>
+    <body><img src="${img}"></body></html>`);
+  d.close();
+  const lanzar=()=>{
+    try{ marco.contentWindow.focus(); marco.contentWindow.print(); }catch(e){}
+    setTimeout(()=>marco.remove(),1500);
+  };
+  if(d.readyState==='complete') setTimeout(lanzar,250);
+  else marco.onload=()=>setTimeout(lanzar,250);
+});
+
+function limpiarTP(){
+  ['tpPrecio','tpGanancia','tpFaltan'].forEach(id=>{ document.getElementById(id).value=''; });
+}
+
+/**
+ * Lee las operaciones pegadas.
+ *
+ * Primero se quitan las comas de millar y solo después se parte la línea: si se
+ * partiera antes, "50,977.72" se leería como dos números, 50 y 977.72.
+ */
+function leerPegadas(){
+  const lote=v('lote')||0.01, mult=v('mult')||1, paso=v('step')||0.01;
+  return document.getElementById('pegar').value.split(/\r?\n/)
+    .map(l=>l.trim()).filter(Boolean)
+    .map((linea,i)=>{
+      let limpia=linea;
+      for(let k=0;k<4;k++) limpia=limpia.replace(/(\d),(\d{3})(?!\d)/g,'$1$2');
+      const p=limpia.split(/[\s;,\t]+/).filter(Boolean).map(Number).filter(Number.isFinite);
+      const propio = p.length>1 && p[1]>0;
+      return {op:i+1, entrada:p[0], lote: propio ? p[1] : loteNivel(i,lote,mult,paso), propio};
+    })
+    .filter(o=>Number.isFinite(o.entrada) && o.entrada>0);
+}
+
+// ---- Cambio de modo ----
+function aplicarModo(){
+  const cerradas = modo==='cerradas';
+  document.getElementById('app').classList.toggle('cerradas',cerradas);
+  document.getElementById('primeraWrap').style.display = cerradas ? 'none' : '';
+  document.getElementById('pegarWrap').style.display   = cerradas ? '' : 'none';
+  document.getElementById('distRow').style.display     = cerradas ? 'none' : '';
+  document.getElementById('tpRow').style.display       = cerradas ? 'none' : '';
+  document.getElementById('actualLabel').textContent   = cerradas ? 'Precio de cierre' : 'Precio actual';
+  const nota=document.getElementById('mgHint');
+  nota.style.display = cerradas ? 'none' : '';
+  document.getElementById('tituloEntradas').innerHTML =
+    'Datos de la cesta <span class="t-modo">· Operaciones ' + (cerradas ? 'cerradas' : 'abiertas') + '</span>';
+  document.getElementById('segHint').textContent = cerradas
+    ? 'Cesta terminada: pega los precios de apertura y pon el lotaje inicial y el múltiplo.'
+    : 'Cesta viva: solo usa la primera operación y el precio actual, igual que el bot.';
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',(b.dataset.modo==='cerradas')===cerradas));
+  calc();
+}
+document.getElementById('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(!b) return;
+  modo=b.dataset.modo;
+  aplicarModo();
+});
+
+document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',calc));
+// Se formatea al SALIR del campo: hacerlo en cada tecla mueve el cursor y no
+// deja corregir una cifra del medio.
+document.querySelectorAll('.fmt-pts,.pfmt').forEach(el=>{
+  el.addEventListener('blur',()=>{ pintar(el); calc(); });
+});
+document.getElementById('pegar').addEventListener('blur',()=>{
+  const ops=leerPegadas();
+  if(!ops.length) return;
+  const d=v('digits')||2;
+  document.getElementById('pegar').value =
+    ops.map(o=>o.propio ? `${precio(o.entrada,d)} ${fmt(o.lote,2)}` : precio(o.entrada,d)).join('\n');
+});
+
+aplicarModo();
+
+// Deshacer con Ctrl+Z y rehacer con Ctrl+Y. El modo abiertas/cerradas viaja
+// con la foto: si deshaces un cambio hecho en el otro modo, vuelve a él.
+NxHistorial.init({
+  raiz: document.getElementById('app'),
+  alCambiar: calc,
+  extra: {
+    leer: () => modo,
+    poner: m => { modo = m; aplicarModo(); }
+  }
+});
+
+// Dentro de un <iframe>: avisa su alto real para que el marco crezca con el
+// contenido y en móvil no quede nada cortado.
+(function(){
+  if(window.parent===window) return;
+  let ultimo=0;
+  function avisar(){
+    const h=Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    if(Math.abs(h-ultimo)>8){ ultimo=h; parent.postMessage({tipo:'nx-calc-alto', alto:h}, '*'); }
+  }
+  avisar();
+  window.addEventListener('load',avisar);
+  window.addEventListener('resize',avisar);
+  if(window.ResizeObserver) new ResizeObserver(avisar).observe(document.body);
+  setInterval(avisar,800);
+})();
+</script>
+</body>
+</html>

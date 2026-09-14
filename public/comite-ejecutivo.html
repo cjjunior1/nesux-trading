@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NESUX — Comité Ejecutivo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#0b1220;color:#e6edf7;line-height:1.7;padding:40px 20px
+  }
+  .wrap{max-width:1020px;margin:0 auto}
+  header{text-align:center;margin-bottom:46px}
+  header h1{font-size:2.7em;font-weight:800;letter-spacing:2px}
+  header p{opacity:.75;margin-top:10px;font-size:1.05em}
+  .divider{width:150px;height:4px;border-radius:99px;margin:24px auto;
+    background:linear-gradient(90deg,transparent,#5eead4,transparent)}
+
+  .card{
+    background:#111c30;border:1px solid #1e2f4d;border-radius:16px;
+    padding:26px 30px;margin-bottom:26px;position:relative;overflow:hidden
+  }
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px}
+  .c1::before{background:#2a5298}.c2::before{background:#6a11cb}
+  .c3::before{background:#0f9b8e}.c4::before{background:#b8860b}
+  .c5::before{background:#dd2476}.c6::before{background:#2575fc}
+  .c7::before{background:#71b280}
+
+  .head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:4px}
+  .num{
+    width:52px;height:52px;flex:0 0 52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.5em;font-weight:800;background:#1b2c48;border:2px solid #33507d
+  }
+  .head h2{font-size:1.5em;font-weight:700}
+  .emoji{font-size:1.6em}
+  .sigla{
+    display:inline-block;margin-left:auto;font-size:.78em;letter-spacing:2px;
+    font-weight:700;color:#0b1220;background:#5eead4;border-radius:99px;padding:5px 14px
+  }
+  .titulo-ing{opacity:.55;font-size:.92em;font-style:italic;margin-bottom:10px;padding-left:68px}
+  .mision{opacity:.88;margin:8px 0 14px}
+  h3{font-size:.8em;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin:16px 0 8px}
+  ul{list-style:none}
+  li{padding:5px 0 5px 26px;position:relative}
+  li::before{content:'\2713';position:absolute;left:0;color:#5eead4;font-weight:bold}
+  .kpi{
+    margin-top:16px;background:#0d1830;border:1px dashed #2a4066;
+    border-radius:10px;padding:12px 16px;font-size:.95em
+  }
+  .kpi b{color:#5eead4}
+  .nota{
+    margin-top:40px;background:#111c30;border:1px solid #1e2f4d;
+    border-radius:16px;padding:24px 30px
+  }
+  .nota h2{font-size:1.3em;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.95em}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #1e2f4d}
+  th{opacity:.6;font-size:.8em;letter-spacing:1.5px;text-transform:uppercase}
+  @media(max-width:640px){
+    header h1{font-size:1.9em}.head h2{font-size:1.15em}body{padding:24px 14px}
+    .sigla{margin-left:0}.titulo-ing{padding-left:0}
+    table{font-size:.85em}th,td{padding:8px 6px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>NESUX — Comité Ejecutivo</h1>
+  <div class="divider"></div>
+  <p>Siete cargos ejecutivos con nombre corporativo, sigla internacional y responsabilidad única.</p>
+</header>
+
+<div class="card c1">
+  <div class="head"><div class="num">1</div><span class="emoji">🧭</span><h2>Director Ejecutivo General</h2><span class="sigla">CEO</span></div>
+  <p class="titulo-ing">Chief Executive Officer</p>
+  <p class="mision"><b>Misión:</b> dirigir NESUX completa. Fija el rumbo, decide lo que nadie más puede decidir y responde por el resultado global.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Visión, identidad corporativa y valores</li>
+    <li>Voto final en estrategia, inversión y alianzas</li>
+    <li>Representación legal de la empresa</li>
+    <li>Preside el Comité Ejecutivo semanal</li>
+    <li>Nombra y evalúa a los demás directores</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> hitos del plan de 90 días cumplidos · crecimiento global de la empresa</div>
+</div>
+
+<div class="card c2">
+  <div class="head"><div class="num">2</div><span class="emoji">🛡️</span><h2>Vicepresidente Ejecutivo</h2><span class="sigla">VP-E</span></div>
+  <p class="titulo-ing">Deputy CEO — el "Sub-CEO", segundo al mando</p>
+  <p class="mision"><b>Misión:</b> ser el respaldo del CEO y el que hace cumplir lo decidido. Donde el CEO decide, él ejecuta y da seguimiento.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Sustituye al CEO con plena autoridad en su ausencia</li>
+    <li>Seguimiento de acuerdos: que lo decidido se cumpla y en fecha</li>
+    <li>Coordinación entre direcciones (evita choques y duplicidad)</li>
+    <li>Gobierno interno: reglamentos, acuerdos de socios, disciplina</li>
+    <li>Consolida el tablero de KPIs de todas las áreas</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> % de acuerdos ejecutados a tiempo · áreas con KPI al día</div>
+</div>
+
+<div class="card c3">
+  <div class="head"><div class="num">3</div><span class="emoji">⚙️</span><h2>Director de Operaciones y Planificación</h2><span class="sigla">COO</span></div>
+  <p class="titulo-ing">Chief Operating Officer — logística y programación</p>
+  <p class="mision"><b>Misión:</b> que la máquina corra. Es el dueño del calendario, de los recursos y de que cada cosa pase cuando debe pasar.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Programación maestra: calendario de sesiones, lanzamientos y entregas</li>
+    <li>Logística de recursos: equipos, licencias, insumos, proveedores</li>
+    <li>Procesos operativos documentados y actualizados</li>
+    <li>Onboarding del cliente: entrega de acceso y credenciales a tiempo</li>
+    <li>Control de cuellos de botella y capacidad del equipo</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> entregas en fecha · tiempo de activación de acceso · procesos documentados</div>
+</div>
+
+<div class="card c4">
+  <div class="head"><div class="num">4</div><span class="emoji">💰</span><h2>Director de Finanzas y Tesorería</h2><span class="sigla">CFO</span></div>
+  <p class="titulo-ing">Chief Financial Officer</p>
+  <p class="mision"><b>Misión:</b> custodiar el dinero. Cada peso con dueño, registro y justificación.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Tesorería: caja, cuentas bancarias, firmas autorizadas</li>
+    <li>Inversión inicial, aportes de socios y distribución del presupuesto</li>
+    <li>Cobros y conciliación: pasarela de pago y transferencias</li>
+    <li>Contabilidad, facturación, RNC y cumplimiento fiscal</li>
+    <li>Estado financiero mensual ante el Comité Ejecutivo</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> ingresos vs. gastos · caja disponible · 100% de pagos conciliados</div>
+</div>
+
+<div class="card c5">
+  <div class="head"><div class="num">5</div><span class="emoji">📣</span><h2>Directora de Comunicación y Marca</h2><span class="sigla">CCO</span></div>
+  <p class="titulo-ing">Chief Communications Officer</p>
+  <p class="mision"><b>Misión:</b> que NESUX hable con una sola voz, hacia afuera y hacia adentro.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Vocería oficial y mensaje institucional</li>
+    <li>Comunicación externa: redes, comunidad, campañas y publicidad</li>
+    <li>Comunicación interna: avisos, actas y circulares al equipo</li>
+    <li>Identidad visual, presentaciones y material corporativo</li>
+    <li>Manejo de crisis y respuesta pública</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> alcance y leads generados · costo por lead · tiempo de respuesta pública</div>
+</div>
+
+<div class="card c6">
+  <div class="head"><div class="num">6</div><span class="emoji">🤖</span><h2>Director de Tecnología e Innovación</h2><span class="sigla">CTO</span></div>
+  <p class="titulo-ing">Chief Technology &amp; Innovation Officer — tecnología avanzada</p>
+  <p class="mision"><b>Misión:</b> construir y sostener la ventaja tecnológica de NESUX: plataforma, automatización e inteligencia artificial.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Desarrollo de software: plataforma, portal y panel administrativo</li>
+    <li>Automatización e IA: asistentes, bots y canales inteligentes</li>
+    <li>Arquitectura del bot de trading (lo construye; Inversiones define las reglas)</li>
+    <li>Infraestructura: servidores, despliegues, respaldos y monitoreo</li>
+    <li>Ciberseguridad y protección de datos de clientes</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> disponibilidad del sistema · funcionalidades entregadas por trimestre · incidentes de seguridad</div>
+</div>
+
+<div class="card c7">
+  <div class="head"><div class="num">7</div><span class="emoji">📊</span><h2>Director de Inversiones y Riesgo</h2><span class="sigla">CIO</span></div>
+  <p class="titulo-ing">Chief Investment &amp; Risk Officer</p>
+  <p class="mision"><b>Misión:</b> que el capital opere con reglas escritas, no con impulsos. Responde por el rendimiento y por las pérdidas.</p>
+  <h3>Atribuciones</h3>
+  <ul>
+    <li>Política de inversión: qué se opera, con cuánto y bajo qué condiciones</li>
+    <li>Gestión de riesgo: lotaje, drawdown máximo, exposición por activo</li>
+    <li>Reglas y parámetros operativos del bot, con backtesting que los respalde</li>
+    <li>Cuentas de bróker: apertura, fondeo, retiros y auditoría</li>
+    <li>Reporte de resultados reales y bitácora de operaciones</li>
+  </ul>
+  <div class="kpi"><b>KPI:</b> rentabilidad mensual · drawdown máximo respetado · % de operaciones dentro de la política</div>
+</div>
+
+<div class="nota">
+  <h2>Cuadro de mando</h2>
+  <table>
+    <tr><th>#</th><th>Sigla</th><th>Cargo</th><th>Responde por</th></tr>
+    <tr><td>1</td><td>CEO</td><td>Director Ejecutivo General</td><td>El rumbo y el resultado global</td></tr>
+    <tr><td>2</td><td>VP-E</td><td>Vicepresidente Ejecutivo</td><td>Que lo decidido se cumpla</td></tr>
+    <tr><td>3</td><td>COO</td><td>Operaciones y Planificación</td><td>Logística, calendario y entregas</td></tr>
+    <tr><td>4</td><td>CFO</td><td>Finanzas y Tesorería</td><td>El dinero</td></tr>
+    <tr><td>5</td><td>CCO</td><td>Comunicación y Marca</td><td>La voz y la imagen</td></tr>
+    <tr><td>6</td><td>CTO</td><td>Tecnología e Innovación</td><td>La plataforma y la IA</td></tr>
+    <tr><td>7</td><td>CIO</td><td>Inversiones y Riesgo</td><td>El rendimiento del capital</td></tr>
+  </table>
+
+  <h2 style="margin-top:26px">Reglas de la estructura</h2>
+  <ul>
+    <li><b>Todos reportan al CEO.</b> El VP-E coordina, pero no sustituye la línea de mando.</li>
+    <li><b>Separación innegociable:</b> quien opera el capital (CIO) no es quien lo administra ni lo audita (CFO). Jamás la misma persona.</li>
+    <li><b>Un dueño por área.</b> Si son menos de siete personas, se acumulan cargos — pero por escrito, con nombre y apellido.</li>
+    <li><b>Cada director llega al Comité semanal con su KPI</b>, no con opiniones.</li>
+    <li><b>El cargo es una función, no un adorno.</b> Se revisa cada 90 días junto con el plan estratégico.</li>
+  </ul>
+</div>
+
+</div>
+</body>
+</html>

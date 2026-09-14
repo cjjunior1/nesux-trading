@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NESUX — Organismo Estructural</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+  body{background:#0f172a}
+
+  .deck{position:relative;width:100%;height:100vh;overflow:hidden}
+
+  .slide{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;visibility:hidden;transition:opacity .7s ease;
+    padding:40px 20px;
+  }
+  .slide.active{opacity:1;visibility:visible}
+  .slide::before,.slide::after{content:'';position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}
+  .slide::before{top:-45%;right:-8%;width:600px;height:600px;background:rgba(255,255,255,.12)}
+  .slide::after{bottom:-40%;left:-6%;width:520px;height:520px;background:rgba(0,0,0,.12)}
+
+  .content{position:relative;z-index:2;text-align:center;color:#fff;max-width:900px;padding:20px}
+
+  /* ---------- INTRODUCCIÓN (una sola presentación) ---------- */
+  .intro{background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)}
+  .intro h1{font-size:4.4em;font-weight:800;letter-spacing:3px;text-shadow:3px 3px 10px rgba(0,0,0,.35);animation:slideDown .9s ease-out}
+  .divider{width:160px;height:5px;margin:30px auto;border-radius:99px;background:linear-gradient(90deg,transparent,#fff,transparent);animation:expandWidth 1.1s ease-out}
+  .intro h2{font-size:2.1em;font-weight:300;opacity:.95;margin-bottom:28px;animation:slideUp 1s ease-out}
+  .intro .panel{
+    background:rgba(255,255,255,.10);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:26px 30px;
+    font-size:1.05em;line-height:1.9;animation:fadeIn 1.3s ease-out;text-align:left
+  }
+  .intro .lead{margin-top:26px;font-size:1.12em;opacity:.9;animation:fadeIn 1.6s ease-out}
+  .cta{
+    margin-top:34px;font-size:1.05em;padding:18px 46px;border:none;border-radius:99px;
+    background:#fff;color:#12303c;font-weight:700;cursor:pointer;
+    transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 10px 30px rgba(0,0,0,.3)
+  }
+  .cta:hover{transform:translateY(-3px);box-shadow:0 16px 42px rgba(0,0,0,.4)}
+
+  /* ---------- TEMAS NUMERADOS ---------- */
+  .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:110px;height:110px;border-radius:50%;
+    font-size:3.2em;font-weight:800;
+    background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.55);
+    backdrop-filter:blur(8px);margin-bottom:20px;
+    animation:popIn .6s cubic-bezier(.68,-.55,.265,1.55)
+  }
+  .icon{font-size:70px;margin-bottom:12px;animation:popIn .6s cubic-bezier(.68,-.55,.265,1.55)}
+  .content h2.tema{font-size:3em;font-weight:800;margin-bottom:18px;text-shadow:2px 3px 8px rgba(0,0,0,.3);animation:slideDown .8s ease-out}
+  .content p.sub{font-size:1.28em;line-height:1.7;margin-bottom:30px;opacity:.95;animation:slideUp .8s ease-out .15s both}
+  .content ul{list-style:none;text-align:left;display:inline-block;font-size:1.15em;animation:slideUp .8s ease-out .3s both}
+  .content li{padding:11px 0 11px 40px;position:relative;line-height:1.6}
+  .content li:before{content:'\2713';position:absolute;left:0;font-weight:bold;font-size:1.3em}
+
+  /* PALETA NUEVA (distinta a la del original) */
+  .t1{background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%)}
+  .t2{background:linear-gradient(135deg,#134e5e 0%,#71b280 100%)}
+  .t3{background:linear-gradient(135deg,#6a11cb 0%,#2575fc 100%)}
+  .t4{background:linear-gradient(135deg,#c31432 0%,#240b36 100%)}
+  .t5{background:linear-gradient(135deg,#ff512f 0%,#dd2476 100%)}
+  .t6{background:linear-gradient(135deg,#0f9b8e 0%,#0b486b 100%)}
+  .t7{background:linear-gradient(135deg,#b8860b 0%,#3a1c71 100%)}
+
+  /* ---------- UI ---------- */
+  .counter{
+    position:absolute;top:26px;right:26px;z-index:10;color:#fff;font-size:1.05em;font-weight:600;
+    background:rgba(255,255,255,.18);backdrop-filter:blur(10px);padding:12px 22px;border-radius:99px
+  }
+  .controls{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:flex;gap:16px;z-index:10}
+  .control-btn{
+    width:52px;height:52px;border-radius:50%;cursor:pointer;color:#fff;font-size:1.4em;
+    background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.85);
+    display:flex;align-items:center;justify-content:center;transition:all .3s ease
+  }
+  .control-btn:hover{background:rgba(255,255,255,.55);transform:scale(1.1)}
+  .dots{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:10}
+  .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:all .3s ease}
+  .dot.active{background:#fff;transform:scale(1.4)}
+  .progress{position:absolute;bottom:0;left:0;height:5px;width:0;background:#fff;z-index:10;transition:width .6s ease}
+
+  @keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes expandWidth{from{width:0}to{width:160px}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes popIn{0%{transform:scale(0);opacity:0}50%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+  @media(max-width:768px){
+    .intro h1{font-size:2.3em}
+    .intro h2{font-size:1.3em}
+    .intro .panel{font-size:.96em;padding:20px}
+    .content h2.tema{font-size:2em}
+    .content p.sub{font-size:1.05em}
+    .num{width:80px;height:80px;font-size:2.2em}
+    .icon{font-size:48px}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div class="counter" id="counter">Introducción</div>
+
+  <!-- 0 · INTRODUCCIÓN -->
+  <section class="slide intro active">
+    <div class="content">
+      <h1>Trading a otro Nivel</h1>
+      <div class="divider"></div>
+      <h2>Logros y Evolución Actual</h2>
+      <div class="panel">
+        <p>🚀 <strong>De una idea al trading automatizado en tiempo real.</strong></p>
+        <p style="margin-top:14px">
+          NESUX representa la evolución de nuestro conocimiento acumulado en trading, automatización
+          y gestión empresarial. Hemos consolidado las mejores prácticas en un sistema integral que
+          permite a nuestro equipo operar con eficiencia, transparencia y resultados medibles.
+        </p>
+      </div>
+      <p class="lead">A continuación, los <strong>7 puntos estratégicos</strong> que nos llevan al siguiente nivel.</p>
+      <button class="cta" onclick="next()">Explorar Plan Estratégico →</button>
+    </div>
+  </section>
+
+  <!-- 1 -->
+  <section class="slide t1">
+    <div class="content">
+      <div class="num">1</div>
+      <div class="icon">🏢</div>
+      <h2 class="tema">Estructuración Organizativa</h2>
+      <p class="sub">Definición clara de la estructura e identidad interna como empresa pre-constitucional</p>
+      <ul>
+        <li>Identidad y valores empresariales</li>
+        <li>Organigrama preliminar</li>
+        <li>Documentación legal base</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide t2">
+    <div class="content">
+      <div class="num">2</div>
+      <div class="icon">👥</div>
+      <h2 class="tema">Asignación de Roles</h2>
+      <p class="sub">Delimitación clara de cargos, funciones y responsabilidades de cada integrante</p>
+      <ul>
+        <li>Cargos y responsabilidades definidas</li>
+        <li>Matriz de autoridad clara</li>
+        <li>Líneas de reporte establecidas</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide t3">
+    <div class="content">
+      <div class="num">3</div>
+      <div class="icon">🤝</div>
+      <h2 class="tema">Acuerdos de Operación</h2>
+      <p class="sub">Formalización de derechos, deberes y compromisos del equipo</p>
+      <ul>
+        <li>Código de conducta profesional</li>
+        <li>Protocolos de decisión claros</li>
+        <li>Mecanismos de resolución de conflictos</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide t4">
+    <div class="content">
+      <div class="num">4</div>
+      <div class="icon">📅</div>
+      <h2 class="tema">Rutinas de Trabajo</h2>
+      <p class="sub">Fijación de un día semanal dedicado a formación y análisis estratégico</p>
+      <ul>
+        <li>Reuniones estratégicas semanales</li>
+        <li>Ciclo de formación continua</li>
+        <li>Seguimiento disciplinado de KPIs</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide t5">
+    <div class="content">
+      <div class="num">5</div>
+      <div class="icon">🧭</div>
+      <h2 class="tema">Hoja de Ruta</h2>
+      <p class="sub">Establecimiento de los primeros hitos y plan de acción inmediato</p>
+      <ul>
+        <li>Fases de implementación definidas</li>
+        <li>Hitos críticos identificados</li>
+        <li>Timeline de ejecución claro</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide t6">
+    <div class="content">
+      <div class="num">6</div>
+      <div class="icon">🎯</div>
+      <h2 class="tema">Objetivos Estratégicos</h2>
+      <p class="sub">Meta principal a 90 días con recursos e indicadores de avance</p>
+      <ul>
+        <li>Objetivo principal (90 días)</li>
+        <li>Indicadores de avance medibles</li>
+        <li>Recursos requeridos asignados</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide t7">
+    <div class="content">
+      <div class="num">7</div>
+      <div class="icon">💰</div>
+      <h2 class="tema">Planificación Financiera</h2>
+      <p class="sub">Acuerdo sobre inversión inicial y fecha límite de ejecución</p>
+      <ul>
+        <li>Inversión inicial conjunta acordada</li>
+        <li>Distribución presupuestaria optimizada</li>
+        <li>Fecha límite de ejecución establecida</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="progress" id="progress"></div>
+  <div class="dots" id="dots"></div>
+  <div class="controls">
+    <button class="control-btn" onclick="prev()">←</button>
+    <button class="control-btn" onclick="next()">→</button>
+  </div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const temas  = slides.length - 1; // 7 temas
+  let i = 0;
+
+  const dots = document.getElementById('dots');
+  slides.forEach(function (_, idx) {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = idx === 0 ? 'Introducción' : 'Tema ' + idx;
+    d.onclick = function () { go(idx); };
+    dots.appendChild(d);
+  });
+
+  function render() {
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+    Array.prototype.forEach.call(dots.children, function (d, idx) { d.classList.toggle('active', idx === i); });
+    document.getElementById('counter').textContent =
+      i === 0 ? 'Introducción' : 'Tema ' + i + ' de ' + temas;
+    document.getElementById('progress').style.width = (i / temas * 100) + '%';
+  }
+
+  function go(n) { i = (n + slides.length) % slides.length; render(); }
+  function next() { go(i + 1); }
+  function prev() { go(i - 1); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'Home') go(0);
+  });
+
+  render();
+</script>
+</body>
+</html>

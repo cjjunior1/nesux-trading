@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import LayoutShell from '@/components/layout-shell';
 import PageTracker from '@/components/page-tracker';
+import InstallApp from '@/components/install-app';
 import { InstallAppBanner } from '@/components/install-app-banner';
 import Script from 'next/script';
 import './globals.css';
@@ -33,6 +34,19 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'Nesux',
   },
+  // iOS NO lee el manifiesto para sacar el icono: necesita un apple-touch-icon
+  // aparte. Sin él, al hacer "Añadir a pantalla de inicio" el iPhone ponía una
+  // miniatura borrosa de la página en vez del logo, y la app parecía un atajo
+  // cualquiera. El PNG va a 180x180 y sin transparencia, que es lo que iOS
+  // espera (una imagen con alfa se le pinta de negro detrás).
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
 };
 
 export const viewport: Viewport = {
@@ -48,6 +62,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <Providers>
           <PageTracker />
+          {/* Descarga de la app: atiende a cualquier botón con data-instalar-app (móvil y PC) */}
+          <InstallApp />
+          {/*
+            Aviso de instalación en el móvil.
+            Estaba escrito y sin montar en ningún sitio, así que la única forma
+            de instalar era el botón "App" del menú — y en las páginas que no
+            llevan ese menú, como la portada, no había ninguna. Ahora aparece
+            solo en móvil y solo si el navegador confirma que se puede instalar.
+          */}
           <InstallAppBanner />
           {/* HumanCheck retirado: la captura de leads la hace el único popup oficial (lead-popup.js). */}
           <LayoutShell>{children}</LayoutShell>

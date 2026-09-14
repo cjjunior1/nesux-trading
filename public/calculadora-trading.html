@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nesux Calculator Trading · Simulador MG (CJ/Nesux Bot)</title>
+<title>Calculator Plus · Simulador MG (CJ/Nesux Bot)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230d1117'/%3E%3Crect x='22' y='16' width='56' height='68' rx='8' fill='%23161b22' stroke='%23f7931a' stroke-width='4'/%3E%3Crect x='30' y='24' width='40' height='16' rx='3' fill='%2358a6ff'/%3E%3Ccircle cx='36' cy='52' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='50' cy='52' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='64' cy='52' r='4' fill='%233fb950'/%3E%3Ccircle cx='36' cy='66' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='50' cy='66' r='4' fill='%23e6edf3'/%3E%3Ccircle cx='64' cy='66' r='4' fill='%23f85149'/%3E%3C/svg%3E">
-<meta property="og:title" content="Nesux Calculator Trading">
+<meta property="og:title" content="Calculator Plus">
 <meta property="og:description" content="Simula la cesta del bot en modo Martingala (MG): respaldos, TP y protección por USD.">
 <meta name="theme-color" content="#0d1117">
 <style>
@@ -21,14 +21,29 @@
   header h1{margin:0;font-size:20px;letter-spacing:.3px}
   header h1 span{color:var(--accent)}
   header p{margin:4px 0 0;color:var(--muted);font-size:13px}
-  .wrap{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:400px 1fr;gap:22px}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:440px 1fr;gap:22px}
+  /* min-width:0 = clave: sin esto una tabla ancha estira la rejilla y corta la página en móvil. */
+  .wrap>*{min-width:0}
+  .card,.kpi,.verdict,.note{min-width:0}
   @media(max-width:900px){.wrap{grid-template-columns:1fr}}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
   .card h2{margin:0 0 14px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
   label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
-  input,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
     border-radius:8px;padding:9px 10px;font-size:14px;font-family:inherit}
-  input:focus,select:focus{outline:none;border-color:var(--accent2)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)}
+  textarea{resize:vertical;line-height:1.6;font-variant-numeric:tabular-nums}
+  /* El relleno automático del navegador pinta el campo de BLANCO y sobre este
+     fondo oscuro queda ilegible. Se fuerza el color con una sombra interior,
+     que es lo único que Chrome respeta ahí. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus{
+    -webkit-text-fill-color:var(--txt);
+    -webkit-box-shadow:0 0 0 1000px var(--panel2) inset;
+    caret-color:var(--txt);
+    transition:background-color 9999s ease-in-out 0s;
+  }
   .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   /* En filas de 2/3 columnas: la etiqueta ocupa alto fijo y el input se alinea abajo,
@@ -41,7 +56,14 @@
   .verdict.bad{background:rgba(248,81,73,.12);border-color:var(--bad)}
   .verdict.warn{background:rgba(210,153,34,.12);border-color:var(--warn)}
   .verdict b{font-size:18px}
+  .exporta{display:flex;gap:8px;justify-content:flex-end;margin-bottom:12px;flex-wrap:wrap}
+  .exporta button{background:var(--panel2);border:1px solid var(--border);color:var(--txt);
+    border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .exporta button:hover{border-color:var(--accent2);color:var(--accent2)}
   .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  /* Si el último bloque queda solo en su fila, la ocupa entera: nunca se ve
+     media rejilla vacía al final. */
+  .kpis .kpi:last-child:nth-child(3n+1){grid-column:1/-1}
   @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
   .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
   .kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -65,6 +87,52 @@
   .seg button.on{background:var(--accent);color:#0d1117;font-weight:600}
   .note{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;font-size:13px}
   .note code{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1px 6px;color:var(--accent)}
+    margin-top:18px;padding:16px;border:1px solid var(--xc-borde);border-left:4px solid var(--xc);
+    border-radius:10px;background:linear-gradient(145deg,var(--xc-fondo),rgba(88,166,255,.08))}
+  /* Verde apagado, no neón: este bloque se mira mucho rato seguido. */
+  /* Segmentado propio: hereda el color del modo en vez del naranja general. */
+  /* Campo que rellena la calculadora sola: negrita y en el color del modo, para
+     que no se confunda con lo que escribió el usuario. */
+  input.auto{font-weight:700;color:var(--xc);border-color:var(--xc-borde);background:rgba(13,17,23,.65)}
+  /* Una fila por operación cerrada: etiqueta, precio de entrada y volumen. */
+  .extra-precio{display:grid;grid-template-columns:96px 1fr 84px;gap:8px;align-items:center;margin-bottom:6px}
+  .extra-precio .p-tag{font-size:11.5px;color:var(--xc);font-weight:600}
+  .extra-precio input{padding:7px 9px;font-size:13.5px}
+  @media(max-width:420px){.extra-precio{grid-template-columns:1fr 84px}.extra-precio .p-tag{grid-column:1/-1}}
+  /* Detalle del beneficio fila a fila, como el historial de MT5. */
+  .extra-detalle{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+  .extra-detalle strong{color:var(--txt)}
+  .detalle-lista{list-style:none;margin:10px 0 0;padding:0}
+  /* DOS LÍNEAS por operación.
+     Antes iba todo en una fila de cinco columnas y dentro de una tarjeta de
+     400 px el volumen y los puntos se partían en dos renglón cada uno, que es
+     justo lo que no se entendía. Arriba va lo que se mira primero: quién, a qué
+     precio y cuánto dejó. Abajo, el resto, en línea y sin cortarse. */
+  .detalle-lista li{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:baseline;
+    padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}
+  .detalle-lista li:last-child{border-bottom:0}
+  .detalle-lista .d-op{color:var(--txt);font-weight:700;font-size:12px;white-space:nowrap;
+    background:rgba(255,255,255,.07);border-radius:6px;padding:2px 8px}
+  .detalle-lista .d-precio{color:var(--txt);font-size:13.5px;font-variant-numeric:tabular-nums}
+  .detalle-lista .d-money{text-align:right;font-size:14.5px;font-weight:700;white-space:nowrap;
+    font-variant-numeric:tabular-nums}
+  /* Segunda línea: volumen, recorrido y separación. Cada dato entero, nunca partido. */
+  .detalle-lista .d-linea2{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;
+    font-size:11.5px;font-variant-numeric:tabular-nums}
+  .detalle-lista .d-linea2 span{white-space:nowrap}
+  .detalle-lista .d-lote{color:var(--accent)}
+  .detalle-lista .d-pts{color:var(--warn)}
+  .detalle-lista .d-sep{color:var(--muted)}
+  .detalle-lista .d-sep b{color:var(--txt);font-weight:600}
+  .detalle-lista .d-linea2 i{color:var(--muted);font-style:normal}
+  .detalle-total{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:14px}
+  .detalle-total b{font-size:16px}
+    font-variant-numeric:tabular-nums}
+  /* Un color por tipo de dato. Van con .extra-value delante porque si no la
+     regla general del valor (blanco) gana por especificidad y se comen el
+     color: así es como la pérdida flotante salía en blanco. */
+  /* Las etiquetas del resumen, en gris: el color se reserva para el dato. */
+    text-transform:uppercase;letter-spacing:.4px}
   .basket-title{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
   /* Las tablas anchas se desplazan DENTRO de su caja, no arrastran la página. */
   .tblwrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -83,9 +151,23 @@
     .kpi{padding:12px}
     .kpi .v{font-size:18px}
     input,select{font-size:16px}          /* 16px evita el zoom automático de iOS */
-    .tblwrap table{min-width:560px;font-size:12px}
-    th,td{padding:7px 8px}
     .note,.footer{font-size:12px}
+
+    /* TABLAS APILADAS: en móvil cada fila es una tarjeta y cada dato lleva su etiqueta
+       delante, así se ve TODO (puntos, USD de precio y flotante) sin mover la pantalla. */
+    .tblwrap{overflow-x:visible}
+    .tblwrap table,.tblwrap thead,.tblwrap tbody,.tblwrap tr,.tblwrap td{display:block;width:100%;min-width:0}
+    .tblwrap thead{display:none}
+    .tblwrap tr{border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-bottom:10px;background:var(--panel2)}
+    .tblwrap tr.pending{opacity:.6}
+    .tblwrap td{display:flex;justify-content:space-between;align-items:center;gap:12px;
+      text-align:right;border:0;border-bottom:1px solid rgba(255,255,255,.06);padding:6px 0;font-size:13px}
+    .tblwrap tr td:last-child{border-bottom:0}
+    .tblwrap td::before{content:attr(data-l);color:var(--muted);font-size:11.5px;text-transform:uppercase;
+      letter-spacing:.4px;text-align:left;flex:1 1 auto}
+    .tblwrap td:first-child{font-weight:700;color:var(--accent2);font-size:14px;justify-content:flex-start}
+    .tblwrap td:first-child::before{content:none}
+    tr.open td{background:transparent}
     /* nada puede desbordar: números y palabras largas se parten */
     .card,.verdict,.note,.kpi{word-break:break-word;overflow-wrap:anywhere}
   }
@@ -98,8 +180,8 @@
 </head>
 <body>
 <header>
-  <h1>Nesux <span>Calculator Trading</span> · Simulador Martingala</h1>
-  <p>Simula la cesta del bot en modo MARTINGALA (MG) tal como opera en MT5: entra en compras, ventas o ambas; abre respaldos cuando el precio va en contra, mantiene un solo TP en puntos sobre el precio medio y corta por (24) pérdida / (25) ganancia máxima en USD.</p>
+  <h1>Calculator <span>Plus</span> · Simulador Martingala</h1>
+  <p>Simula la cesta del bot en modo Martingala tal como opera en MT5: respaldos, TP sobre el precio medio y corte por (24) y (25).</p>
 </header>
 
 <div class="wrap">
@@ -122,18 +204,18 @@
       </div>
       <div>
         <label>(05) T/P (pts)</label>
-        <input id="tpPts" type="number" value="100000" step="1000">
+        <input id="tpPts" class="fmt-pts" type="text" inputmode="numeric" value="100.000">
       </div>
     </div>
 
     <div class="row">
       <div>
         <label>(14) Múltiplo MG</label>
-        <input id="m" type="number" value="1.25" step="0.01">
+        <input id="m" type="number" value="2" step="0.01">
       </div>
       <div>
         <label>(15) Puntos 1er resp.</label>
-        <input id="D1" type="number" value="50000" step="1000">
+        <input id="D1" class="fmt-pts" type="text" inputmode="numeric" value="70.000">
       </div>
     </div>
 
@@ -152,18 +234,18 @@
     <div class="row">
       <div>
         <label>(24) Pérdida Máx (USD)</label>
-        <input id="maxLoss" type="number" value="5000" step="50">
+        <input id="maxLoss" class="fmt-usd" type="text" inputmode="decimal" value="5,000.00">
       </div>
       <div>
         <label>(25) Ganancia Máx (USD)</label>
-        <input id="maxGain" type="number" value="5000" step="50">
+        <input id="maxGain" class="fmt-usd" type="text" inputmode="decimal" value="5,000.00">
       </div>
     </div>
     <div class="hint">El bot cierra TODA la cesta en cuanto el beneficio flotante toca −(24) o +(25).</div>
 
     <h2 style="margin-top:20px">Capital y símbolo</h2>
     <label>Capital disponible (USD) · <span class="pill">C</span></label>
-    <input id="C" type="number" value="10000" step="100">
+    <input id="C" class="fmt-usd" type="text" inputmode="decimal" value="10,000.00">
     <div class="hint">Saldo con el que operas. Solo sirve para ver qué % de tu cuenta consume la pérdida flotante.</div>
 
     <label style="margin-top:14px">Par / Símbolo que operas</label>
@@ -178,7 +260,7 @@
       <div class="row3">
         <div>
           <label>Contrato</label>
-          <input id="contract" type="number" value="1" step="0.01">
+          <input id="contract" class="fmt-pts" type="text" inputmode="numeric" value="1">
         </div>
         <div>
           <label>Dígitos</label>
@@ -203,12 +285,19 @@
       <button data-u="usd">USD de precio</button>
       <button data-u="loss">Pérdida USD</button>
     </div>
-    <input id="mov" type="number" value="200000" step="1000" style="margin-top:10px">
+    <input id="mov" class="fmt-pts" type="text" inputmode="decimal" value="200.000" style="margin-top:10px">
     <div class="hint" id="movHint"></div>
+
   </div>
 
   <!-- RESULTADOS -->
   <div>
+    <div class="exporta">
+      <button type="button" id="btnCopiar">⧉ Copiar</button>
+      <button type="button" id="btnPNG">⬇ PNG</button>
+      <button type="button" id="btnPDF">⬇ PDF</button>
+    </div>
+
     <div id="verdict" class="verdict ok"></div>
 
     <div class="kpis">
@@ -217,6 +306,7 @@
       <div class="kpi"><div class="l">Movimiento en contra</div><div class="v" id="k_mov"></div><div class="s" id="k_mov_s"></div></div>
       <div class="kpi"><div class="l">Pérdida flotante total</div><div class="v red" id="k_loss"></div><div class="s" id="k_loss_s"></div></div>
       <div class="kpi"><div class="l">Precio medio (breakeven)</div><div class="v" id="k_be"></div><div class="s" id="k_be_s"></div></div>
+      <div class="kpi"><div class="l">Equidad</div><div class="v" id="k_colchon"></div><div class="s" id="k_colchon_s"></div></div>
       <div class="kpi" id="tpTile"><div class="l">Beneficio a favor (cerrado)</div><div class="v green" id="k_tp"></div><div class="s" id="k_tp_s"></div></div>
     </div>
 
@@ -261,22 +351,85 @@
     </div>
 
     <div class="footer">
-      Nesux Calculator Trading · basado en CJ Bot Calculator v2.44 · Nesux Global Business RD.<br>
+      Calculator Plus · basado en CJ Bot Calculator v2.44 · Nesux Global Business RD.<br>
       ⚠️ Simulación educativa. El mercado real añade spread, slippage, swaps y los (18) seg de confirmación de respaldo.
     </div>
   </div>
 </div>
 
+<script src="/informe-export.js"></script>
+<script src="/historial-form.js"></script>
 <script>
 let movUnit = 'pts';
+let informe = null;   // lo rellena calc() en cada cálculo
 
-const fmt=(n,d=2)=>isFinite(n)?n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
-const usd=n=>(n<0?'-$':'$')+fmt(Math.abs(n),2);
+/**
+ * Formatos de número de TODA la calculadora.
+ *
+ * Los puntos y el dinero se escriben distinto a propósito, para que no haya
+ * forma de confundirlos leyendo por encima:
+ *   puntos  →  70.000        (sin decimales, punto de millar)
+ *   dólares →  70,000.00     (dos decimales, coma de millar)
+ * Los precios llevan los decimales que tenga el símbolo elegido.
+ */
+const nf=(n,d,loc)=>isFinite(n)?n.toLocaleString(loc,{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
+const pts=n=>nf(n,0,'es-ES');
+const fmt=(n,d=2)=>nf(n,d,'en-US');
+const usd=n=>(n<0?'-$':'$')+nf(Math.abs(n),2,'en-US');
+/**
+ * Precios: agrupados con coma y SIN ceros de relleno.
+ *
+ * El símbolo pone el tope de decimales —el euro admite 5 y un índice 2—, pero
+ * un precio que vale 51173.61 se escribe 51,173.61 y no 51,173.61000, aunque el
+ * par admita más. Rellenar con ceros hacía ilegible la lista pegada.
+ */
+function decimalesDe(n){
+  const s=String(n);
+  const i=s.indexOf('.');
+  return i<0 ? 0 : Math.min(8, s.length-i-1);
+}
+function precio(n,d){
+  if(!isFinite(n)) return '∞';
+  const max=Math.max(0,Math.min(8,d|0));
+  const min=Math.min(max,decimalesDe(n));
+  return n.toLocaleString('en-US',{minimumFractionDigits:min,maximumFractionDigits:max});
+}
+
+/**
+ * Campos con separadores de miles.
+ *
+ * Los que llevan puntos se escriben 50.000 y los que llevan dinero 10,000.00.
+ * Como el navegador no sabe formatear un <input type="number">, esos campos son
+ * de texto y aquí se limpian antes de operar:
+ *
+ *   fmt-pts → el punto es separador de miles, así que se quita entero.
+ *   fmt-usd → la coma es de miles y el punto es el decimal.
+ *
+ * Confundir los dos es el fallo clásico: 50.000 leído como 50 con decimales.
+ */
+function leerCampo(el){
+  if(!el) return NaN;
+  let t=String(el.value||'').replace(/\s/g,'');
+  t = el.classList.contains('fmt-pts') ? t.replace(/[.,]/g,'') : t.replace(/,/g,'');
+  return t==='' ? NaN : +t;
+}
+
+function pintarCampo(el){
+  const n=leerCampo(el);
+  if(!isFinite(n)) return;
+  el.value = el.classList.contains('fmt-pts') ? pts(n) : fmt(n,2);
+}
+
+// Se formatea al SALIR del campo: hacerlo en cada tecla mueve el cursor y no
+// deja corregir una cifra del medio.
+document.querySelectorAll('.fmt-pts,.fmt-usd').forEach(el=>{
+  el.addEventListener('blur',()=>{ pintarCampo(el); calc(); });
+});
 
 // V autocalculado desde contrato y dígitos
 ['contract','digits'].forEach(id=>{
   document.getElementById(id).addEventListener('input',()=>{
-    const c=+document.getElementById('contract').value;
+    const c=leerCampo(document.getElementById('contract'));
     const d=+document.getElementById('digits').value;
     document.getElementById('V').value = +(c*Math.pow(10,-d)).toFixed(8);
     calc();
@@ -307,7 +460,10 @@ const PRESETS={
   v10:    {g:'Sintéticos Deriv', name:'Volatility 10 Index',      contract:1, digits:3, step:0.01,  V:0.001,  approx:true},
   v25:    {g:'Sintéticos Deriv', name:'Volatility 25 Index',      contract:1, digits:3, step:0.01,  V:0.001,  approx:true},
   v50:    {g:'Sintéticos Deriv', name:'Volatility 50 Index',      contract:1, digits:4, step:0.01,  V:0.0001, approx:true},
-  v75:    {g:'Sintéticos Deriv', name:'Volatility 75 Index',      contract:1, digits:4, step:0.001, V:0.0001, approx:true},
+  // V75 con 2 dígitos: el historial real de la cuenta muestra precios tipo
+  // 51173.61 y el (15) del bot se configura en 70.000 puntos ≈ 700.00 de precio.
+  // Con 4 dígitos los puntos salían ×100 y no cuadraban con lo que se teclea en MT5.
+  v75:    {g:'Sintéticos Deriv', name:'Volatility 75 Index',      contract:1, digits:2, step:0.001, V:0.01,   approx:true},
   v100:   {g:'Sintéticos Deriv', name:'Volatility 100 Index',     contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
   v10s:   {g:'Sintéticos Deriv', name:'Volatility 10 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
   v25s:   {g:'Sintéticos Deriv', name:'Volatility 25 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
@@ -344,8 +500,8 @@ const PRESETS={
     const o=document.createElement('option'); o.value=k; o.textContent=PRESETS[k].name; grupos[g].appendChild(o);
   }
   const o=document.createElement('option'); o.value='otro'; o.textContent='Otro / personalizado…'; sel.appendChild(o);
-  sel.value='eur';                // símbolo por defecto
-  aplicarPreset('eur', false);
+  sel.value='v75';                // símbolo por defecto: es con el que se opera
+  aplicarPreset('v75', false);
 })();
 
 function aplicarPreset(k, recalcular=true){
@@ -357,6 +513,7 @@ function aplicarPreset(k, recalcular=true){
   } else {
     const s=PRESETS[k];
     document.getElementById('contract').value=s.contract;
+    pintarCampo(document.getElementById('contract'));
     document.getElementById('digits').value=s.digits;
     document.getElementById('step').value=s.step;
     document.getElementById('V').value=s.V;
@@ -364,6 +521,8 @@ function aplicarPreset(k, recalcular=true){
     specLine.innerHTML=`<b>${s.name}</b> · 1 punto = ${point} · V = $${s.V} por punto/lote`+
       (s.approx?` <span class="yel">(aprox — verifica el tick value en tu bróker)</span>`:``);
   }
+  // Solo recalcula la simulación de arriba: la calculadora de nueva operación
+  // tiene su propio símbolo y no se entera de este cambio.
   if(recalcular) calc();
 }
 
@@ -378,6 +537,16 @@ document.getElementById('seg').addEventListener('click', e=>{
   if(e.target.tagName!=='BUTTON') return;
   movUnit = e.target.dataset.u;
   document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b===e.target));
+  /**
+   * El campo cambia de naturaleza con la unidad: en "Puntos" es 200.000 y en
+   * las dos de USD es 200,000.00. Se cambia la clase y se repinta, porque si no
+   * el número se quedaría leyéndose con las reglas de la unidad anterior.
+   */
+  const mov=document.getElementById('mov');
+  const n=leerCampo(mov);
+  mov.classList.toggle('fmt-pts', movUnit==='pts');
+  mov.classList.toggle('fmt-usd', movUnit!=='pts');
+  if(isFinite(n)){ mov.value=String(n); pintarCampo(mov); }
   calc();
 });
 
@@ -386,13 +555,13 @@ document.querySelectorAll('input,select').forEach(i=>i.addEventListener('input',
 // Trunca el lote al paso, como NormalizarLotaje (MathFloor), nunca por debajo del inicial.
 function normLot(x, step, Lmin){
   let l = Math.floor(x/step + 1e-8)*step;
-  l = +l.toFixed(2);
+  l = +l.toFixed(decimalesDe(step));   // decimales del paso, no dos fijos
   if(l < Lmin) l = Lmin;
   return l;
 }
 
 function calc(){
-  const g=id=>+document.getElementById(id).value;
+  const g=id=>leerCampo(document.getElementById(id));
   const dir=document.getElementById('dir').value;
   const C=g('C'), L=g('L'), m=g('m'), D1=g('D1'),
         p=g('p')/100, N=Math.max(1,Math.round(g('N'))),
@@ -426,7 +595,7 @@ function calc(){
   }
 
   // ---- Entrada del movimiento ----
-  const movVal=+document.getElementById('mov').value;
+  const movVal=leerCampo(document.getElementById('mov'));
   let x;
   if(movUnit==='pts')      x = movVal;
   else if(movUnit==='usd') x = movVal/point;
@@ -480,12 +649,27 @@ function calc(){
   document.getElementById('k_resp_s').textContent = openPos+' de '+N+' operaciones abiertas';
   document.getElementById('k_lots').textContent = fmt(openLots,2)+' lotes';
   document.getElementById('k_lots_s').textContent = 'suma de lotes abiertos';
-  document.getElementById('k_mov').textContent = fmt(x,0)+' pts';
+  document.getElementById('k_mov').textContent = pts(x)+' pts';
   document.getElementById('k_mov_s').textContent = usd(x*point)+' de precio en contra';
   document.getElementById('k_loss').textContent = usd(floatLoss);
   document.getElementById('k_loss_s').textContent = burnedCapital? '🔥 supera tu capital ('+usd(C)+')' : fmt(floatLoss/C*100,1)+'% del capital';
-  document.getElementById('k_be').textContent = fmt(bePts,0)+' pts';
+  document.getElementById('k_be').textContent = pts(bePts)+' pts';
   document.getElementById('k_be_s').textContent = usd(bePts*point)+' desde la 1ª entrada';
+  /**
+   * Colchón restante: capital menos lo que ya se está perdiendo en flotante.
+   *
+   * Es el dato que dice cuánto aguanta la cuenta si el precio sigue en contra,
+   * y de paso deja la rejilla en seis bloques, sin el hueco del final.
+   */
+  // Equidad: el capital con el flotante ya descontado. Es el término que usa
+  // MT5 en la barra inferior, no un invento nuestro.
+  const colchon = C - floatLoss;
+  const elColchon = document.getElementById('k_colchon');
+  elColchon.textContent = usd(colchon);
+  elColchon.className = 'v ' + (colchon<=0 ? 'red' : colchon < C*0.25 ? 'yel' : 'green');
+  document.getElementById('k_colchon_s').textContent = colchon<=0
+    ? 'la cuenta ya no aguanta'
+    : fmt(colchon/C*100,1)+'% del capital libre';
   // "Beneficio a favor (cerrado)": SOLO en Ambas (necesita el lado contrario). En un
   // solo sentido no hay lado a favor cerrando en TP, así que el bloque se oculta.
   const tpTile=document.getElementById('tpTile');
@@ -503,18 +687,18 @@ function calc(){
   if(cortadaPorPerdida){
     v.className='verdict bad';
     v.innerHTML = `<b class="red">🛑 CIERRE POR (24) PÉRDIDA MÁXIMA</b> — cesta ${sideTxt}.<br>
-      A ${fmt(xMaxLoss,0)} pts en contra (${usd(xMaxLoss*point)}) el flotante llega a −${usd(maxLoss)} y el bot cierra TODA la cesta.
-      Con los ${fmt(x,0)} pts indicados el flotante sería ${usd(floatLoss)}.`;
+      A ${pts(xMaxLoss)} pts en contra (${usd(xMaxLoss*point)}) el flotante llega a −${usd(maxLoss)} y el bot cierra TODA la cesta.
+      Con los ${pts(x)} pts indicados el flotante sería ${usd(floatLoss)}.`;
   } else if(burnedCapital){
     v.className='verdict bad';
     v.innerHTML = `<b class="red">🔥 CUENTA QUEMADA</b> antes de este punto (cesta ${sideTxt}).<br>
-      Con ${fmt(x,0)} pts en contra hay <b>${respaldos} respaldos</b> y la pérdida flotante es <b>${usd(floatLoss)}</b>, que supera tu capital de ${usd(C)}.
-      Nota: (24) está en ${usd(maxLoss)} → el bot habría cortado a ${fmt(xMaxLoss,0)} pts.`;
+      Con ${pts(x)} pts en contra hay <b>${respaldos} respaldos</b> y la pérdida flotante es <b>${usd(floatLoss)}</b>, que supera tu capital de ${usd(C)}.
+      Nota: (24) está en ${usd(maxLoss)} → el bot habría cortado a ${pts(xMaxLoss)} pts.`;
   } else {
     v.className='verdict ok';
-    v.innerHTML = `<b class="green">✅ ${respaldos} respaldos abiertos</b> con ${fmt(x,0)} pts en contra (${usd(x*point)}) — cesta ${sideTxt}.<br>
+    v.innerHTML = `<b class="green">✅ ${respaldos} respaldos abiertos</b> con ${pts(x)} pts en contra (${usd(x*point)}) — cesta ${sideTxt}.<br>
       Pérdida flotante: <b>${usd(floatLoss)}</b> (${fmt(floatLoss/C*100,1)}% del capital). Colchón restante: ${usd(C-floatLoss)}.<br>
-      Si la cesta vuelve al TP cierras con <b class="green">+${usd(tpProfit)}</b> (el precio debe recuperar ${fmt(retroceso,0)} pts = ${usd(retroceso*point)}).
+      Si la cesta vuelve al TP cierras con <b class="green">+${usd(tpProfit)}</b> (el precio debe recuperar ${pts(retroceso)} pts = ${usd(retroceso*point)}).
       ${tpCortaGanancia?`<br><span class="yel">⚑ Ese beneficio (${usd(tpProfit)}) ya alcanza (25) Ganancia Máxima (${usd(maxGain)}): el bot cerraría por equidad.</span>`:''}`;
   }
 
@@ -528,27 +712,75 @@ function calc(){
     const flo = isOpen ? V*lot[j]*(x-cum[j]) : 0;
     const paso = j===0 ? 0 : cum[j]-cum[j-1];   // distancia de esta op respecto a la anterior
     rows+=`<tr class="${isOpen?'open':'pending'}">
-      <td>${j===0?'Inicial':'Resp. '+j}</td>
-      <td><span class="tag ${isOpen?'o':'p'}">${isOpen?'ABIERTA':'pendiente'}</span></td>
-      <td>${fmt(lot[j],2)}</td>
-      <td>${fmt(cumLots[j],2)}</td>
-      <td>${fmt(cum[j],0)}</td>
-      <td>${j===0?'—':fmt(paso,0)}</td>
-      <td>${isOpen?usd(flo):'—'}</td></tr>`;
+      <td data-l="Nivel">${j===0?'Inicial':'Resp. '+j}</td>
+      <td data-l="Estado"><span class="tag ${isOpen?'o':'p'}">${isOpen?'ABIERTA':'pendiente'}</span></td>
+      <td data-l="Lote">${fmt(lot[j],2)}</td>
+      <td data-l="Lotes acum.">${fmt(cumLots[j],2)}</td>
+      <td data-l="Dist. apertura (pts)">${pts(cum[j])}</td>
+      <td data-l="Dist. entre ops (pts)">${j===0?'—':pts(paso)}</td>
+      <td data-l="Pérdida aquí (USD)">${isOpen?usd(flo):'—'}</td></tr>`;
   }
   document.querySelector('#tbl tbody').innerHTML=rows;
 
   // ---- Disparadores ----
   let trg='';
   for(let j=1;j<N;j++){
-    trg+=`<tr><td><span class="tag o">Respaldo ${j}</span></td>
-      <td>${fmt(cum[j],0)}</td><td>${usd(cum[j]*point)}</td><td>${usd(lossAt(cum[j]))}</td></tr>`;
+    trg+=`<tr><td data-l="Evento"><span class="tag o">Respaldo ${j}</span></td>
+      <td data-l="Ocurre en (pts en contra)">${pts(cum[j])}</td>
+      <td data-l="= USD de precio">${usd(cum[j]*point)}</td>
+      <td data-l="Pérdida flotante">${usd(lossAt(cum[j]))}</td></tr>`;
   }
   if(maxLoss>0 && isFinite(xMaxLoss)){
-    trg+=`<tr><td><span class="tag sell">(24) Cierre por pérdida</span></td>
-      <td>${fmt(xMaxLoss,0)}</td><td>${usd(xMaxLoss*point)}</td><td class="red">${usd(maxLoss)}</td></tr>`;
+    trg+=`<tr><td data-l="Evento"><span class="tag sell">(24) Cierre por pérdida</span></td>
+      <td data-l="Ocurre en (pts en contra)">${pts(xMaxLoss)}</td>
+      <td data-l="= USD de precio">${usd(xMaxLoss*point)}</td>
+      <td data-l="Pérdida flotante" class="red">${usd(maxLoss)}</td></tr>`;
   }
   document.getElementById('trg').innerHTML=trg;
+
+  /**
+   * Informe exportable.
+   *
+   * Se guarda con cada cálculo y de aquí beben los botones de copiar, PNG y PDF.
+   * Solo lleva texto ya formateado: el dibujo vive en /informe-export.js, que
+   * comparten esta calculadora y Trading Calculator.
+   */
+  const nombreSimbolo=document.getElementById('preset').selectedOptions[0]?.textContent || '';
+  informe={
+    titulo:'Calculator Plus',
+    modo:'SIMULADOR MARTINGALA · CESTA '+sideTxt,
+    acento:'#f7931a',
+    meta:nombreSimbolo+' · capital '+usd(C)+' · '+new Date().toLocaleString('es-DO'),
+    kpis:[
+      {l:'Respaldos abiertos', v:String(respaldos), color:'#a78bfa'},
+      {l:'Operaciones abiertas', v:openPos+' de '+N, color:'#a78bfa'},
+      {l:'Movimiento en contra', v:pts(x)+' pts', color:'#d29922'},
+      {l:'Lotes abiertos', v:fmt(openLots,2), color:'#f7931a'},
+      {l:'Pérdida flotante', v:usd(-floatLoss), color:'#f85149'},
+      {l:'Equidad', v:usd(colchon), color: colchon<=0 ? '#f85149' : '#3fb950'},
+      {l:'Precio medio (breakeven)', v:pts(bePts)+' pts', color:'#d29922'},
+      {l:'Si vuelve al TP', v:'+'+usd(tpProfit), color:'#58a6ff'}
+    ],
+    tituloDetalle:'Detalle nivel por nivel',
+    filas:Array.from({length:N},(_,j)=>{
+      const abierta=j<=k;
+      const flo=abierta ? V*lot[j]*(x-cum[j]) : 0;
+      return {
+        izq: j===0?'Inicial':'Resp. '+j,
+        centro: abierta?'ABIERTA':'pendiente',
+        der: abierta?usd(-flo):'—',
+        derColor: abierta?'#f85149':'#8b949e',
+        sub:[
+          {t:fmt(lot[j],2)+' lotes', color:'#f7931a'},
+          {t:'acumulado '+fmt(cumLots[j],2), color:'#8b949e'},
+          {t:'abre a '+pts(cum[j])+' pts', color:'#d29922'},
+          {t:j===0?'primera entrada':'separada '+pts(cum[j]-cum[j-1])+' pts', color:'#8b949e'}
+        ]
+      };
+    }),
+    total:{texto:'Pérdida flotante total', valor:usd(-floatLoss), color:'#f85149'},
+    pie:'Lotes truncados al paso, como MT5. El mercado real añade spread, slippage y swaps.'
+  };
 
   // ---- Lado opuesto (Ambas) ----
   const opp=document.getElementById('oppCard');
@@ -556,14 +788,54 @@ function calc(){
     opp.style.display='block';
     document.getElementById('oppSide').textContent = 'la otra cesta va a favor y toca su TP';
     document.getElementById('oppTxt').innerHTML =
-      `Mientras esta cesta acumula respaldos, la cesta contraria va a favor. Cada vez que el precio recorre ${tpPts.toLocaleString('es-ES')} pts (el (05) TP) a su favor, esa cesta cierra en <b class="green">+${usd(ganCiclo)}</b> con su operación inicial y vuelve a abrir. `+
-      `Con ${fmt(x,0)} pts de recorrido total, el lado a favor habría cerrado en TP ≈ <b>${ciclosFav}</b> ${ciclosFav===1?'vez':'veces'} = <b class="green">${usd(favorReal)}</b> real (sin contar sus propios respaldos si el precio retrocede).`;
+      `Mientras esta cesta acumula respaldos, la cesta contraria va a favor. Cada vez que el precio recorre ${pts(tpPts)} pts (el (05) TP) a su favor, esa cesta cierra en <b class="green">+${usd(ganCiclo)}</b> con su operación inicial y vuelve a abrir. `+
+      `Con ${pts(x)} pts de recorrido total, el lado a favor habría cerrado en TP ≈ <b>${ciclosFav}</b> ${ciclosFav===1?'vez':'veces'} = <b class="green">${usd(favorReal)}</b> real (sin contar sus propios respaldos si el precio retrocede).`;
   } else {
     opp.style.display='none';
   }
 }
 
 calc();
+
+// Deshacer con Ctrl+Z y rehacer con Ctrl+Y. La unidad del movimiento en contra
+// viaja con la foto, porque cambia cómo se lee ese campo.
+NxHistorial.init({
+  raiz: document.body,
+  alCambiar: calc,
+  extra: {
+    leer: () => movUnit,
+    poner: u => {
+      movUnit = u;
+      document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b.dataset.u===u));
+      const mov=document.getElementById('mov');
+      mov.classList.toggle('fmt-pts', u==='pts');
+      mov.classList.toggle('fmt-usd', u!=='pts');
+    }
+  }
+});
+
+// Copiar, PNG y PDF: mismo informe y mismo dibujo que Trading Calculator.
+NxInforme.conectar({
+  copiar:'btnCopiar', png:'btnPNG', pdf:'btnPDF',
+  archivo:'calculator-plus',
+  obtener:()=>informe
+});
+
+// La calculadora va dentro de un <iframe>. Le avisa a la página su alto real para que
+// el marco crezca con el contenido: así en móvil se ve TODO y nada queda cortado.
+(function(){
+  if(window.parent===window) return;
+  let ultimo=0;
+  function avisar(){
+    const h=Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    if(Math.abs(h-ultimo)>8){ ultimo=h; parent.postMessage({tipo:'nx-calc-alto', alto:h}, '*'); }
+  }
+  avisar();
+  window.addEventListener('load', avisar);
+  window.addEventListener('resize', avisar);
+  if(window.ResizeObserver) new ResizeObserver(avisar).observe(document.body);
+  setInterval(avisar, 800);   // los resultados cambian al escribir
+})();
 </script>
 </body>
 </html>
