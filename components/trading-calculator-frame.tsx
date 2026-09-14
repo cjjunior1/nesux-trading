@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 /**
  * Marco de Trading Calculator.
@@ -22,6 +23,31 @@ export default function TradingCalculatorFrame({
   const [alto, setAlto] = useState(1100);
 
   const marco = useRef<HTMLIFrameElement | null>(null);
+
+  /**
+   * Manda el tema a la calculadora.
+   *
+   * Vive en un marco aparte y no ve la clase que next-themes pone en el <html>
+   * de la web, así que se lo decimos por mensaje: al cargar, cada vez que se
+   * toca el interruptor, y también cuando ella lo pide al arrancar, porque
+   * puede terminar de cargar después de que lo hayamos enviado.
+   */
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    const enviar = () => {
+      marco.current?.contentWindow?.postMessage(
+        { tipo: "nx-tema", tema: resolvedTheme === "light" ? "light" : "dark" },
+        "*"
+      );
+    };
+    enviar();
+    const onPide = (e: MessageEvent) => {
+      if (e.data && e.data.tipo === "nx-pide-tema") enviar();
+    };
+    window.addEventListener("message", onPide);
+    return () => window.removeEventListener("message", onPide);
+  }, [resolvedTheme]);
+
 
   /**
    * Alto del iframe.

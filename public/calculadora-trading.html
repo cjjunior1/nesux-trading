@@ -17,11 +17,30 @@
   *{box-sizing:border-box}
   html,body{max-width:100%;overflow-x:hidden}   /* móvil: NUNCA scroll horizontal de la página */
   body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
-  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:2px solid var(--accent);padding:22px 28px}
+  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid var(--border);padding:20px 26px}
   header h1{margin:0;font-size:20px;letter-spacing:.3px}
   header h1 span{color:var(--accent)}
   header p{margin:4px 0 0;color:var(--muted);font-size:13px}
   /* El botón de instalar va a la derecha del título, no en una franja aparte. */
+
+  /* ---- TEMA CLARO ----
+     La web tiene interruptor de claro y oscuro, y la calculadora vive en un
+     marco aparte con su propia hoja de estilos. La página de fuera le manda el
+     tema y aquí solo se reescriben los colores base: todo lo demás usa esas
+     mismas variables, así que cambia solo. Los acentos se oscurecen, porque el
+     naranja y el ámbar que se leen bien sobre negro desaparecen sobre blanco. */
+  html.claro{
+    --bg:#f5f7fa; --panel:#ffffff; --panel2:#eef2f7; --border:#d3dbe5;
+    --txt:#0f1720; --muted:#5a6675;
+    --accent:#b26a00; --accent2:#1a5fc8;
+    --ok:#12794a; --bad:#c02a20; --warn:#8a6100; --lila:#6b46d6;
+  }
+  html.claro header{background:linear-gradient(135deg,#ffffff,#eef2f7)}
+  html.claro .op,html.claro .d-op{background:rgba(0,0,0,.06)}
+  html.claro .lista li,html.claro .detalle-lista li{border-bottom-color:rgba(0,0,0,.08)}
+  html.claro tr.open td{background:rgba(26,95,200,.08)}
+  html.claro .extra-result,html.claro .btn-app{background:rgba(255,255,255,.7)}
+  html.claro .kpi,html.claro .note,html.claro .aviso{background:var(--panel2)}
   .cab{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .cab-txt{min-width:0;flex:1 1 340px}
   .btn-app{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;
@@ -866,6 +885,21 @@ NxInforme.conectar({
   if(window.ResizeObserver) new ResizeObserver(avisar).observe(document.body);
   setInterval(avisar, 800);   // los resultados cambian al escribir
 })();
+
+/**
+ * Tema claro u oscuro.
+ *
+ * La calculadora va dentro de un marco y no ve la clase que la web pone en su
+ * <html>, así que la página de fuera se lo manda por mensaje: al cargar y cada
+ * vez que se toca el interruptor. Aquí solo se pone o se quita una clase.
+ */
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(!d || d.tipo!=='nx-tema') return;
+  document.documentElement.classList.toggle('claro', d.tema==='light');
+});
+if(window.parent!==window) parent.postMessage({tipo:'nx-pide-tema'},'*');
+
 </script>
 </body>
 </html>
