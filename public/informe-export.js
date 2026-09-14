@@ -61,19 +61,10 @@
     medidor.font = F(12);
     var anchoUtil = W - M * 2;
 
-    function lineasDe(f) {
-      var lineas = 1, x = 0;
-      (f.sub || []).forEach(function (t) {
-        var w = medidor.measureText(t.t).width + 18;
-        if (x + w > anchoUtil) { lineas++; x = w; } else { x += w; }
-      });
-      return lineas;
-    }
-
     var filasKpi = Math.ceil(r.kpis.length / 2);
     var altoKpis = filasKpi * 78;
     var impar = r.kpis.length % 2 === 1;
-    var altoDet = r.filas.reduce(function (a, f) { return a + 46 + lineasDe(f) * 16; }, 0);
+    var altoDet = 34 + r.filas.length * 26;   // cabecera + una linea por operacion
     var Hnat = 150 + altoKpis + 56 + altoDet + 90;
 
     var escala = Math.min(1, (H - 48) / Hnat);
@@ -119,35 +110,49 @@
 
     g.fillStyle = COLOR.txt; g.font = F(14, '700');
     g.fillText((r.tituloDetalle || '').toUpperCase(), M, y);
-    y += 18;
+    y += 22;
 
-    r.filas.forEach(function (f) {
-      g.strokeStyle = 'rgba(255,255,255,.08)';
-      g.beginPath(); g.moveTo(M, y + 4); g.lineTo(W - M, y + 4); g.stroke();
+    /**
+     * Detalle en filas y columnas, como una hoja de calculo.
+     *
+     * Las columnas se reparten el ancho segun los pesos que trae el informe y
+     * los numeros van pegados a la derecha, que es como se comparan. La franja
+     * tenue va por FILA, nunca por columna: lo que se sigue con la vista es la
+     * operacion entera, de izquierda a derecha.
+     */
+    var cols = r.columnas || [];
+    var libre = W - M * 2;
+    var pesos = cols.reduce(function (a, c) { return a + (c.peso || 1); }, 0) || 1;
+    var xs = [], acum = M;
+    cols.forEach(function (c) {
+      var an = libre * (c.peso || 1) / pesos;
+      xs.push({ x: acum, an: an, der: c.der !== false });
+      acum += an;
+    });
 
-      g.fillStyle = COLOR.panel2; redondeado(g, M, y + 16, 66, 22, 6); g.fill();
-      g.fillStyle = COLOR.txt; g.font = F(12, '700');
-      g.fillText(f.izq, M + 10, y + 31);
+    g.font = F(10.5, '600'); g.fillStyle = COLOR.muted;
+    cols.forEach(function (c, i) {
+      var p = xs[i];
+      g.textAlign = p.der ? 'right' : 'left';
+      g.fillText(c.t.toUpperCase(), p.der ? p.x + p.an - 6 : p.x, y);
+    });
+    g.textAlign = 'left';
+    g.strokeStyle = COLOR.borde; g.beginPath();
+    g.moveTo(M, y + 6); g.lineTo(W - M, y + 6); g.stroke();
+    y += 12;
 
-      g.font = F(15); g.fillStyle = COLOR.txt;
-      g.fillText(f.centro || '', M + 82, y + 32);
-
-      if (f.der) {
-        g.font = F(16, '700'); g.fillStyle = f.derColor || COLOR.txt;
-        g.textAlign = 'right'; g.fillText(f.der, W - M, y + 32); g.textAlign = 'left';
-      }
-
-      // Segunda línea: si no cabe, salta de renglón en vez de salirse.
-      var base = y + 52, x = M, lineas = 1;
-      g.font = F(12);
-      (f.sub || []).forEach(function (t) {
-        var w = g.measureText(t.t).width + 18;
-        if (x - M + w > anchoUtil) { x = M; lineas++; }
-        g.fillStyle = t.color || COLOR.muted;
-        g.fillText(t.t, x, base + (lineas - 1) * 16);
-        x += w;
+    r.filas.forEach(function (f, n) {
+      if (n % 2 === 0) { g.fillStyle = 'rgba(255,255,255,.04)'; g.fillRect(M, y, libre, 26); }
+      g.font = F(12.5);
+      (f.celdas || []).forEach(function (cel, i) {
+        var p = xs[i]; if (!p) return;
+        g.fillStyle = cel.color || COLOR.txt;
+        g.font = F(12.5, cel.fuerte ? '700' : '400');
+        g.textAlign = p.der ? 'right' : 'left';
+        g.fillText(cel.t, p.der ? p.x + p.an - 6 : p.x, y + 18);
       });
-      y += 46 + lineas * 16;
+      g.textAlign = 'left';
+      y += 26;
     });
 
     if (r.total) {
@@ -181,10 +186,20 @@
    */
   function conectar(o) {
     var base = o.archivo || 'informe';
-    var $ = function (id) { return document.getElementById(id); };
+    /**
+     * Cada accion puede tener MAS DE UN boton: los mismos tres estan arriba de
+     * los resultados y tambien junto a los datos, para no tener que subir a
+     * buscarlos. `cada` los recorre todos.
+     */
+    var cada = function (ids, fn) {
+      (Array.isArray(ids) ? ids : [ids]).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) fn(el);
+      });
+    };
 
-    if ($(o.copiar)) $(o.copiar).addEventListener('click', function () {
-      var btn = $(o.copiar), c = dibujar(o.obtener());
+    cada(o.copiar, function (btn) { btn.addEventListener('click', function () {
+      var c = dibujar(o.obtener());
       if (!c) return;
       var original = btn.textContent;
       var avisar = function (t) { btn.textContent = t; setTimeout(function () { btn.textContent = original; }, 1800); };
@@ -197,9 +212,9 @@
             .catch(function () { avisar('No se pudo copiar'); });
         } catch (e) { avisar('No se pudo copiar'); }
       }, 'image/png');
-    });
+    }); });
 
-    if ($(o.png)) $(o.png).addEventListener('click', function () {
+    cada(o.png, function (btn) { btn.addEventListener('click', function () {
       var c = dibujar(o.obtener());
       if (!c) return;
       c.toBlob(function (b) {
@@ -208,9 +223,9 @@
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
       }, 'image/png');
-    });
+    }); });
 
-    if ($(o.pdf)) $(o.pdf).addEventListener('click', function () {
+    cada(o.pdf, function (btn) { btn.addEventListener('click', function () {
       var c = dibujar(o.obtener());
       if (!c) return;
       /**
@@ -243,7 +258,7 @@
       };
       if (d.readyState === 'complete') setTimeout(lanzar, 250);
       else marco.onload = function () { setTimeout(lanzar, 250); };
-    });
+    }); });
   }
 
   global.NxInforme = { dibujar: dibujar, conectar: conectar };

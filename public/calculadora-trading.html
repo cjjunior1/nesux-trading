@@ -17,7 +17,7 @@
   *{box-sizing:border-box}
   html,body{max-width:100%;overflow-x:hidden}   /* móvil: NUNCA scroll horizontal de la página */
   body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
-  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid var(--border);padding:20px 26px}
+  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid var(--border);padding:12px 26px}
   header h1{margin:0;font-size:20px;letter-spacing:.3px}
   header h1 span{color:var(--accent)}
   header p{margin:4px 0 0;color:var(--muted);font-size:13px}
@@ -52,11 +52,14 @@
   .wrap>*{min-width:0}
   .card,.kpi,.verdict,.note{min-width:0}
   @media(max-width:900px){.wrap{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
   .card h2{margin:0 0 14px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
-  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+  /* La segunda parte del titulo, en su linea: en el movil se partia por donde
+     caia y quedaba a medias. */
+  .card h2 .t-modo{color:var(--txt);display:block;margin-top:2px}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:7px 0 3px}
   input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
-    border-radius:8px;padding:9px 10px;font-size:14px;font-family:inherit}
+    border-radius:8px;padding:7px 10px;font-size:14px;font-family:inherit}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)}
   textarea{resize:vertical;line-height:1.6;font-variant-numeric:tabular-nums}
   /* El relleno automático del navegador pinta el campo de BLANCO y sobre este
@@ -70,11 +73,11 @@
     caret-color:var(--txt);
     transition:background-color 9999s ease-in-out 0s;
   }
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   /* En filas de 2/3 columnas: la etiqueta ocupa alto fijo y el input se alinea abajo,
      así los bloques quedan parejos aunque un título tenga una o dos líneas. */
-  .row>div>label,.row3>div>label{min-height:34px;display:flex;align-items:flex-end;margin-top:10px}
+  .row>div>label,.row3>div>label{min-height:30px;display:flex;align-items:flex-end;margin-top:7px}
   .hint{font-size:11px;color:var(--muted);margin-top:3px}
   .pill{display:inline-block;font-size:11px;color:#0d1117;background:var(--accent);border-radius:20px;padding:1px 8px;font-weight:600}
   .verdict{border-radius:12px;padding:18px;margin-bottom:18px;font-size:15px;border:1px solid}
@@ -83,24 +86,35 @@
   .verdict.warn{background:rgba(210,153,34,.12);border-color:var(--warn)}
   .verdict b{font-size:18px}
   .exporta{display:flex;gap:8px;justify-content:flex-end;margin-bottom:12px;flex-wrap:wrap}
-  .exporta button{background:var(--panel2);border:1px solid var(--border);color:var(--txt);
-    border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
-  .exporta button:hover{border-color:var(--accent2);color:var(--accent2)}
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  /* Tres colores, uno por acción, para que la mano vaya sola al que busca:
+     copiar en azul, PNG en violeta y PDF en rojo, que es el color con el que
+     todo el mundo asocia ese formato. */
+  .exporta button{border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;border:1px solid;transition:all .15s}
+  .exporta .b-copiar{background:rgba(88,166,255,.14);border-color:rgba(88,166,255,.5);color:#58a6ff}
+  .exporta .b-copiar:hover{background:rgba(88,166,255,.26);color:#8cc2ff}
+  .exporta .b-png{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.5);color:#a78bfa}
+  .exporta .b-png:hover{background:rgba(167,139,250,.26);color:#c4b0ff}
+  .exporta .b-pdf{background:rgba(248,81,73,.14);border-color:rgba(248,81,73,.5);color:#f85149}
+  .exporta .b-pdf:hover{background:rgba(248,81,73,.26);color:#ff8078}
+
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
   /* Si el último bloque queda solo en su fila, la ocupa entera: nunca se ve
      media rejilla vacía al final. */
   .kpis .kpi:last-child:nth-child(3n+1){grid-column:1/-1}
   @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
   .kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
   .kpi .v{font-size:20px;font-weight:700;margin-top:4px}
   .kpi .s{font-size:12px;color:var(--muted);margin-top:2px}
   .accent{color:var(--accent)} .blue{color:var(--accent2)} .green{color:var(--ok)} .red{color:var(--bad)} .yel{color:var(--warn)}
-  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
-  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
-  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:6px;font-variant-numeric:tabular-nums}
+  th,td{padding:6px 5px;text-align:right;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:600;font-size:9.5px;text-transform:uppercase;letter-spacing:.2px}
   th:first-child,td:first-child{text-align:left}
-  tr.open td{background:rgba(88,166,255,.08)}
+  /* Franja tenue por FILA, para seguir la operacion de lado a lado. */
+  tbody tr:nth-child(odd) td{background:rgba(255,255,255,.035)}
+  tr.open td{background:rgba(88,166,255,.10)}
   tr.pending td{color:var(--muted);opacity:.55}
   .tag{font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:600}
   .tag.o{background:rgba(88,166,255,.18);color:var(--accent2)}
@@ -161,11 +175,13 @@
     text-transform:uppercase;letter-spacing:.4px}
   .basket-title{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent2)}
   /* Las tablas anchas se desplazan DENTRO de su caja, no arrastran la página. */
-  .tblwrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .tblwrap table{min-width:640px}
+  /* Las tablas caben ENTERAS, sin barra lateral: lo que hay que arrastrar para
+     verlo no se mira. Se aprieta la celda en vez de forzar un ancho minimo. */
+  .tblwrap{width:100%}
+  .tblwrap table{min-width:0}
 
   /* ---- MÓVIL: todo cabe de lado a lado, sin mover la pantalla ---- */
-  @media(max-width:640px){
+  @media(max-width:700px){
     header{padding:16px 14px}
     header h1{font-size:17px;line-height:1.25}
     header p{font-size:12px}
@@ -218,7 +234,12 @@
 <div class="wrap">
   <!-- ENTRADAS -->
   <div class="card">
-    <h2>Parámetros del bot (MG)</h2>
+    <div class="exporta">
+      <button type="button" class="b-copiar" id="btnCopiar2">⧉ Copiar</button>
+      <button type="button" class="b-png" id="btnPNG2">⬇ PNG</button>
+      <button type="button" class="b-pdf" id="btnPDF2">⬇ PDF</button>
+    </div>
+    <h2>Parámetros del bot:<span class="t-modo">Martingala (MG)</span></h2>
 
     <label>(02) Buy And Sell · dirección</label>
     <select id="dir">
@@ -324,9 +345,9 @@
   <!-- RESULTADOS -->
   <div>
     <div class="exporta">
-      <button type="button" id="btnCopiar">⧉ Copiar</button>
-      <button type="button" id="btnPNG">⬇ PNG</button>
-      <button type="button" id="btnPDF">⬇ PDF</button>
+      <button type="button" class="b-copiar" id="btnCopiar">⧉ Copiar</button>
+      <button type="button" class="b-png" id="btnPNG">⬇ PNG</button>
+      <button type="button" class="b-pdf" id="btnPDF">⬇ PDF</button>
     </div>
 
     <div id="verdict" class="verdict ok"></div>
@@ -404,7 +425,18 @@ let informe = null;   // lo rellena calc() en cada cálculo
  * Los precios llevan los decimales que tenga el símbolo elegido.
  */
 const nf=(n,d,loc)=>isFinite(n)?n.toLocaleString(loc,{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
-const pts=n=>nf(n,0,'es-ES');
+/**
+ * Puntos: separador de millar SIEMPRE, incluso con cuatro cifras.
+ *
+ * El espanol no agrupa los numeros de cuatro digitos, asi que 4562 salia
+ * "4562" justo encima de "336.713" y la columna no se podia leer. Se agrupa a
+ * mano para que todas las filas tengan la misma forma.
+ */
+const pts=n=>{
+  if(!isFinite(n)) return '∞';
+  const e=Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return (n<0?'-':'')+e;
+};
 const fmt=(n,d=2)=>nf(n,d,'en-US');
 const usd=n=>(n<0?'-$':'$')+nf(Math.abs(n),2,'en-US');
 /**
@@ -496,7 +528,7 @@ const PRESETS={
   // V75 con 2 dígitos: el historial real de la cuenta muestra precios tipo
   // 51173.61 y el (15) del bot se configura en 70.000 puntos ≈ 700.00 de precio.
   // Con 4 dígitos los puntos salían ×100 y no cuadraban con lo que se teclea en MT5.
-  v75:    {g:'Sintéticos Deriv', name:'Volatility 75 Index',      contract:1, digits:2, step:0.001, V:0.01,   approx:true},
+  v75:    {g:'Sintéticos Deriv', name:'Volatility 75 Index',      contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
   v100:   {g:'Sintéticos Deriv', name:'Volatility 100 Index',     contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
   v10s:   {g:'Sintéticos Deriv', name:'Volatility 10 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
   v25s:   {g:'Sintéticos Deriv', name:'Volatility 25 (1s) Index', contract:1, digits:2, step:0.01,  V:0.01,   approx:true},
@@ -583,7 +615,35 @@ document.getElementById('seg').addEventListener('click', e=>{
   calc();
 });
 
-document.querySelectorAll('input,select').forEach(i=>i.addEventListener('input',calc));
+const RAIZ=document.body;
+/**
+ * Recálculo en vivo.
+ *
+ * Se escucha en el CONTENEDOR, no campo por campo. Dando de alta cada input por
+ * separado, cualquier campo que aparezca después —los que dibuja el modo
+ * cerradas, por ejemplo— se quedaba mudo. Delegando, todo lo que se teclee
+ * dentro cuenta, exista ya o no.
+ *
+ * Se escuchan cuatro sucesos porque no todos los navegadores disparan los
+ * mismos: teclear, pegar, cortar y elegir en una lista.
+ *
+ * Y va envuelto en try/catch a propósito: si un valor a medio escribir hace
+ * fallar una cuenta, el fallo se queda ahí y el siguiente tecleo vuelve a
+ * calcular. Sin esto, un solo error dejaba la calculadora congelada.
+ */
+function recalcular(){
+  try{ calc(); }
+  catch(e){ console.error('[calculadora]', e); }
+}
+['input','change','keyup','paste','cut'].forEach(ev=>{
+  RAIZ.addEventListener(ev, e=>{
+    const t=e.target;
+    if(!t || !/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+    // paste y cut llegan ANTES de que el campo cambie: se espera un tic.
+    if(ev==='paste'||ev==='cut') setTimeout(recalcular,0); else recalcular();
+  }, true);
+});
+
 
 // Trunca el lote al paso, como NormalizarLotaje (MathFloor), nunca por debajo del inicial.
 function normLot(x, step, Lmin){
@@ -795,21 +855,27 @@ function calc(){
       {l:'Si vuelve al TP', v:'+'+usd(tpProfit), color:'#58a6ff'}
     ],
     tituloDetalle:'Detalle nivel por nivel',
+    columnas:[
+      {t:'Nivel', peso:1.1, der:false},
+      {t:'Estado', peso:1, der:false},
+      {t:'Lote', peso:.9},
+      {t:'Acumulado', peso:1.1},
+      {t:'Abre a', peso:1.3},
+      {t:'Separación', peso:1.2},
+      {t:'Pérdida aquí', peso:1.2}
+    ],
     filas:Array.from({length:N},(_,j)=>{
       const abierta=j<=k;
       const flo=abierta ? V*lot[j]*(x-cum[j]) : 0;
-      return {
-        izq: j===0?'Inicial':'Resp. '+j,
-        centro: abierta?'ABIERTA':'pendiente',
-        der: abierta?usd(-flo):'—',
-        derColor: abierta?'#f85149':'#8b949e',
-        sub:[
-          {t:fmt(lot[j],2)+' lotes', color:'#f7931a'},
-          {t:'acumulado '+fmt(cumLots[j],2), color:'#8b949e'},
-          {t:'abre a '+pts(cum[j])+' pts', color:'#d29922'},
-          {t:j===0?'primera entrada':'separada '+pts(cum[j]-cum[j-1])+' pts', color:'#8b949e'}
-        ]
-      };
+      return {celdas:[
+        {t: j===0?'Inicial':'Resp. '+j, color:'#e6edf3', fuerte:true},
+        {t: abierta?'ABIERTA':'pendiente', color: abierta?'#58a6ff':'#8b949e'},
+        {t: fmt(lot[j],2), color:'#38bdf8'},
+        {t: fmt(cumLots[j],2), color:'#a78bfa'},
+        {t: pts(cum[j])+' pts', color:'#d29922'},
+        {t: j===0?'—':pts(cum[j]-cum[j-1])+' pts', color:'#b9c4d0'},
+        {t: abierta?usd(-flo):'—', color: abierta?'#f85149':'#8b949e', fuerte:true}
+      ]};
     }),
     total:{texto:'Pérdida flotante total', valor:usd(-floatLoss), color:'#f85149'},
     pie:'Lotes truncados al paso, como MT5. El mercado real añade spread, slippage y swaps.'
@@ -867,7 +933,7 @@ NxHistorial.init({
 
 // Copiar, PNG y PDF: mismo informe y mismo dibujo que Trading Calculator.
 NxInforme.conectar({
-  copiar:'btnCopiar', png:'btnPNG', pdf:'btnPDF',
+  copiar:['btnCopiar','btnCopiar2'], png:['btnPNG','btnPNG2'], pdf:['btnPDF','btnPDF2'],
   archivo:'calculator-plus',
   obtener:()=>informe
 });

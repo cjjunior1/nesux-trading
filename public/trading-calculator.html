@@ -22,7 +22,7 @@
   .app{--xc:#c96aa6; --xc-titulo:#3aa585; --xc-borde:#8f4b77}
   .app.cerradas{--xc:#3aa585; --xc-titulo:#c96aa6; --xc-borde:#1c6b57}
 
-  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid var(--border);padding:20px 26px}
+  header{background:linear-gradient(135deg,#161b22,#0d1117);border-bottom:1px solid var(--border);padding:12px 26px}
   header h1{margin:0;font-size:21px;letter-spacing:.3px}
   header h1 span{color:var(--xc-titulo)}
   header p{margin:4px 0 0;color:var(--muted);font-size:12.5px;max-width:70ch}
@@ -43,7 +43,8 @@
   }
   html.claro header{background:linear-gradient(135deg,#ffffff,#eef2f7)}
   html.claro .op,html.claro .d-op{background:rgba(0,0,0,.06)}
-  html.claro .lista li,html.claro .detalle-lista li{border-bottom-color:rgba(0,0,0,.08)}
+  html.claro table.det td{border-bottom-color:rgba(0,0,0,.08)}
+  html.claro table.det tbody tr:nth-child(odd){background:rgba(0,0,0,.035)}
   html.claro tr.open td{background:rgba(26,95,200,.08)}
   html.claro .extra-result,html.claro .btn-app{background:rgba(255,255,255,.7)}
   html.claro .kpi,html.claro .note,html.claro .aviso{background:var(--panel2)}
@@ -57,20 +58,22 @@
   /* Izquierda lo que se escribe, derecha lo que sale. Las dos columnas miden
      lo mismo y las tarjetas se estiran a la misma altura: stretch en vez de
      start, que es lo que dejaba la de resultados a media altura. */
-  .wrap{max-width:1240px;margin:0 auto;padding:22px;display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:stretch}
+  .wrap{max-width:1240px;margin:0 auto;padding:14px 22px;display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
   @media(max-width:940px){.wrap{grid-template-columns:1fr}}
 
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
   /* La tarjeta va neutra. El color del modo se queda en los TÍTULOS y en el
      selector de modo; tiñendo la caja entera cansaba la vista. */
   .card.entradas{border-left:1px solid var(--border)}
   .card h2{margin:0 0 14px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--xc-titulo)}
-  .card h2 .t-modo{color:var(--txt)}
+  /* El modo va en su propia linea: en el movil "Datos de la cesta · Operaciones
+     abiertas" se partia por donde caia y quedaba feo. */
+  .card h2 .t-modo{color:var(--txt);display:block;margin-top:2px}
 
-  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:7px 0 3px}
   input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--txt);
-    border-radius:9px;padding:9px 10px;font-size:14px;font-family:inherit}
+    border-radius:9px;padding:7px 10px;font-size:14px;font-family:inherit}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)}
   textarea{resize:vertical;line-height:1.7;font-variant-numeric:tabular-nums}
   /* El relleno automático del navegador pinta el campo de BLANCO y sobre este
@@ -85,9 +88,9 @@
     transition:background-color 9999s ease-in-out 0s;
   }
 
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-  .row>div>label,.row3>div>label{min-height:34px;display:flex;align-items:flex-end;margin-top:10px}
+  .row>div>label,.row3>div>label{min-height:30px;display:flex;align-items:flex-end;margin-top:7px}
   .hint{font-size:11px;color:var(--muted);margin-top:3px}
   .pill{display:inline-block;font-size:10.5px;color:#0d1117;background:var(--accent);border-radius:20px;padding:1px 8px;font-weight:600}
 
@@ -117,16 +120,24 @@
   .res-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .res-cab h2{margin-bottom:14px}
   .exporta{display:flex;gap:8px;margin-bottom:14px}
-  .exporta button{background:var(--panel2);border:1px solid var(--border);color:var(--txt);
-    border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
-  .exporta button:hover{border-color:var(--xc);color:var(--xc)}
+  /* Tres colores, uno por acción, para que la mano vaya sola al que busca:
+     copiar en azul, PNG en violeta y PDF en rojo, que es el color con el que
+     todo el mundo asocia ese formato. */
+  .exporta button{border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit;border:1px solid;transition:all .15s}
+  .exporta .b-copiar{background:rgba(88,166,255,.14);border-color:rgba(88,166,255,.5);color:#58a6ff}
+  .exporta .b-copiar:hover{background:rgba(88,166,255,.26);color:#8cc2ff}
+  .exporta .b-png{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.5);color:#a78bfa}
+  .exporta .b-png:hover{background:rgba(167,139,250,.26);color:#c4b0ff}
+  .exporta .b-pdf{background:rgba(248,81,73,.14);border-color:rgba(248,81,73,.5);color:#f85149}
+  .exporta .b-pdf:hover{background:rgba(248,81,73,.26);color:#ff8078}
   .exporta button:disabled{opacity:.5;cursor:default}
-  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
   /* Si el número de datos queda impar, el último ocupa la fila entera: nunca
      se queda media rejilla vacía al final. */
   .kpis .kpi:last-child:nth-child(odd){grid-column:1/-1}
   @media(max-width:520px){.kpis{grid-template-columns:1fr}}
-  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:13px}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:10px 12px}
   .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
   .kpi .v{font-size:19px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--txt)}
   .kpi .v.v-pts{color:var(--warn)}
@@ -141,23 +152,48 @@
 
   .detalle{margin-top:18px}
   .detalle h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--txt)}
-  .lista{list-style:none;margin:8px 0 0;padding:0}
-  /* Dos líneas por operación: arriba quién, a qué precio y cuánto deja; abajo el
-     resto. En una sola fila de cinco columnas los datos se partían a la mitad. */
-  .lista li{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:baseline;
-    padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13.5px}
-  .lista li:last-child{border-bottom:0}
-  .op{color:var(--txt);font-weight:700;font-size:12px;white-space:nowrap;
-    background:rgba(255,255,255,.08);border-radius:6px;padding:2px 8px}
-  .pr{color:var(--txt);font-variant-numeric:tabular-nums}
-  .mo{text-align:right;font-weight:700;font-size:14.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
-  .l2{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
-  .l2 span{white-space:nowrap}
-  .l2 .lo{color:var(--accent)}
-  .l2 .pt{color:var(--warn)}
-  .l2 .se{color:#b9c4d0;font-weight:600}
-  .l2 .se b{color:var(--txt);font-weight:700}
-  .l2 i{color:var(--muted);font-style:normal;font-weight:400}
+  /* Tabla de verdad: filas y columnas alineadas, como una hoja de cálculo.
+     La franja tenue va por FILA, nunca por columna: lo que se sigue con la
+     vista es la operación entera, de izquierda a derecha. */
+  /* La tabla cabe ENTERA en la tarjeta, sin barra lateral: se quito la columna
+     suelta de "en precio", que ahora va junto a la separacion, y se aprieta el
+     espacio. Lo que no se ve no sirve de nada. */
+  .tablawrap{width:100%;margin-top:8px}
+  table.det{width:100%;border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums;table-layout:auto}
+  table.det th{font-size:9.5px;text-transform:uppercase;letter-spacing:.2px;color:var(--muted);
+    font-weight:600;text-align:right;padding:5px 4px;border-bottom:1px solid var(--border);white-space:nowrap}
+  table.det th:first-child{text-align:left}
+  table.det td{padding:6px 4px;text-align:right;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.05)}
+  table.det td:first-child{text-align:left}
+  table.det .c-sep b{color:var(--txt);font-weight:600}
+
+  /* MOVIL: cada operacion pasa a ser una ficha con su etiqueta delante, para
+     que se vean TODOS los valores sin mover la pantalla de lado. */
+  @media(max-width:700px){
+    table.det,table.det thead,table.det tbody,table.det tr,table.det td{display:block;width:100%}
+    table.det thead{display:none}
+    table.det tbody tr{border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-bottom:9px}
+    table.det td{display:flex;justify-content:space-between;gap:12px;text-align:right;
+      border:0;border-bottom:1px solid rgba(255,255,255,.06);padding:5px 0;font-size:12.5px}
+    table.det tr td:last-child{border-bottom:0}
+    table.det td::before{content:attr(data-l);color:var(--muted);font-size:10.5px;
+      text-transform:uppercase;letter-spacing:.3px;text-align:left}
+    table.det td:first-child{justify-content:flex-start}
+    table.det td:first-child::before{content:none}
+  }
+  table.det tbody tr:nth-child(odd){background:rgba(255,255,255,.035)}
+  table.det tbody tr:hover{background:rgba(88,166,255,.10)}
+  .c-op{font-weight:700;color:var(--txt)}
+  .c-precio{color:var(--txt)}
+  /* Antes habia TRES columnas en tonos amarillos seguidas y se leian como una
+     sola mancha. El ambar se queda solo en el recorrido, que es el dato que se
+     busca; el lote pasa a cian y el sobrante a lila. */
+  .c-lote{color:#38bdf8}
+  .c-acum{color:var(--lila)}
+  .c-pts{color:var(--warn)}
+  .c-sep{color:#b9c4d0}
+  .c-mas{color:var(--accent2);font-weight:700}
+  .c-menos{color:var(--bad);font-weight:700}
   .total{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:14.5px}
   .total b{font-size:18px}
   .mas{color:var(--accent2)} .menos{color:var(--bad)} .yel{color:var(--warn)}
@@ -191,7 +227,12 @@
   <div class="card entradas">
     <!-- Dos colores: el nombre de la tarjeta en el color del modo y el modo en
          blanco, para que no compitan y se lea de un golpe cuál está activo. -->
-    <h2 id="tituloEntradas">Datos de la cesta <span class="t-modo">· Operaciones abiertas</span></h2>
+      <div class="exporta">
+        <button type="button" class="b-copiar" id="btnCopiar2">⧉ Copiar</button>
+        <button type="button" class="b-png" id="btnPNG2">⬇ PNG</button>
+        <button type="button" class="b-pdf" id="btnPDF2">⬇ PDF</button>
+      </div>
+    <h2 id="tituloEntradas">Datos de la cesta:<span class="t-modo">Operaciones abiertas</span></h2>
 
     <label>Operaciones</label>
     <div class="seg" id="seg">
@@ -206,7 +247,9 @@
         <select id="dir">
           <option value="buy">Compra</option>
           <option value="sell">Venta</option>
+          <option value="both">Ambas (compras y ventas)</option>
         </select>
+        <div class="hint" id="dirHint"></div>
       </div>
       <div>
         <label>(17) Nº Martingalas</label>
@@ -306,9 +349,9 @@
     <div class="res-cab">
       <h2>Resultado</h2>
       <div class="exporta">
-        <button type="button" id="btnCopiar">⧉ Copiar</button>
-        <button type="button" id="btnPNG">⬇ PNG</button>
-        <button type="button" id="btnPDF">⬇ PDF</button>
+        <button type="button" class="b-copiar" id="btnCopiar">⧉ Copiar</button>
+        <button type="button" class="b-png" id="btnPNG">⬇ PNG</button>
+        <button type="button" class="b-pdf" id="btnPDF">⬇ PDF</button>
       </div>
     </div>
     <div id="salida"></div>
@@ -333,7 +376,18 @@
  * Los precios llevan como mucho los decimales del símbolo, y nunca ceros de relleno.
  */
 const nf=(n,d,loc)=>isFinite(n)?n.toLocaleString(loc,{minimumFractionDigits:d,maximumFractionDigits:d}):'∞';
-const pts=n=>nf(n,0,'es-ES');
+/**
+ * Puntos: separador de millar SIEMPRE, incluso con cuatro cifras.
+ *
+ * El espanol no agrupa los numeros de cuatro digitos, asi que 4562 salia
+ * "4562" justo encima de "336.713" y la columna no se podia leer. Se agrupa a
+ * mano para que todas las filas tengan la misma forma.
+ */
+const pts=n=>{
+  if(!isFinite(n)) return '∞';
+  const e=Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  return (n<0?'-':'')+e;
+};
 const fmt=(n,d=2)=>nf(n,d,'en-US');
 const usd=n=>(n<0?'-$':'$')+nf(Math.abs(n),2,'en-US');
 function decimalesDe(n){ const s=String(n), i=s.indexOf('.'); return i<0?0:Math.min(8,s.length-i-1); }
@@ -381,7 +435,7 @@ const PRESETS={
   v25:{g:'Sintéticos Deriv',name:'Volatility 25 Index',contract:1,digits:3,step:0.01,V:0.001,approx:true},
   v50:{g:'Sintéticos Deriv',name:'Volatility 50 Index',contract:1,digits:4,step:0.01,V:0.0001,approx:true},
   // V75 con 2 dígitos: es lo que muestra el historial real de la cuenta.
-  v75:{g:'Sintéticos Deriv',name:'Volatility 75 Index',contract:1,digits:2,step:0.001,V:0.01,approx:true},
+  v75:{g:'Sintéticos Deriv',name:'Volatility 75 Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
   v100:{g:'Sintéticos Deriv',name:'Volatility 100 Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
   v75s:{g:'Sintéticos Deriv',name:'Volatility 75 (1s) Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
   v100s:{g:'Sintéticos Deriv',name:'Volatility 100 (1s) Index',contract:1,digits:2,step:0.01,V:0.01,approx:true},
@@ -443,10 +497,25 @@ document.getElementById('advToggle').addEventListener('click',e=>{
  * 0.010: la calculadora enseñaba un volumen que no era el que abre el bot.
  */
 function loteNivel(i, lote, mult, paso){
-  const dec=decimalesDe(paso);
+  return nivelLote(i,lote,mult,paso).lote;
+}
+
+/**
+ * Lote de un nivel y lo que sobra.
+ *
+ * El bot no puede abrir 0.0125 lotes: corta hacia abajo al paso que admite el
+ * broker, igual que MathFloor en MT5. Lo que queda por debajo de ese corte es
+ * el SOBRANTE, el trozo de lote que no llego a entrar y que queda disponible
+ * para la siguiente operacion.
+ *
+ * Con multiplo 2 y paso 0.01 el sobrante es siempre cero, porque 0.01, 0.02 y
+ * 0.04 son exactos. Con 1.25 el nivel de 0.0125 entra como 0.01 y sobra 0.0025.
+ */
+function nivelLote(i, lote, mult, paso){
   const bruto=lote*Math.pow(mult,i);
-  const truncado=+((Math.floor(bruto/paso+1e-8))*paso).toFixed(dec);
-  return Math.max(lote, truncado);
+  const dec=decimalesDe(paso);
+  const truncado=Math.max(lote, +((Math.floor(bruto/paso+1e-8))*paso).toFixed(dec));
+  return {lote:truncado, sobrante:Math.max(0, +(bruto-truncado).toFixed(6)), bruto};
 }
 
 /** Specs activas del símbolo. */
@@ -462,17 +531,24 @@ function specs(){
  * el signo delante: con separador de miles, "-19.589 pts" se lee como menos
  * diecinueve coma quinientos ochenta y nueve, lo contrario de lo que significa.
  */
-function fila({op, entrada, lote, puntos, dinero, digits, calculado, extra}){
-  return `<li>
-    <span class="op">Op ${op}</span>
-    <span class="pr">${precio(entrada,digits)}</span>
-    <span class="mo ${dinero<0?'menos':'mas'}">${usd(dinero)}</span>
-    <span class="l2">
-      <span class="lo">${fmt(lote,Math.max(2,decimalesDe(v('step')||0.01)))} lotes${calculado?' <i>calc.</i>':''}</span>
-      <span class="pt">${pts(Math.abs(puntos))} pts ${puntos>=0?'a favor':'en contra'}</span>
-      ${extra||''}
-    </span>
-  </li>`;
+function fila({op, entrada, lote, sobrante, puntos, dinero, digits, calculado, sep, sepPrecio, nota}){
+  const aFavor = puntos>=0;
+  return `<tr>
+    <td class="c-op" data-l="Operación">Op ${op}</td>
+    <td class="c-precio" data-l="Apertura">${precio(entrada,digits)}</td>
+    <td class="c-lote" data-l="Lote">${fmt(lote,2)}${calculado?' <i style="opacity:.6;font-style:normal">calc.</i>':''}</td>
+    <td class="c-acum" data-l="Sobrante">${sobrante ? fmt(sobrante,4) : '—'}</td>
+    <td class="c-pts" data-l="Recorrido">${pts(Math.abs(puntos))} ${aFavor?'a favor':'en contra'}</td>
+    <td class="c-sep" data-l="Separación">${sep===null||sep===undefined ? (nota||'—')
+      : pts(sep)+' pts <b>'+usd(sepPrecio)+'</b>'}</td>
+    <td class="${dinero<0?'c-menos':'c-mas'}" data-l="Resultado">${usd(dinero)}</td>
+  </tr>`;
+}
+
+/** Cabecera de la tabla del detalle. */
+function cabeceraDet(){
+  return `<tr><th>Op</th><th>Apertura</th><th>Lote</th><th>Sobrante</th>
+    <th>Recorrido</th><th>Separación</th><th>Resultado</th></tr>`;
 }
 
 function kpi(l, valor, clase){ return `<div class="kpi"><div class="l">${l}</div><div class="v ${clase||''}">${valor}</div></div>`; }
@@ -488,7 +564,20 @@ function calc(){ return modo==='cerradas' ? calcCerradas() : calcAbiertas(); }
  * martingalas se deduce en lugar de escribirse, igual que hace el bot.
  */
 function calcAbiertas(){
-  const dir=document.getElementById('dir').value;
+  const dirElegida=document.getElementById('dir').value;
+  /**
+   * Con (02) en AMBAS el bot lleva dos cestas a la vez, una de compras y otra
+   * de ventas. El movimiento carga SIEMPRE una y deja a la otra a favor, asi
+   * que la cesta que se analiza es la del lado contrario al que se movio el
+   * precio: si el precio baja, la cargada es la de compras.
+   */
+  const ambas = dirElegida==='both';
+  // leer() es el lector de esta página: quita las comas de millar y devuelve el
+  // número. No existe aquí ningún otro, y usar uno inventado hacía reventar el
+  // cálculo entero en cada tecla.
+  const primeraTmp=leer(document.getElementById('primera'));
+  const actualTmp=leer(document.getElementById('actual'));
+  const dir = ambas ? (actualTmp<=primeraTmp ? 'buy' : 'sell') : dirElegida;
   const primera=leer(document.getElementById('primera'));
   const actual=leer(document.getElementById('actual'));
   const lote=v('lote'), mult=v('mult'), d1=v('d1'), inc=v('inc')/100;
@@ -498,7 +587,14 @@ function calcAbiertas(){
 
   if(![primera,actual,lote,mult,d1,inc,digits,V].every(Number.isFinite) || primera<=0 || actual<=0 || lote<=0 || V<=0){
     campoMG.value='';
-    salida.innerHTML='<div class="aviso">Completa los datos de la cesta para calcular.</div>';
+    // Se dice QUE falta, no un "completa los datos" generico: asi la pantalla
+    // responde a cada tecla y se ve que la calculadora esta viva.
+    const faltan=[];
+    if(!(primera>0)) faltan.push('el precio de la primera operación');
+    if(!(actual>0))  faltan.push('el precio actual');
+    if(!(lote>0))    faltan.push('el (04) lotaje');
+    if(!(V>0))       faltan.push('el símbolo');
+    salida.innerHTML='<div class="aviso">Falta '+(faltan.join(' y ')||'algún dato')+'.</div>';
     limpiarTP();
     return;
   }
@@ -573,10 +669,44 @@ function calcAbiertas(){
     kpis.push(['Faltan en precio', usd(faltan*point), '']);
   }
 
-  const detalle=filas.map(f=>({
-    op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, calculado:true,
-    notas: f.sep===null ? ['primera entrada de la cesta']
-      : [`separada: ${pts(f.sep)} pts`, `${usd(f.sep*point)} de precio`]
+  /**
+   * Lado a favor (solo en AMBAS).
+   *
+   * Mientras esta cesta acumula respaldos, la contraria va ganando y cierra en
+   * su T/P cada vez que el precio recorre (05) puntos, con su lote inicial, y
+   * vuelve a abrir. Eso es beneficio YA realizado, no flotante, y es lo que
+   * hace que la estrategia en dos sentidos no sea la suma de dos perdidas.
+   */
+  let favorReal=0, ciclosFav=0;
+  if(ambas){
+    if(usaTP){
+      const ganCiclo = tp*V*loteNivel(0,lote,mult,paso);
+      ciclosFav = Math.floor(x/tp);
+      favorReal = ciclosFav*ganCiclo;
+      kpis.push(['Cierres del lado a favor', String(ciclosFav), 'v-num']);
+      kpis.push(['Ganado por el lado a favor', usd(favorReal), 'v-mas']);
+      kpis.push(['Neto de las dos cestas', usd(total+favorReal), (total+favorReal)<0 ? 'v-menos' : 'v-mas']);
+      kpis.push(['Cesta cargada', dir==='buy' ? 'COMPRAS' : 'VENTAS', 'v-estado']);
+    } else {
+      kpis.push(['Lado a favor', 'escribe el T/P', 'v-num']);
+      kpis.push(['Cesta cargada', dir==='buy' ? 'COMPRAS' : 'VENTAS', 'v-estado']);
+    }
+  }
+
+  document.getElementById('dirHint').textContent = ambas
+    ? 'Dos cestas independientes. El movimiento carga la de ' + (dir==='buy'?'COMPRAS':'VENTAS') + ' y la otra cierra en su T/P.'
+    : (dirElegida==='buy'
+        ? 'Los respaldos se abren cuando el precio BAJA.'
+        : 'Los respaldos se abren cuando el precio SUBE.');
+
+  // Tres lotajes por fila: el de la operación, el acumulado hasta ella y, en el
+  // resumen, el total de la cesta.
+  const detalle=filas.map((f,i)=>({
+    op:f.op, entrada:f.entrada, lote:f.lote,
+    sobrante: nivelLote(i,lote,mult,paso).sobrante,
+    puntos:f.puntos, dinero:f.dinero,
+    calculado:true, sep:f.sep, sepPrecio: f.sep===null ? null : f.sep*point,
+    nota: f.sep===null ? 'primera' : null
   }));
 
   guardarReporte({
@@ -590,10 +720,10 @@ function calcAbiertas(){
     <div class="kpis">${kpis.map(k=>kpi(k[0],k[1],k[2])).join('')}</div>
     <div class="detalle">
       <h3>Resultado por operación</h3>
-      <ol class="lista">${detalle.map(f=>fila({
-        op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, digits, calculado:f.calculado,
-        extra: f.notas.map(n=>`<span class="se">${n}</span>`).join('')
-      })).join('')}</ol>
+      <div class="tablawrap"><table class="det">
+        <thead>${cabeceraDet()}</thead>
+        <tbody>${detalle.map(f=>fila({...f, digits})).join('')}</tbody>
+      </table></div>
       <div class="total">Flotante de la cesta <b class="${total<0?'menos':'mas'}">${usd(total)}</b></div>
       <div class="hint" style="margin-top:6px">Precios de apertura calculados con (15) y (16): son los que el bot buscaría.</div>
     </div>`;
@@ -607,7 +737,19 @@ function calcAbiertas(){
  * retraso y deslizamiento incluidos, así que se pegan los precios reales.
  */
 function calcCerradas(){
-  const dir=document.getElementById('dir').value;
+  /**
+   * En AMBAS no hay una direccion que elegir: la cesta que se pego es la que
+   * fue cargada, y eso se sabe mirando sus precios. Si las aperturas van
+   * bajando, era la de compras.
+   */
+  const dirElegida=document.getElementById('dir').value;
+  const ops0=leerPegadas();
+  const dir = dirElegida!=='both' ? dirElegida
+    : (ops0.length>1 && ops0[ops0.length-1].entrada < ops0[0].entrada ? 'buy' : 'sell');
+  if(dirElegida==='both'){
+    document.getElementById('dirHint').textContent =
+      'Cesta pegada: la de ' + (dir==='buy'?'COMPRAS':'VENTAS') + ', deducida de sus aperturas.';
+  }
   const cierre=leer(document.getElementById('actual'));
   const lote=v('lote'), mult=v('mult');
   const {digits,point,V,paso}=specs();
@@ -656,11 +798,13 @@ function calcCerradas(){
     ['Resultado de la cesta', usd(total), total<0?'v-menos':'v-mas'],
   ];
 
-  const detalle=filas.map(f=>({
-    op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, calculado:!f.propio,
-    notas: f.sep===null ? ['primera entrada de la cesta']
-      : [`separada: ${pts(f.sep)} pts`, `${usd(f.sep*point)} de precio`]
-        .concat(f.incremento===null ? [] : [`incremento ${fmt(f.incremento,1)}%`])
+  const detalle=filas.map((f,i)=>({
+    op:f.op, entrada:f.entrada, lote:f.lote,
+    // Si el volumen se escribio a mano no hay sobrante que calcular.
+    sobrante: f.propio ? 0 : nivelLote(i,lote,mult,paso).sobrante,
+    puntos:f.puntos, dinero:f.dinero,
+    calculado:!f.propio, sep:f.sep, sepPrecio: f.sep===null ? null : f.sep*point,
+    nota: f.sep===null ? 'primera' : null
   }));
 
   guardarReporte({
@@ -674,10 +818,10 @@ function calcCerradas(){
     <div class="kpis">${kpis.map(k=>kpi(k[0],k[1],k[2])).join('')}</div>
     <div class="detalle">
       <h3>Beneficio por operación</h3>
-      <ol class="lista">${detalle.map(f=>fila({
-        op:f.op, entrada:f.entrada, lote:f.lote, puntos:f.puntos, dinero:f.dinero, digits, calculado:f.calculado,
-        extra: f.notas.map(n=>`<span class="se">${n}</span>`).join('')
-      })).join('')}</ol>
+      <div class="tablawrap"><table class="det">
+        <thead>${cabeceraDet()}</thead>
+        <tbody>${detalle.map(f=>fila({...f, digits})).join('')}</tbody>
+      </table></div>
       <div class="total">El total de las filas suma <b class="${total<0?'menos':'mas'}">${usd(total)}</b></div>
       <div class="hint" style="margin-top:6px">Usa el precio de CIERRE de la operación, no el Take Profit: en el historial son columnas distintas y se parecen mucho.</div>
     </div>`;
@@ -693,6 +837,13 @@ function calcCerradas(){
  * librería externa: la app instalada tiene que funcionar sin conexión.
  */
 let reporte=null;
+
+/**
+ * Los mismos tres botones estan arriba de los resultados y tambien junto a los
+ * datos, para no tener que subir a buscarlos. Esto engancha todos los que
+ * existan con la misma accion.
+ */
+function cadaBoton(ids,fn){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) fn(el); }); }
 
 function guardarReporte(r){
   reporte={
@@ -732,20 +883,8 @@ function dibujarInforme(){
   const altoKpis=filasKpi*78;
   const impar = reporte.kpis.length % 2 === 1;
 
-  const medidor=document.createElement('canvas').getContext('2d');
-  medidor.font=`400 12px 'Segoe UI', system-ui, sans-serif`;
   const anchoUtil=W-M*2;
-  const lineasDe=f=>{
-    const trozos=trozosDe(f);
-    let lineas=1, x=0;
-    trozos.forEach(([t])=>{
-      const w=medidor.measureText(t).width+18;
-      if(x+w>anchoUtil){ lineas++; x=w; } else x+=w;
-    });
-    return lineas;
-  };
-  const altosDet=reporte.detalle.map(f=>46+lineasDe(f)*16);
-  const altoDet=altosDet.reduce((a,b)=>a+b,0);
+  const altoDet=34+reporte.detalle.length*26;   // cabecera + una línea por operación
   const Hnat=150+altoKpis+56+altoDet+90;   // lo que ocupa este informe
 
   /**
@@ -802,30 +941,57 @@ function dibujarInforme(){
   // Detalle
   g.fillStyle=COLOR.txt; g.font=F(14,'700');
   g.fillText(reporte.tituloDetalle.toUpperCase(),M,y);
-  y+=18;
+  y+=22;
 
-  reporte.detalle.forEach(f=>{
-    g.strokeStyle='rgba(255,255,255,.08)'; g.beginPath();
-    g.moveTo(M,y+4); g.lineTo(W-M,y+4); g.stroke();
-    g.fillStyle=COLOR.panel2; redondeado(g,M,y+16,54,22,6); g.fill();
-    g.fillStyle=COLOR.txt; g.font=F(12,'700');
-    g.fillText('Op '+f.op,M+10,y+31);
-    g.font=F(15); g.fillStyle=COLOR.txt;
-    g.fillText(precio(f.entrada,reporte.digits),M+70,y+32);
-    g.font=F(16,'700'); g.fillStyle=f.dinero<0?COLOR.rojo:COLOR.azul;
-    g.textAlign='right'; g.fillText(usd(f.dinero),W-M,y+32); g.textAlign='left';
+  /**
+   * Detalle en filas y columnas, como una hoja de cálculo.
+   *
+   * Los números van pegados a la derecha, que es como se comparan de un
+   * vistazo. La franja tenue va por FILA, nunca por columna: lo que se sigue
+   * con la vista es la operación entera, de izquierda a derecha.
+   */
+  const COLS=[
+    {t:'Op', peso:.7, der:false},
+    {t:'Apertura', peso:1.3},
+    {t:'Lote', peso:.9},
+    {t:'Sobrante', peso:1},
+    {t:'Recorrido', peso:1.7},
+    {t:'Separación', peso:1.2},
+    {t:'Resultado', peso:1.2}
+  ];
+  const pesos=COLS.reduce((a,c)=>a+c.peso,0);
+  let acum=M;
+  const xs=COLS.map(c=>{ const an=anchoUtil*c.peso/pesos; const p={x:acum,an,der:c.der!==false}; acum+=an; return p; });
 
-    // Segunda línea: si no cabe, salta de renglón en vez de salirse del lienzo.
-    const base=y+52;
-    let x=M, lineas=1;
-    g.font=F(12);
-    trozosDe(f).forEach(([t,col])=>{
-      const w=g.measureText(t).width+18;
-      if(x-M+w>anchoUtil){ x=M; lineas++; }
-      g.fillStyle=col; g.fillText(t,x,base+(lineas-1)*16); x+=w;
+  g.font=F(10.5,'600'); g.fillStyle=COLOR.muted;
+  COLS.forEach((c,i)=>{
+    const p=xs[i];
+    g.textAlign=p.der?'right':'left';
+    g.fillText(c.t.toUpperCase(), p.der ? p.x+p.an-6 : p.x, y);
+  });
+  g.textAlign='left';
+  g.strokeStyle=COLOR.borde; g.beginPath(); g.moveTo(M,y+6); g.lineTo(W-M,y+6); g.stroke();
+  y+=12;
+
+  reporte.detalle.forEach((f,n)=>{
+    if(n%2===0){ g.fillStyle='rgba(255,255,255,.04)'; g.fillRect(M,y,anchoUtil,26); }
+    const celdas=[
+      {t:'Op '+f.op, color:COLOR.txt, fuerte:true},
+      {t:precio(f.entrada,reporte.digits), color:COLOR.txt},
+      {t:fmt(f.lote,2), color:COLOR.cian},
+      {t:f.sobrante ? fmt(f.sobrante,4) : '—', color:COLOR.lila},
+      {t:pts(Math.abs(f.puntos))+' pts '+(f.puntos>=0?'a favor':'en contra'), color:COLOR.ambar},
+      {t:f.sep===null||f.sep===undefined ? '—' : pts(f.sep)+' pts', color:COLOR.muted},
+      {t:usd(f.dinero), color: f.dinero<0?COLOR.rojo:COLOR.azul, fuerte:true}
+    ];
+    celdas.forEach((cel,i)=>{
+      const p=xs[i]; if(!p) return;
+      g.fillStyle=cel.color; g.font=F(12.5, cel.fuerte?'700':'400');
+      g.textAlign=p.der?'right':'left';
+      g.fillText(cel.t, p.der ? p.x+p.an-6 : p.x, y+18);
     });
-    // Mismo alto que el medido antes de dibujar, para que nada se salga.
-    y+=46+lineas*16;
+    g.textAlign='left';
+    y+=26;
   });
 
   // Total
@@ -841,16 +1007,6 @@ function dibujarInforme(){
   return c;
 }
 
-/** Los datos de la segunda línea de cada operación, con su color. */
-function trozosDe(f){
-  const dec=Math.max(2,decimalesDe(v('step')||0.01));
-  return [
-    [fmt(f.lote,dec)+' lotes'+(f.calculado?' (calc.)':''),COLOR.naranja],
-    [pts(Math.abs(f.puntos))+' pts '+(f.puntos>=0?'a favor':'en contra'),COLOR.ambar],
-    ...f.notas.map(n=>[n,COLOR.muted])
-  ];
-}
-
 function redondeado(g,x,y,w,h,r){
   g.beginPath();
   g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
@@ -862,7 +1018,7 @@ function nombreArchivo(ext){
   return `trading-calculator-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${ext}`;
 }
 
-document.getElementById('btnPNG').addEventListener('click',()=>{
+cadaBoton(['btnPNG','btnPNG2'],btn=>btn.addEventListener('click',()=>{
   const c=dibujarInforme();
   if(!c) return;
   c.toBlob(b=>{
@@ -872,7 +1028,7 @@ document.getElementById('btnPNG').addEventListener('click',()=>{
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),4000);
   },'image/png');
-});
+}));
 
 /**
  * Copiar el informe al portapapeles COMO IMAGEN.
@@ -881,8 +1037,7 @@ document.getElementById('btnPNG').addEventListener('click',()=>{
  * listo para pegar en WhatsApp, Telegram o un correo sin pasar por el disco.
  * Funciona en los dos modos porque el informe se guarda igual en los dos.
  */
-document.getElementById('btnCopiar').addEventListener('click',async ()=>{
-  const btn=document.getElementById('btnCopiar');
+cadaBoton(['btnCopiar','btnCopiar2'],btn=>btn.addEventListener('click',async ()=>{
   const c=dibujarInforme();
   if(!c) return;
   const original=btn.textContent;
@@ -896,9 +1051,9 @@ document.getElementById('btnCopiar').addEventListener('click',async ()=>{
   }catch(e){
     avisar('No se pudo copiar');
   }
-});
+}));
 
-document.getElementById('btnPDF').addEventListener('click',()=>{
+cadaBoton(['btnPDF','btnPDF2'],btn=>btn.addEventListener('click',()=>{
   const c=dibujarInforme();
   if(!c) return;
   /**
@@ -932,7 +1087,7 @@ document.getElementById('btnPDF').addEventListener('click',()=>{
   };
   if(d.readyState==='complete') setTimeout(lanzar,250);
   else marco.onload=()=>setTimeout(lanzar,250);
-});
+}));
 
 function limpiarTP(){
   ['tpPrecio','tpGanancia','tpFaltan'].forEach(id=>{ document.getElementById(id).value=''; });
@@ -970,7 +1125,7 @@ function aplicarModo(){
   const nota=document.getElementById('mgHint');
   nota.style.display = cerradas ? 'none' : '';
   document.getElementById('tituloEntradas').innerHTML =
-    'Datos de la cesta <span class="t-modo">· Operaciones ' + (cerradas ? 'cerradas' : 'abiertas') + '</span>';
+    'Datos de la cesta:<span class="t-modo">Operaciones ' + (cerradas ? 'cerradas' : 'abiertas') + '</span>';
   document.getElementById('segHint').textContent = cerradas
     ? 'Cesta terminada: pega los precios de apertura y pon el lotaje inicial y el múltiplo.'
     : 'Cesta viva: solo usa la primera operación y el precio actual, igual que el bot.';
@@ -984,7 +1139,35 @@ document.getElementById('seg').addEventListener('click',e=>{
   aplicarModo();
 });
 
-document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',calc));
+const RAIZ=document.getElementById('app');
+/**
+ * Recálculo en vivo.
+ *
+ * Se escucha en el CONTENEDOR, no campo por campo. Dando de alta cada input por
+ * separado, cualquier campo que aparezca después —los que dibuja el modo
+ * cerradas, por ejemplo— se quedaba mudo. Delegando, todo lo que se teclee
+ * dentro cuenta, exista ya o no.
+ *
+ * Se escuchan cuatro sucesos porque no todos los navegadores disparan los
+ * mismos: teclear, pegar, cortar y elegir en una lista.
+ *
+ * Y va envuelto en try/catch a propósito: si un valor a medio escribir hace
+ * fallar una cuenta, el fallo se queda ahí y el siguiente tecleo vuelve a
+ * calcular. Sin esto, un solo error dejaba la calculadora congelada.
+ */
+function recalcular(){
+  try{ calc(); }
+  catch(e){ console.error('[calculadora]', e); }
+}
+['input','change','keyup','paste','cut'].forEach(ev=>{
+  RAIZ.addEventListener(ev, e=>{
+    const t=e.target;
+    if(!t || !/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+    // paste y cut llegan ANTES de que el campo cambie: se espera un tic.
+    if(ev==='paste'||ev==='cut') setTimeout(recalcular,0); else recalcular();
+  }, true);
+});
+
 // Se formatea al SALIR del campo: hacerlo en cada tecla mueve el cursor y no
 // deja corregir una cifra del medio.
 document.querySelectorAll('.fmt-pts,.pfmt').forEach(el=>{
