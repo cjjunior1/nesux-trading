@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Download } from "lucide-react";
 
 /**
  * Marco de Trading Calculator.
@@ -21,7 +20,6 @@ export default function TradingCalculatorFrame({
   mostrarInstalar = true,
 }: { mostrarInstalar?: boolean } = {}) {
   const [alto, setAlto] = useState(1100);
-  const [instalada, setInstalada] = useState(false);
 
   const marco = useRef<HTMLIFrameElement | null>(null);
 
@@ -42,6 +40,9 @@ export default function TradingCalculatorFrame({
     const onMsg = (e: MessageEvent) => {
       const d = e.data;
       if (d && d.tipo === "nx-calc-alto" && typeof d.alto === "number") aplicar(d.alto);
+      // El botón de descargar vive dentro del iframe; instalar es cosa de esta
+      // página, así que el aviso llega por mensaje y aquí se lanza el evento.
+      if (d && d.tipo === "nx-instalar-app") window.dispatchEvent(new Event("nx-instalar-app"));
     };
     window.addEventListener("message", onMsg);
 
@@ -63,28 +64,9 @@ export default function TradingCalculatorFrame({
     };
   }, []);
 
-  // Si ya está abierta como app instalada, el botón sobra.
-  useEffect(() => {
-    const enModoApp =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true;
-    setInstalada(enModoApp);
-  }, []);
 
   return (
     <>
-      {mostrarInstalar && !instalada && (
-        <div className="mx-auto flex max-w-[1240px] justify-end px-5 pt-4">
-          <button
-            type="button"
-            data-instalar-app
-            className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:border-emerald-400 hover:bg-emerald-500/25 hover:text-emerald-300"
-          >
-            <Download className="h-4 w-4" />
-            Descargar como app
-          </button>
-        </div>
-      )}
 
       <iframe
         ref={marco}

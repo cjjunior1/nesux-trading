@@ -14,6 +14,14 @@ export default function CalculadoraFrame() {
       if (d && d.tipo === "nx-calc-alto" && typeof d.alto === "number" && d.alto > 200) {
         setAlto(Math.ceil(d.alto));
       }
+      /**
+       * El botón de descargar la app vive DENTRO del iframe, pero quien sabe
+       * instalar es esta página. El botón avisa por mensaje y aquí se lanza el
+       * evento que recoge InstallApp, en el layout.
+       */
+      if (d && d.tipo === "nx-instalar-app") {
+        window.dispatchEvent(new Event("nx-instalar-app"));
+      }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);

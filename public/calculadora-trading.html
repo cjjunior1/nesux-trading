@@ -21,6 +21,13 @@
   header h1{margin:0;font-size:20px;letter-spacing:.3px}
   header h1 span{color:var(--accent)}
   header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+  /* El botón de instalar va a la derecha del título, no en una franja aparte. */
+  .cab{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cab-txt{min-width:0;flex:1 1 340px}
+  .btn-app{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;
+    background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.5);color:#34d399;
+    border-radius:11px;padding:9px 16px;font-size:13px;font-weight:600;transition:all .15s}
+  .btn-app:hover{background:rgba(16,185,129,.25);border-color:#34d399;color:#6ee7b7}
   .wrap{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:440px 1fr;gap:22px}
   /* min-width:0 = clave: sin esto una tabla ancha estira la rejilla y corta la página en móvil. */
   .wrap>*{min-width:0}
@@ -180,8 +187,13 @@
 </head>
 <body>
 <header>
-  <h1>Calculator <span>Plus</span> · Simulador Martingala</h1>
-  <p>Simula la cesta del bot en modo Martingala tal como opera en MT5: respaldos, TP sobre el precio medio y corte por (24) y (25).</p>
+  <div class="cab">
+    <div class="cab-txt">
+      <h1>Calculator <span>Plus</span> · Simulador Martingala</h1>
+      <p>Simula la cesta del bot en modo Martingala tal como opera en MT5: respaldos, TP sobre el precio medio y corte por (24) y (25).</p>
+    </div>
+    <button type="button" id="btnApp" class="btn-app">⬇ Descargar app</button>
+  </div>
 </header>
 
 <div class="wrap">
@@ -307,7 +319,7 @@
       <div class="kpi"><div class="l">Pérdida flotante total</div><div class="v red" id="k_loss"></div><div class="s" id="k_loss_s"></div></div>
       <div class="kpi"><div class="l">Precio medio (breakeven)</div><div class="v" id="k_be"></div><div class="s" id="k_be_s"></div></div>
       <div class="kpi"><div class="l">Equidad</div><div class="v" id="k_colchon"></div><div class="s" id="k_colchon_s"></div></div>
-      <div class="kpi" id="tpTile"><div class="l">Beneficio a favor (cerrado)</div><div class="v green" id="k_tp"></div><div class="s" id="k_tp_s"></div></div>
+      <div class="kpi" id="tpTile"><div class="l">Beneficio a favor (cerrado)</div><div class="v blue" id="k_tp"></div><div class="s" id="k_tp_s"></div></div>
     </div>
 
     <div class="card">
@@ -796,6 +808,24 @@ function calc(){
 }
 
 calc();
+
+/**
+ * Descargar la app.
+ *
+ * La calculadora vive dentro de un marco, y quien sabe instalar la aplicación
+ * es la página de fuera. Por eso el botón no instala: avisa al marco padre, que
+ * es quien lanza el diálogo del navegador. Si algún día se abre suelta, se
+ * lanza el aviso aquí mismo.
+ */
+(function(){
+  const btn=document.getElementById('btnApp');
+  const enModoApp = matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+  if(enModoApp){ btn.style.display='none'; return; }   // ya instalada: el botón sobra
+  btn.addEventListener('click',()=>{
+    if(window.parent!==window) parent.postMessage({tipo:'nx-instalar-app'},'*');
+    else window.dispatchEvent(new Event('nx-instalar-app'));
+  });
+})();
 
 // Deshacer con Ctrl+Z y rehacer con Ctrl+Y. La unidad del movimiento en contra
 // viaja con la foto, porque cambia cómo se lee ese campo.

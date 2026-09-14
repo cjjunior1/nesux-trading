@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import CalculadoraFrame from "@/components/calculadora-frame";
 import TradingCalculatorFrame from "@/components/trading-calculator-frame";
-import BotonInstalarApp from "@/components/boton-instalar-app";
 
 const THUMB = "https://trading.nesuxglobalbusinessrd.com/calculadora-thumb.jpg";
 const URL = "https://trading.nesuxglobalbusinessrd.com/landing/calculadora";
@@ -50,11 +49,7 @@ export default function CalculadoraTradingPage() {
       <div className="mx-auto my-2 h-px max-w-[1240px] bg-white/10" />
       <TradingCalculatorFrame mostrarInstalar={false} />
 
-      {/* El botón de instalar, al final: arriba se comía una franja entera
-          antes de que se viera la calculadora. */}
-      <div className="mx-auto flex max-w-[1240px] justify-center px-5 pb-10">
-        <BotonInstalarApp etiqueta="Descargar Calculator Plus" />
-      </div>
+      <div className="pb-10" />
     </main>
   );
 }

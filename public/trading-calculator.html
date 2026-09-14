@@ -26,6 +26,14 @@
   header h1{margin:0;font-size:21px;letter-spacing:.3px}
   header h1 span{color:var(--xc-titulo)}
   header p{margin:4px 0 0;color:var(--muted);font-size:12.5px;max-width:70ch}
+  /* El botón de instalar va a la derecha del título, a su misma altura, no en
+     una franja propia encima de todo. */
+  .cab{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cab-txt{min-width:0;flex:1 1 340px}
+  .btn-app{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;
+    background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.5);color:#34d399;
+    border-radius:11px;padding:9px 16px;font-size:13px;font-weight:600;transition:all .15s}
+  .btn-app:hover{background:rgba(16,185,129,.25);border-color:#34d399;color:#6ee7b7}
 
   /* Izquierda lo que se escribe, derecha lo que sale. Las dos columnas miden
      lo mismo y las tarjetas se estiran a la misma altura: stretch en vez de
@@ -149,8 +157,13 @@
 <div class="app" id="app">
 
 <header>
-  <h1>Trading <span>Calculator</span></h1>
-  <p>Calcula una cesta del CJ Bot con datos reales: cuántas martingalas lleva, qué deja cada operación y a qué precio cierra en beneficio.</p>
+  <div class="cab">
+    <div class="cab-txt">
+      <h1>Trading <span>Calculator</span></h1>
+      <p>Calcula una cesta del CJ Bot con datos reales: cuántas martingalas lleva, qué deja cada operación y a qué precio cierra en beneficio.</p>
+    </div>
+    <button type="button" id="btnApp" class="btn-app">⬇ Descargar como app</button>
+  </div>
 </header>
 
 <div class="wrap">
@@ -962,6 +975,23 @@ document.getElementById('pegar').addEventListener('blur',()=>{
 });
 
 aplicarModo();
+
+/**
+ * Descargar la app.
+ *
+ * La calculadora vive dentro de un marco y quien sabe instalar es la página de
+ * fuera. El botón no instala: avisa al marco padre, que lanza el diálogo del
+ * navegador. Si algún día se abre suelta, se lanza el aviso aquí mismo.
+ */
+(function(){
+  const btn=document.getElementById('btnApp');
+  const enModoApp = matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+  if(enModoApp){ btn.style.display='none'; return; }
+  btn.addEventListener('click',()=>{
+    if(window.parent!==window) parent.postMessage({tipo:'nx-instalar-app'},'*');
+    else window.dispatchEvent(new Event('nx-instalar-app'));
+  });
+})();
 
 // Deshacer con Ctrl+Z y rehacer con Ctrl+Y. El modo abiertas/cerradas viaja
 // con la foto: si deshaces un cambio hecho en el otro modo, vuelve a él.
