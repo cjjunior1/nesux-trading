@@ -869,6 +869,15 @@ document.getElementById('btnPDF').addEventListener('click',()=>{
    * "Guardar como PDF". Se manda a un iframe oculto en vez de abrir una ventana
    * nueva porque los bloqueadores de ventanas emergentes matan la ventana.
    */
+  /**
+   * Ojo con las etiquetas de cierre dentro de este texto.
+   * El servidor inyecta el widget de captación de leads justo antes del
+   * cierre del cuerpo de cada página, y lo busca como texto plano. Si esa
+   * etiqueta aparece aquí dentro, el servidor mete la suya EN MEDIO de este
+   * archivo y corta el nuestro por la mitad: el resto del código se ve como
+   * texto suelto en la página. Por eso las etiquetas van partidas.
+   */
+  const CUERPO='bo'+'dy';
   const img=c.toDataURL('image/png');
   const marco=document.createElement('iframe');
   marco.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
@@ -878,7 +887,7 @@ document.getElementById('btnPDF').addEventListener('click',()=>{
   d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${nombreArchivo('pdf')}</title>
     <style>@page{margin:10mm} html,body{margin:0;background:#fff}
     img{width:100%;display:block}</style></head>
-    <body><img src="${img}"></body></html>`);
+    <${CUERPO}><img src="${img}"></${CUERPO}></html>`);
   d.close();
   const lanzar=()=>{
     try{ marco.contentWindow.focus(); marco.contentWindow.print(); }catch(e){}
